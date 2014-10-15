@@ -1,12 +1,4 @@
 class GisService
-
-  # Pre-defined distance metrics that can be used to define linear distances
-  INCH                = 'inch'
-  FEET                = 'foot'
-  YARD                = 'yard'
-  MILE                = 'mile'
-  METER               = 'meter'
-  KILOMETER           = 'kilometer'
   
   DEFAULT_SRID        = SystemConfig.instance.srid
   
@@ -17,9 +9,8 @@ class GisService
   EARTHS_RADIUS_KM    = 6371      # earth's mean radius, km
 
   DD_TO_MILES         = 65.5375   # Approximate number of miles in a decimal degree
-  MILES_TO_METERS     = Unitwise(1, MILE).convert_to(METER).to_f      # Number of meters in a mile
-  MILES_TO_KM         = Unitwise(1, MILE).convert_to(KILOMETER).to_f  # Number of kilometers in a mile
-  
+  MILES_TO_METERS     = Uom.convert(1, Uom::MILE, Uom::METER)      # Number of meters in a mile
+  MILES_TO_KM         = Uom.convert(1, Uom::MILE, Uom::KILOMETER)  # Number of kilometers in a mile
   
   # Allow an optional SRID to be configured. This will be added to all geometries created
   attr_reader         :srid
@@ -27,7 +18,6 @@ class GisService
   attr_reader         :input_unit
   # output_unit
   attr_reader         :output_unit
-  
   
   def initialize(attrs = {})
     @srid = DEFAULT_SRID
@@ -39,9 +29,9 @@ class GisService
     end
   end
 
-  # Calulates the euclidean distance between two points and converst the units to output units
+  # Calulates the euclidean distance between two points and convert the units to output units
   def euclidean_distance(point1, point2)
-    dist = GisService.convert_distance(point1.euclidean_distance(point2), @input_unit, @output_unit)
+    dist = Uom.convert(point1.euclidean_distance(point2), @input_unit, @output_unit)
   end
   
   def from_wkt(wkt)
@@ -69,7 +59,7 @@ class GisService
     lng = point.lon
     
     # Convert input units to miles and radians
-    search_distance_in_miles = GisService.convert_distance(radius, unit, MILE)
+    search_distance_in_miles = Uom.convert(radius, unit, MILE)
     search_distance_in_radians = search_distance_in_miles / EARTHS_RADIUS_MILES
     # Convert to decimal degrees, compensating for changes in latitude
     delta_lat = rad2deg(search_distance_in_radians)
@@ -82,12 +72,6 @@ class GisService
     minLon = lng - delta_lon
 
     as_polygon(minLat, minLon, maxLat, maxLon)    
-  end
-
-  # Converts one distance unit to another
-  def self.convert_distance(val, from_unit, to_unit)
-    Rails.logger.debug "converting #{val} from #{from_unit}, #{to_unit}"
-    Unitwise(val, from_unit).convert_to(to_unit).to_f
   end
   
   # Converts a coordinate defined as a lat,lon into a Point geometry

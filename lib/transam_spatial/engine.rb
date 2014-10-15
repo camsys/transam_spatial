@@ -1,5 +1,4 @@
 require 'geocoder'
-require 'unitwise'
 
 module TransamSpatial
   class Engine < ::Rails::Engine
