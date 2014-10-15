@@ -1,4 +1,12 @@
 class GisService
+
+  # Pre-defined distance metrics that can be used to define linear distances
+  INCH                = 'inch'
+  FEET                = 'foot'
+  YARD                = 'yard'
+  MILE                = 'mile'
+  METER               = 'meter'
+  KILOMETER           = 'kilometer'
   
   DEFAULT_SRID        = SystemConfig.instance.srid
   
@@ -9,16 +17,9 @@ class GisService
   EARTHS_RADIUS_KM    = 6371      # earth's mean radius, km
 
   DD_TO_MILES         = 65.5375   # Approximate number of miles in a decimal degree
-  MILES_TO_METERS     = 1609.344  # Number of meters in a mile
-  MILES_TO_KM         = 1.609344  # Number of kilometers in a mile
+  MILES_TO_METERS     = Unitwise(1, MILE).convert_to(METER).to_f      # Number of meters in a mile
+  MILES_TO_KM         = Unitwise(1, MILE).convert_to(KILOMETER).to_f  # Number of kilometers in a mile
   
-  # Distance metrics that can be used to define linear distances
-  INCH                = Unit.new('in')
-  FEET                = Unit.new('ft')
-  YARD                = Unit.new('yd')
-  MILE                = Unit.new('mi')
-  METER               = Unit.new('m')
-  KILOMETER           = Unit.new('km')
   
   # Allow an optional SRID to be configured. This will be added to all geometries created
   attr_reader         :srid
@@ -85,7 +86,8 @@ class GisService
 
   # Converts one distance unit to another
   def self.convert_distance(val, from_unit, to_unit)
-    val * from_unit.convert_to(to_unit).scalar.to_f
+    Rails.logger.debug "converting #{val} from #{from_unit}, #{to_unit}"
+    Unitwise(val, from_unit).convert_to(to_unit).to_f
   end
   
   # Converts a coordinate defined as a lat,lon into a Point geometry
