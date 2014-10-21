@@ -21,8 +21,8 @@ class GisService
   
   def initialize(attrs = {})
     @srid = DEFAULT_SRID
-    @input_unit = MILE
-    @output_unit = MILE
+    @input_unit = Uom::MILE
+    @output_unit = Uom::MILE
     @geometry_factory = GeometryFactory.new
     attrs.each do |k, v|
       self.send "#{k}=", v
