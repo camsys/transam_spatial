@@ -5,17 +5,17 @@ class GeocodingService
   attr_accessor :raw_address, :results, :sensor, :bounds, :region, :components, :errors
 
   INCLUDED_TYPES = %w{
-    airport 
+    airport
     establishment
-    intersection 
-    natural_feature 
-    park 
+    intersection
+    natural_feature
+    park
     point_of_interest
     premise
-    route 
-    street_address 
+    route
+    street_address
   }
-  
+
   def initialize(attrs = {})
     # reset the current state
     reset
@@ -27,11 +27,11 @@ class GeocodingService
       self.send "#{k}=", v
     end
   end
-    
+
   def has_errors
     return @errors.count > 1
-  end 
-  
+  end
+
   def reverse_geocode(lat, lon)
     Rails.logger.debug "GEOCODE #{[lat, lon]}"
     # reset the current state
@@ -41,7 +41,7 @@ class GeocodingService
       res = Geocoder.search(@raw_address)
       process_results(res)
     rescue Exception => e
-      Rails.logger.error format_exception(e)
+      #Rails.logger.error format_exception(e)
       @errors << e.message
     end
     [@errors.empty?, @errors, @results]
@@ -60,14 +60,14 @@ class GeocodingService
       Rails.logger.debug res.ai
       process_results(res)
     rescue Exception => e
-      Rails.logger.error format_exception(e)
+      #Rails.logger.error format_exception(e)
       @errors << e.message
     end
     [@errors.empty?, @errors, @results]
   end
-  
+
 protected
-  
+
   def process_results(res)
     i = 0
     res.each do |alt|
@@ -87,9 +87,9 @@ protected
         }
         i += 1
       end
-    end    
-  end    
-  
+    end
+  end
+
   # Google puts the country designator into the formatted address. We don't want this so we chomp the
   # end of the address string if the designator is there
   def sanitize_formatted_address(addr)
@@ -97,9 +97,9 @@ protected
       return addr[0..-6]
     else
       return addr
-    end    
+    end
   end
-  
+
   # Filters addresses returned by Google to only those we want to consider
   def is_valid(addr_types)
     addr_types.each do |addr_type|
@@ -109,10 +109,10 @@ protected
     end
     return false;
   end
-  
+
   def reset
     @results = []
     @errors = []
   end
-    
+
 end
