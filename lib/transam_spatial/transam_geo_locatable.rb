@@ -51,12 +51,7 @@ module TransamGeoLocatable
   def mappable?
     ! geometry.nil?
   end
-  
-  # returns true if this instance can be geo_located. Always true
-  def geo_locatable?
-    true
-  end
-  
+    
   def icon_class
     return 'blueIcon'
   end
