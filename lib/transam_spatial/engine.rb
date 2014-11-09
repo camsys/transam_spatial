@@ -1,4 +1,7 @@
 require 'geocoder'
+require 'georuby'
+require 'spatial_adapter'
+require 'leaflet_gem'
 
 module TransamSpatial
   class Engine < ::Rails::Engine
