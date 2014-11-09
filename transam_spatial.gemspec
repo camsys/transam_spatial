@@ -19,8 +19,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'rails', '>=4.0.9'
   s.add_dependency "geocoder"
   s.add_dependency "georuby"
-  s.add_dependency 'leaflet_gem', :github => 'julianray/leaflet_gem'
-  s.add_dependency 'spatial_adapter', :github => 'julianray/spatial_adapter'
 
   s.add_development_dependency "rspec-rails"
   s.add_development_dependency "factory_girl_rails"
