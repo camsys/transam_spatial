@@ -56,7 +56,7 @@ module TransamGeoLocatable
     return 'blueIcon'
   end
   
-  # Returns a JSON string containing a map marker for this asset  
+  # Returns a ruby hash representing a map marker for this asset  
   def map_marker(draggable=false, zindex = 0, icon = icon_class)
     {
       "id" => object_key,
@@ -68,7 +68,7 @@ module TransamGeoLocatable
       "draggable" => draggable,
       "title" => name,
       "description" => description
-    }.to_json
+    }
   end
     
   # validation to ensure that a coordinate can be derived from the location reference
