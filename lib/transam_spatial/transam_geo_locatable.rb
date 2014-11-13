@@ -60,10 +60,10 @@ module TransamSpatial
     # Returns an array of geo hashes hash representing the map markers for this asset  
     def map_markers(draggable=false, zindex = 0, icon = icon_class)
       a = []
-      a << map_markers(draggable, zindex, icon)
+      a << map_marker(draggable, zindex, icon)
       a
     end
-  
+
     # Returns a hash representing a map marker for this asset. Nothe that this assumes that the geometry
     # is a point
     # TODO make this more generic for line and polygonal assets
@@ -81,7 +81,7 @@ module TransamSpatial
         "description" => description
       }
     end
-      
+    
     # validation to ensure that a coordinate can be derived from the location reference
     def validate_location_reference
       if location_reference_type_id.nil?
