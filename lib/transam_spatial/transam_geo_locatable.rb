@@ -56,9 +56,19 @@ module TransamGeoLocatable
     return 'blueIcon'
   end
   
-  # Returns a JSON hash representing a map marker for this asset  
+  # Returns an array of geo hashes hash representing the map markers for this asset  
   def map_markers(draggable=false, zindex = 0, icon = icon_class)
-    [{
+    a = []
+    a << map_markers(draggable, zindex, icon)
+    a
+  end
+
+  # Returns a hash representing a map marker for this asset. Nothe that this assumes that the geometry
+  # is a point
+  # TODO make this more generic for line and polygonal assets
+  #  
+  def map_marker(draggable=false, zindex = 0, icon = icon_class)
+    {
       "id" => object_key,
       "lat" => geometry.lat,
       "lng" => geometry.lon,
@@ -68,7 +78,7 @@ module TransamGeoLocatable
       "draggable" => draggable,
       "title" => name,
       "description" => description
-    }].to_json
+    }
   end
     
   # validation to ensure that a coordinate can be derived from the location reference
