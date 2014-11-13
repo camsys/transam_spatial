@@ -59,7 +59,7 @@ module TransamGeoLocatable
   # Returns an array of geo hashes hash representing the map markers for this asset  
   def map_markers(draggable=false, zindex = 0, icon = icon_class)
     a = []
-    a << map_markers(draggable, zindex, icon)
+    a << map_marker(draggable, zindex, icon)
     a
   end
 
