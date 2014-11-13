@@ -57,8 +57,8 @@ module TransamGeoLocatable
   end
   
   # Returns a JSON hash representing a map marker for this asset  
-  def map_marker(draggable=false, zindex = 0, icon = icon_class)
-    {
+  def map_markers(draggable=false, zindex = 0, icon = icon_class)
+    [{
       "id" => object_key,
       "lat" => geometry.lat,
       "lng" => geometry.lon,
@@ -68,7 +68,7 @@ module TransamGeoLocatable
       "draggable" => draggable,
       "title" => name,
       "description" => description
-    }.to_json
+    }].to_json
   end
     
   # validation to ensure that a coordinate can be derived from the location reference
