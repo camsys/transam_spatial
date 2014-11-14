@@ -23,8 +23,8 @@ module TransamSpatial
       # Validations
       # ----------------------------------------------------  
       
-      validates :location_reference_type, :presence => true
-      validates :location_reference,      :presence => true
+      # validates :location_reference_type, :presence => true
+      # validates :location_reference,      :presence => true
   
       # custom validator for location_reference
       #validate  :validate_location_reference
