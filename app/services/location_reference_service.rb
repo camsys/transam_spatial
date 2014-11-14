@@ -7,6 +7,7 @@ class LocationReferenceService
   LRS             = "LRS"
   ADDRESS         = "ADDRESS"
   WELL_KNOWN_TEXT = "WELL_KNOWN_TEXT"   
+  NULL            = "NULL"   
   
   COORD_REGEX = /^(\()([-+]?)([\d]{1,2})(((\.)(\d+)(,)))(\s*)(([-+]?)([\d]{1,3})((\.)(\d+))?(\)))$/
   FLOAT_REGEX = /([+-]?\d+\.?\d+)\s*,\s*([+-]?\d+\.?\d+)/
@@ -49,6 +50,8 @@ class LocationReferenceService
       geocode_address(locref)
     elsif format == WELL_KNOWN_TEXT
       parse_wkt(locref)
+    elsif format == NULL
+      # Nothing to do
     else
       message = "Unknown location reference format #{format}"
       @errors << message      

@@ -84,8 +84,15 @@ module TransamSpatial
     
     # validation to ensure that a coordinate can be derived from the location reference
     def validate_location_reference
-      if location_reference_type_id.nil?
+      
+      # Fail validation if the location reference type is not set
+      if self.location_reference_type_id.nil?
         return false
+      end
+      
+      # If the user explicitly set the type to NULL then always pass validation
+      if self.location_reference_type.name = 'NULL'
+        return true
       end
       
       parser = LocationReferenceService.new
