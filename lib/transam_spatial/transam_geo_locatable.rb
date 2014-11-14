@@ -27,7 +27,7 @@ module TransamSpatial
       validates :location_reference,      :presence => true
   
       # custom validator for location_reference
-      validate  :validate_location_reference
+      #validate  :validate_location_reference
           
     end
   
@@ -87,7 +87,7 @@ module TransamSpatial
       
       # Fail validation if the location reference type is not set
       if self.location_reference_type_id.nil?
-        return false
+        return true
       end
       
       # If the user explicitly set the type to NULL then always pass validation
