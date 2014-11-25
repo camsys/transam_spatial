@@ -21,7 +21,7 @@ location_reference_types = [
   {:active => 1, :name => 'Street Address',         :format => "ADDRESS",         :description => 'Location is determined by a geocoded street address.'},
   {:active => 1, :name => 'Map Location',           :format => "COORDINATE",      :description => 'Location is determined by deriving a location from a map.'},
   {:active => 1, :name => 'GeoServer',              :format => "GEOSERVER",       :description => 'Location is determined by deriving a location from Geo Server.'},
-  {:active => 1, :name => 'Null',                   :format => "NULL",            :description => 'Location is not defined.'}
+  {:active => 1, :name => 'Undefined',              :format => "NULL",            :description => 'Location is not defined.'}
 ]
 
 lookup_tables = %w{ location_reference_types }

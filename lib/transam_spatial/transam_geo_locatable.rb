@@ -88,7 +88,7 @@ module TransamSpatial
       end
       
       # If the user explicitly set the type to NULL then always pass validation
-      if self.location_reference_type.name = 'NULL'
+      if self.location_reference_type.format == 'NULL'
         return true
       end
       
