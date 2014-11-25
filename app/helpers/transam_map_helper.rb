@@ -1,13 +1,10 @@
 module TransamMapHelper
   
-  # From the application config    
-  TILE_PROVIDER = SystemConfig.instance.map_tile_provider
-  
   ALPHABET = ('A'..'Z').to_a
 
   # Return the tile provider
   def get_map_tile_provider
-    TILE_PROVIDER
+    SystemConfig.instance.map_tile_provider
   end
   
   # Returns a formatted string for displaying a map marker image that includes a A,B,C, etc. designator.
