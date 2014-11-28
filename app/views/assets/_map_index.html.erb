@@ -1,6 +1,6 @@
 <div class="row">
 	<div id="results" class="col-md-6">
-		<%= render :partial => 'asset_map_server_datatable', :locals => {:assets => @assets} %>
+		<%= render :partial => 'asset_compact_datatable', :locals => {:assets => @assets} %>
 	</div>
 	<div class="col-md-6">
 		<%= LeafletMap({ :mapid => 'lmap', :markers => @markers, :tile_provider => get_map_tile_provider, :min_zoom => 10, :max_zoom => 18, :class => "map", :style => "height:600px;" }) %>
