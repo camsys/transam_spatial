@@ -21,8 +21,9 @@ GIT
 PATH
   remote: .
   specs:
-    transam_spatial (0.0.1b)
+    transam_spatial (0.0.4a)
       geocoder
+      georuby
       rails (>= 4.0.9)
 
 GEM
