@@ -94,7 +94,7 @@ module TransamGeoLocatable
   def set_geometry_from_parent
 
     # Only set the geometry if the asset has a location set
-    unless parent.nil?
+    if geometry.nil? and parent.present?
       self.geometry = parent.geometry
     end
 
