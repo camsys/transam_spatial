@@ -1,0 +1,10 @@
+<div >
+	<div class="well well-small">
+		<div class="caption">
+			<i class="icon-building icon-3x pull-left"></i> <h4><%= geoloc.name %></h4>
+		</div>
+		<%= content_tag "address" do %>
+			<%= format_as_address(geoloc) %>
+		<% end %>
+	</div>
+</div>

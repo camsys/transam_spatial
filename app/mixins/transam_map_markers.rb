@@ -2,18 +2,33 @@ module TransamMapMarkers
 
   ALPHABET = ('A'..'Z').to_a
 
+  # create a map marker fopr a geocoded object
+  def get_geocoded_marker(geoloc, render_open = false, draggable = false)
+    {
+      "id" => geoloc.id,
+      "lat" => geoloc.latitude,
+      "lng" => geoloc.longitude,
+      "iconClass" => geoloc.icon_class,
+      "title" => geoloc.name,
+      "zindex" => 1,
+      "open" => render_open,
+      "draggable" => false,
+      "description" => render_to_string(:partial => "shared/geocoded_popup", :locals => { :geoloc => geoloc })
+    }
+  end
+
   # create an agency-specific map marker
   def get_location_marker(location, render_open = false, draggable = false)
     {
       "id" => location.id,
-      "lat" => location.latitude, 
-      "lng" => location.longitude, 
+      "lat" => location.latitude,
+      "lng" => location.longitude,
       "iconClass" => location.location_type.map_icon_name,
       "title" => location.name,
       "zindex" => 1,
       "open" => render_open,
       "draggable" => false,
-      "description" => render_to_string(:partial => "/locations/map_popup", :locals => { :location => location })        
+      "description" => render_to_string(:partial => "/locations/map_popup", :locals => { :location => location })
     }
   end
 
@@ -21,17 +36,17 @@ module TransamMapMarkers
   def get_organization_marker(organization, render_open = false, draggable = false)
     {
       "id" => organization.id,
-      "lat" => organization.latitude, 
-      "lng" => organization.longitude, 
+      "lat" => organization.latitude,
+      "lng" => organization.longitude,
       "iconClass" => organization.organization_type.map_icon_name,
       "title" => organization.name,
       "zindex" => 1,
       "open" => render_open,
       "draggable" => false,
-      "description" => render_to_string(:partial => "/organizations/organization_popup", :locals => { :organization => organization })        
+      "description" => render_to_string(:partial => "/organizations/organization_popup", :locals => { :organization => organization })
     }
   end
-  
+
   # create a map marker for a GeolocatableAsset instance
   #
   # place is an instance of the Place class
@@ -53,7 +68,7 @@ module TransamMapMarkers
       "description" => render_to_string(:partial => "/shared/map_popup", :locals => { :asset => geolocatable_asset})
     }
   end
-  
+
   # create a map marker for a geocoded address
   #
   # addr is a hash returned from the TransAM Geocoder
