@@ -1,9 +1,10 @@
 :javascript
-	
+
   // Capture the show event and re-render the map
   $("a[href='#maps']").on('shown.bs.tab', function(e) {
     invalidateMap();
   });
 
-
-
+  $(document).ready(function() {
+    invalidateMap();
+  });

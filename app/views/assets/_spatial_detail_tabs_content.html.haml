@@ -1,6 +1,4 @@
-- if @asset.type_of? TransamGeoLocatable
-  - if @asset.mappable?
-    .tab-pane.fade#maps
-      .tab-content
-        = render 'map'
-            
+- if @asset.type_of? TransamGeoLocatable and @asset.mappable?
+  .tab-pane.fade#maps
+    .tab-content
+      = render 'map'

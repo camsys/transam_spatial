@@ -1,5 +1,4 @@
-- if @asset.type_of? TransamGeoLocatable
-  - if @asset.mappable?
-    %li
-      %a{:href => "#maps", :data =>{:toggle => 'tab'}}
-        Map
+- if @asset.type_of? TransamGeoLocatable and @asset.mappable?
+  %li
+    %a{:href => "#maps", :data =>{:toggle => 'tab'}}
+      Map

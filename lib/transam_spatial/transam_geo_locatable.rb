@@ -12,31 +12,31 @@
 #------------------------------------------------------------------------------
 module TransamGeoLocatable
   extend ActiveSupport::Concern
-  
+
   included do
 
-    # ----------------------------------------------------  
+    # ----------------------------------------------------
     # Callbacks
-    # ----------------------------------------------------  
+    # ----------------------------------------------------
 
     # Implementing classes must set the location reference before
     # validation
     before_validation :set_location_reference
 
-    # ----------------------------------------------------  
+    # ----------------------------------------------------
     # Associations
-    # ----------------------------------------------------  
-       
+    # ----------------------------------------------------
+
     # Type of location reference used to geocode the asset
     belongs_to :location_reference_type
-    
-    # ----------------------------------------------------  
+
+    # ----------------------------------------------------
     # Validations
-    # ----------------------------------------------------  
-    
+    # ----------------------------------------------------
+
     # custom validator for location_reference
     validate  :validate_location_reference
-        
+
   end
 
   #------------------------------------------------------------------------------
@@ -60,22 +60,22 @@ module TransamGeoLocatable
   def mappable?
     ! geometry.nil?
   end
-    
+
   def icon_class
     return 'blueIcon'
   end
-  
-  # Returns an array of geo hashes hash representing the map markers for this asset  
+
+  # Returns an array of geo hashes hash representing the map markers for this asset
   def map_markers(draggable=false, zindex = 0, icon = icon_class)
     a = []
-    a << map_marker(draggable, zindex, icon)
+    a << map_marker(draggable, zindex, icon) unless geometry.nil?
     a
   end
 
   # Returns a hash representing a map marker for this asset. Nothe that this assumes that the geometry
   # is a point
   # TODO make this more generic for line and polygonal assets
-  #  
+  #
   def map_marker(draggable=false, zindex = 0, icon = icon_class)
     {
       "id" => object_key,
@@ -100,30 +100,30 @@ module TransamGeoLocatable
 
   end
 
-  # Default method for setting the location reference.     
+  # Default method for setting the location reference.
   def set_location_reference
     if parent.nil?
       self.location_reference_type = LocationReferenceType.find_by_format('NULL')
     else
       p = Asset.get_typed_asset(parent)
-      self.location_reference = p.location_reference 
+      self.location_reference = p.location_reference
       self.location_reference_type = p.location_reference_type
     end
   end
-      
+
   # validation to ensure that a coordinate can be derived from the location reference
   def validate_location_reference
-    
+
     # Fail validation if the location reference type is not set
     if self.location_reference_type_id.nil?
       return false
     end
-    
+
     # If the user explicitly set the type to NULL then always pass validation
     if self.location_reference_type.format == 'NULL'
       return true
     end
-    
+
     parser = LocationReferenceService.new
     type = LocationReferenceType.find(location_reference_type_id)
     parser.parse(location_reference, type.format)
@@ -133,7 +133,7 @@ module TransamGeoLocatable
       return true
     else
       errors.add(:location_reference, parser.errors)
-      return false      
+      return false
     end
   end
-end      
+end
