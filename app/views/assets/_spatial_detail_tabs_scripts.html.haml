@@ -5,8 +5,6 @@
       invalidateMap();
     });
 
-    $(document).ready(function() {
-      if ($('#maps').length) {
-        invalidateMap();
-      }
+    $(window).load(function() {
+      invalidateMap();
     });
