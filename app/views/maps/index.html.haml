@@ -1,0 +1,8 @@
+.col-md-12
+  = LeafletMap({ :mapid => 'lmap', :markers => @markers, :min_zoom => 10, :max_zoom => 18, :class => "map", :style => "height:400px;" })
+.col-md-12
+  = render :partial => 'assets/asset_datatable', :locals => {:assets => @assets}
+
+= yield :scripts
+
+= render 'index_scripts'

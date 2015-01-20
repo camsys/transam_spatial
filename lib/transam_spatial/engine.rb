@@ -1,5 +1,4 @@
 require 'geocoder'
-require 'georuby'
 
 module TransamSpatial
   class Engine < ::Rails::Engine
