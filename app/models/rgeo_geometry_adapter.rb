@@ -28,7 +28,8 @@ class RgeoGeometryAdapter
     @geometry_factory.parse_wkt(wkt)
   end
 
-  def initialize
-    @geometry_factory = RGeo::Cartesian.factory
+  def initialize(klass, column_name)
+    col = column_name.blank? ? "geometry" : column_name
+    @geometry_factory = klass.rgeo_factory_for_column(col)
   end
 end

@@ -103,7 +103,7 @@ module TransamGeoLocatable
   # Default method for setting the location reference.
   def set_location_reference
     if parent.nil?
-      self.location_reference_type = LocationReferenceType.find_by_format('NULL')
+      self.location_reference_type ||= LocationReferenceType.find_by_format('NULL')
     else
       p = Asset.get_typed_asset(parent)
       self.location_reference = p.location_reference
@@ -115,7 +115,7 @@ module TransamGeoLocatable
   def validate_location_reference
 
     # Fail validation if the location reference type is not set
-    if self.location_reference_type_id.nil?
+    if self.location_reference_type.nil?
       return false
     end
 
@@ -124,9 +124,8 @@ module TransamGeoLocatable
       return true
     end
 
-    parser = LocationReferenceService.new
-    type = LocationReferenceType.find(location_reference_type_id)
-    parser.parse(location_reference, type.format)
+    parser = LocationReferenceService.new({:klass => self.class, :column_name => 'geometry'})
+    parser.parse(location_reference, location_reference_type.format)
     if parser.errors.empty?
       self.geometry = parser.geometry
       self.location_reference = parser.formatted_location_reference

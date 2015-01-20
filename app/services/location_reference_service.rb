@@ -6,33 +6,37 @@ class LocationReferenceService
   COORDINATE      = "COORDINATE"
   LRS             = "LRS"
   ADDRESS         = "ADDRESS"
-  WELL_KNOWN_TEXT = "WELL_KNOWN_TEXT"   
-  NULL            = "NULL"   
-  
+  WELL_KNOWN_TEXT = "WELL_KNOWN_TEXT"
+  NULL            = "NULL"
+
   COORD_REGEX = /^(\()([-+]?)([\d]{1,2})(((\.)(\d+)(,)))(\s*)(([-+]?)([\d]{1,3})((\.)(\d+))?(\)))$/
   FLOAT_REGEX = /([+-]?\d+\.?\d+)\s*,\s*([+-]?\d+\.?\d+)/
-    
+
   attr_accessor :location_reference
   attr_accessor :format
   attr_accessor :geometry
   attr_accessor :formatted_location_reference
   attr_accessor :errors
   attr_reader   :gis_service
-  
+  attr_accessor :klass
+  attr_accessor :column_name
+
   def initialize(attrs = {})
     # reset the current state
     reset
-    @gis_service = GisService.new
-    
+
     attrs.each do |k, v|
       self.send "#{k}=", v
     end
+
+    # initialize the gis service sending the bject class
+    @gis_service = GisService.new({:klass => @klass, :column_name => @column_name})
   end
-  
+
   def has_errors
     return @errors.count > 0
-  end 
-  
+  end
+
   # Parses a location reference and returns a geometry object or nil if the parse
   # fails.
   def parse(locref, format)
@@ -41,7 +45,7 @@ class LocationReferenceService
     reset
     @location_reference = locref
     @format = format
-    
+
     if format == COORDINATE
       parse_coordinate(locref)
     elsif format == LRS
@@ -54,7 +58,7 @@ class LocationReferenceService
       # Nothing to do
     else
       message = "Unknown location reference format #{format}"
-      @errors << message      
+      @errors << message
     end
     [@errors.empty?, @errors, @location]
   end
@@ -78,7 +82,7 @@ class LocationReferenceService
       @geometry = @gis_service.as_point(longitude, latitude)
     else
       message = "Coordinate is incorrectly formatted. Use '(logitude,latitude)' format."
-      @errors << message            
+      @errors << message
     end
   end
 
@@ -89,10 +93,10 @@ class LocationReferenceService
       @formatted_location_reference = @geometry.as_wkt
     rescue
       message = "WKT is incorrectly formatted."
-      @errors << message            
+      @errors << message
     end
   end
-  
+
   def geocode_address(raw_address)
     Rails.logger.debug "ADDRESS #{raw_address}"
 
@@ -112,22 +116,22 @@ class LocationReferenceService
       end
     end
   end
-  
+
   def geocode_lrs(locref)
     Rails.logger.debug "LRS #{locref}"
     message = "GIS LRS Service is not installed. Unable to locate reference."
-    @errors << message                
+    @errors << message
   end
 
 
   def format_coord_part(val)
     sprintf('%0.8f', val)
   end
- 
+
   def reset
     @geometry = nil
     @formatted_location_reference = nil
     @errors = []
   end
-    
+
 end

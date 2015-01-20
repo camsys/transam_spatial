@@ -13,21 +13,24 @@ class GisService
   MILES_TO_KM         = Uom.convert(1, Uom::MILE, Uom::KILOMETER)  # Number of kilometers in a mile
 
   # Allow an optional SRID to be configured. This will be added to all geometries created
-  attr_reader         :srid
+  attr_accessor       :srid
   # Input unit
-  attr_reader         :input_unit
+  attr_accessor       :input_unit
   # output_unit
-  attr_reader         :output_unit
+  attr_accessor       :output_unit
+  # klass being manipulated
+  attr_accessor       :klass
+  attr_accessor       :column_name
 
   def initialize(attrs = {})
     @srid = DEFAULT_SRID
     @input_unit = Uom::MILE
     @output_unit = Uom::MILE
-    # Create the geometry factory by using the adapter configured in the app
-    @geometry_factory = TransamGeometryFactory.new(Rails.application.config.transam_spatial_geometry_adapter)
     attrs.each do |k, v|
       self.send "#{k}=", v
     end
+    # Create the geometry factory by using the adapter configured in the app
+    @geometry_factory = TransamGeometryFactory.new(Rails.application.config.transam_spatial_geometry_adapter, @klass, @column_name)
   end
 
   # Calulates the euclidean distance between two points and convert the units to output units
