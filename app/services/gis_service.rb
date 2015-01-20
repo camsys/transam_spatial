@@ -30,7 +30,7 @@ class GisService
       self.send "#{k}=", v
     end
     # Create the geometry factory by using the adapter configured in the app
-    @geometry_factory = TransamGeometryFactory.new(Rails.application.config.transam_spatial_geometry_adapter, @klass, @column_name)
+    @geometry_factory = TransamGeometryFactory.new(Rails.application.config.transam_spatial_geometry_adapter, @klass, @column_name, DEFAULT_SRID)
   end
 
   # Calulates the euclidean distance between two points and convert the units to output units

@@ -15,6 +15,7 @@ class TransamGeometryFactory
 
   attr_reader :geometry_adapter
   attr_reader :klass
+  attr_reader :srid
 
   # Define on self, since it's  a class method
   def method_missing(method_sym, *arguments)
@@ -39,11 +40,11 @@ class TransamGeometryFactory
     end
   end
 
-  def initialize(adapter_type, klass = nil, column_name = nil)
+  def initialize(adapter_type, klass = nil, column_name = nil, srid = nil)
     if adapter_type == 'rgeo'
       @geometry_adapter = RgeoGeometryAdapter.new(klass, column_name)
     elsif adapter_type == 'georuby'
-      @geometry_adapter = GeorubyGeometryAdapter.new
+      @geometry_adapter = GeorubyGeometryAdapter.new(srid)
     else
       RaiseException "Geometry Adapter #{adapter_type} not found."
     end

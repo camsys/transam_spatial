@@ -7,8 +7,6 @@
 #-------------------------------------------------------------------------------
 class GeorubyGeometryAdapter
 
-  @geometry_factory = GeometryFactory.new
-
   def create_point(lat, lon)
     Rails.logger.debug "Creating point geometry from lat = #{lat}, lon = #{lon}"
     @geometry_factory.reset
@@ -45,6 +43,11 @@ class GeorubyGeometryAdapter
 
   def create_from_wkt(wkt)
     Geometry.from_ewkt(wkt)
+  end
+
+  def initialize(srid)
+    @geometry_factory = GeometryFactory.new
+    @srid = srid
   end
 
 end
