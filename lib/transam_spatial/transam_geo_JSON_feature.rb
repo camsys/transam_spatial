@@ -43,7 +43,7 @@ module TransamGeoJSONFeature
 
   module ClassMethods
 
-    def acts_as_mappable(options = {})
+    def configure_geojson(options = {})
       self.geometry_attribute_name = (options[:geometry_attribute_name] || "geometry").to_s
       self.property_names = (options[:property_names] || ["id"])
     end
