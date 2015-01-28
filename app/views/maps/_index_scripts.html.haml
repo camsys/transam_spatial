@@ -1,5 +1,6 @@
 :javascript
 
+  var map = leaflet_tools.map();
   var locate_option = #{(Rails.application.config.transam_spatial_map_options.include? "locate").to_s};
   var marker_cluster_option = #{(Rails.application.config.transam_spatial_map_options.include? "marker_cluster").to_s};
   var full_screen_option = #{(Rails.application.config.transam_spatial_map_options.include? "full_screen").to_s};
@@ -7,7 +8,7 @@
 
   if (locate_option) {
     // Allow the user to locate themselves on the map using the HTML 5 fuctions
-    var location_control = new L.control.locate().addTo(LMmap);
+    var location_control = new L.control.locate().addTo(map);
   }
 
   if (marker_cluster_option) {
@@ -15,19 +16,19 @@
   }
   if (full_screen_option) {
     // Allow the user to go full screen if the browser supports it
-    var full_screen_control = new L.control.fullscreen().addTo(LMmap);
+    var full_screen_control = new L.control.fullscreen().addTo(map);
   }
   if (draw_option) {
     // Add a feature groups for selecting
-    var featureGroup = L.featureGroup().addTo(LMmap);
+    var featureGroup = L.featureGroup().addTo(map);
 
     var drawControl = new L.Control.Draw({
       edit: {
         featureGroup: featureGroup
       }
-    }).addTo(LMmap);
+    }).addTo(map);
 
-    LMmap.on('draw:created', function(e) {
+    map.on('draw:created', function(e) {
         featureGroup.addLayer(e.layer);
     });
   }

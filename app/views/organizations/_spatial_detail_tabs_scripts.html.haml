@@ -2,9 +2,9 @@
 
   // Capture the show event and re-render the map
   $("a[href='#maps']").on('shown.bs.tab', function(e) {
-    invalidateMap();
+    leaflet_tools.invalidate_map();
   });
 
   $(window).load(function() {
-    invalidateMap();
+    leaflet_tools.invalidate_map();
   });
