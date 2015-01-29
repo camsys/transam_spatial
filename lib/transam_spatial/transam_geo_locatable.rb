@@ -2,7 +2,7 @@
 #
 # Geolocatable
 #
-# Injects methods and associations for maintainaing assets as spatial objects
+# Injects methods and associations for maintaining assets as spatial objects
 #
 # Usage:
 #   Add the following line to an asset class
@@ -72,7 +72,7 @@ module TransamGeoLocatable
     a
   end
 
-  # Returns a hash representing a map marker for this asset. Nothe that this assumes that the geometry
+  # Returns a hash representing a map marker for this asset. Note that this assumes that the geometry
   # is a point
   # TODO make this more generic for line and polygonal assets
   #
