@@ -12,16 +12,24 @@ class RgeoGeometryAdapter
     @geometry_factory.point(lat, lon)
   end
 
-  def create_polygon(minLat, minLon, maxLat, maxLon)
-    Rails.logger.debug "Creating polygon geometry from (#{minLat}, #{minLon}), (#{maxLat}, #{maxLon})"
+  # create a line string from an array of arrays
+  def create_linestring(coords)
+    Rails.logger.debug "Creating line string geometry from #{coords.inspect}"
     a = []
-    a << @geometry_factory.point(minLon, minLat)
-    a << @geometry_factory.point(minLon, maxLat)
-    a << @geometry_factory.point(maxLon, maxLat)
-    a << @geometry_factory.point(maxLon, minLat)
-    a << @geometry_factory.point(minLon, minLat)
-    line_string = @geometry_factory.line_string(a)
-    @geometry_factory.polygon(line_string)
+    coords.each do |c|
+      a << @geometry_factory.point(c.first, c.last)
+    end
+    @geometry_factory.line_string(a)
+  end
+
+  def create_polygon(coords, closed = false)
+    Rails.logger.debug "Creating polygon geometry from #{coords.inspect}"
+    # If the polygon is not closed we close it before creating the geometry
+    a = coords
+    unless closed
+      a << coords.first
+    end
+    @geometry_factory.polygon(create_linestring(a))
   end
 
   def create_from_wkt(wkt)

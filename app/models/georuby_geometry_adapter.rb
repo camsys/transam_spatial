@@ -13,31 +13,33 @@ class GeorubyGeometryAdapter
     @geometry_factory.begin_geometry(Point, @srid)
     @geometry_factory.add_point_x_y(lon, lat)
     @geometry_factory.end_geometry
-    Rails.logger.debug "Geometry = #{@geometry_factory.geometry}"
     @geometry_factory.geometry
   end
 
-  def create_polygon(minLat, minLon, maxLat, maxLon)
-    Rails.logger.debug "Creating polygon geometry from (#{minLat}, {minLon}), (#{maxLat}, {maxLon})"
+  # create a line string from an array of arrays
+  def create_linestring(coords)
+    Rails.logger.debug "Creating linestring geometry from #{coords.inspect}"
+    @geometry_factory.reset
+    @geometry_factory.begin_geometry(Linestring, @srid)
+    coords.each do |c|
+      @geometry_factory.begin_geometry(Point, @srid)
+      @geometry_factory.add_point_x_y(c.first, c.last)
+      @geometry_factory.end_geometry
+    end
+    @geometry_factory.end_geometry
+    @geometry_factory.geometry
+  end
+
+  def create_polygon(coords)
+    Rails.logger.debug "Creating polygon geometry from #{coords.inspect}"
     @geometry_factory.reset
     @geometry_factory.begin_geometry(Polygon, @srid)
-    @geometry_factory.begin_geometry(Point, @srid)
-    @geometry_factory.add_point_x_y(minLon, minLat)
+    coords.each do |c|
+      @geometry_factory.begin_geometry(Point, @srid)
+      @geometry_factory.add_point_x_y(c.first, c.last)
+      @geometry_factory.end_geometry
+    end
     @geometry_factory.end_geometry
-    @geometry_factory.begin_geometry(Point, @srid)
-    @geometry_factory.add_point_x_y(minLon, maxLat)
-    @geometry_factory.end_geometry
-    @geometry_factory.begin_geometry(Point, @srid)
-    @geometry_factory.add_point_x_y(maxLon, maxLat)
-    @geometry_factory.end_geometry
-    @geometry_factory.begin_geometry(Point, @srid)
-    @geometry_factory.add_point_x_y(maxLon, minLat)
-    @geometry_factory.end_geometry
-    @geometry_factory.begin_geometry(Point, @srid)
-    @geometry_factory.add_point_x_y(maxLon, minLat) # ensure that the polygon is closed
-    @geometry_factory.end_geometry
-    @geometry_factory.end_geometry
-    Rails.logger.debug "Geometry = #{@geometry_factory.geometry}"
     @geometry_factory.geometry
   end
 

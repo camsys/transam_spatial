@@ -53,7 +53,13 @@ class GisService
     maxLon = elems[2].to_f
     maxLat = elems[3].to_f
 
-    as_polygon(minLat, minLon, maxLat, maxLon)
+    coords = []
+    coords << [minLon, minLat]
+    coords << [minLon, maxLat]
+    coords << [maxLon, maxLat]
+    coords << [maxLon, minLat]
+    coords << [minLon, minLat]
+    as_polygon(coords, true)
   end
 
   # Creates a Polygon geometry that can be used as a search box for spatial
@@ -75,16 +81,27 @@ class GisService
     maxLon = lng + delta_lon
     minLon = lng - delta_lon
 
-    as_polygon(minLat, minLon, maxLat, maxLon)
+    coords = []
+    coords << [minLon, minLat]
+    coords << [minLon, maxLat]
+    coords << [maxLon, maxLat]
+    coords << [maxLon, minLat]
+    coords << [minLon, minLat]
+    as_polygon(coords, true)
   end
 
   # Converts a coordinate defined as a lat,lon into a Point geometry
   def as_point(lat, lon)
     @geometry_factory.create_point(lat, lon)
   end
-
-  def as_polygon(minLat, minLon, maxLat, maxLon)
-    @geometry_factory.create_polygon(minLat, minLon, maxLat, maxLon)
+  # Converts an array of coordinate pairs into a line string
+  def as_linestring(coords)
+    @geometry_factory.create_linestring(coords)
+  end
+  # Converts an array of coordinate pairs into a line string. Assumes the polygon
+  # is not closed
+  def as_polygon(coords, closed = false)
+    @geometry_factory.create_polygon(coords, closed)
   end
 
   protected
