@@ -5,9 +5,18 @@
 # Injects methods and associations for maintaining assets as spatial objects
 #
 # Usage:
-#   Add the following line to an asset class
+#   Add the following line to an class
 #
 #   Include TransamGeoLocatable
+#
+#   Any class also neecd to implement the following methods
+#
+#      set_location_reference -- this methods sets the location_reference_type
+#                                and location_reference for the class instance
+#
+#      derive_geometry        -- this method is called if the location_reference_type
+#                                is DERIVED. This method should create and return
+#                                a geometry object from its relationships
 #
 #------------------------------------------------------------------------------
 module TransamGeoLocatable
@@ -90,14 +99,9 @@ module TransamGeoLocatable
     }
   end
 
-  # Update the geometry for this asset from the parent's geometry
-  def set_geometry_from_parent
-
-    # Only set the geometry if the asset has a location set
-    if geometry.nil? and parent.present?
-      self.geometry = parent.geometry
-    end
-
+  # Derive the geometry for this asset based on the parents geomtery
+  def derive_geometry
+    parent.present? ? parent.geometry : nil
   end
 
   # Default method for setting the location reference.
@@ -111,28 +115,36 @@ module TransamGeoLocatable
     end
   end
 
-  # validation to ensure that a coordinate can be derived from the location reference
+  # validation to ensure that a geometry can be derived from the location reference
   def validate_location_reference
 
     # Fail validation if the location reference type is not set
     if self.location_reference_type.nil?
-      return false
-    end
-
-    # If the user explicitly set the type to NULL then always pass validation
-    if self.location_reference_type.format == 'NULL'
-      return true
-    end
-
-    parser = LocationReferenceService.new({:klass => self.class, :column_name => 'geometry'})
-    parser.parse(location_reference, location_reference_type.format)
-    if parser.errors.empty?
-      self.geometry = parser.geometry
-      self.location_reference = parser.formatted_location_reference
-      return true
+      errors.add(:location_reference, "Location reference type is missing.")
+      false
+    elsif self.location_reference_type.format == 'NULL'
+      # If the user explicitly set the type to NULL then always pass validation
+      true
+    elsif self.location_reference_type.format == 'DERIVED'
+      # If the format is derived then call the method to derive the geometry. This
+      # method must be provided by the class
+      self.geometry = derive_geometry
+      true
     else
-      errors.add(:location_reference, parser.errors)
-      return false
+      # If we get here then we use the LocationReferenceService to parse the location
+      # reference and generate the geometry for us
+      parser = LocationReferenceService.new({:klass => self.class, :column_name => 'geometry'})
+      parser.parse(location_reference, location_reference_type.format)
+      # If we found errors then stop validation and report them
+      if parser.has_errors?
+        errors.add(:location_reference, parser.errors)
+        false
+      else
+        # otherwise we can store the geometry and continue with validation
+        self.geometry = parser.geometry
+        self.location_reference = parser.formatted_location_reference
+        true
+      end
     end
   end
 end
