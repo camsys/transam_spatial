@@ -96,14 +96,14 @@ class AbstractGeocodingService
     reset
 
     @location_reference = raw_location_reference
-    m = COORD_REGEX.match(locref)
+    m = COORD_REGEX.match(@location_reference)
     if m
       # match floats in the string which are returned as an array
-      matches = locref.scan(FLOAT_REGEX).flatten
+      matches = @location_reference.scan(FLOAT_REGEX).flatten
       longitude = matches[0]
       latitude = matches[1]
       @formatted_location_reference = encode_coordinate(latitude, longitude)
-      @geometry = @gis_service.as_point(longitude, latitude)
+      @coords = [longitude, latitude]
       @results << @formatted_location_reference
     else
       message = "Coordinate is incorrectly formatted. Use '(logitude,latitude)' format."
@@ -113,6 +113,9 @@ class AbstractGeocodingService
   end
 
   #-----------------------------------------------------------------------------
+  # TODO parsing the WKT needs a gis service to be available so that the WKT can
+  # be validated and converted to a coordinate chain
+  #
   def parse_well_known_text(raw_location_reference)
 
     Rails.logger.debug "parse_well_known_text #{raw_location_reference}"
@@ -122,8 +125,8 @@ class AbstractGeocodingService
     @location_reference = raw_location_reference
 
     begin
-      @geometry = @gis_service.from_wkt(locref)
-      @formatted_location_reference = @geometry.as_wkt
+      #@geometry = @gis_service.from_wkt(locref)
+      #@formatted_location_reference = @geometry.as_wkt
       @results << @formatted_location_reference
     rescue
       message = "WKT is incorrectly formatted."

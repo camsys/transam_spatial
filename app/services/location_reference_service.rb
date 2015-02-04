@@ -87,12 +87,12 @@ class LocationReferenceService
       # process the results. If errors were generated then we add them to this
       # list of errors
       if @geocoding_service.has_errors?
-        geocoder.errors.each do |e|
+        @geocoding_service.errors.each do |e|
           @errors << e
         end
       else
-        # propagate any warngins from the service to this instance
-        geocoding_service.warnings.each {|x| @warnings << x}
+        # propagate any warnings from the service to this instance
+        @geocoding_service.warnings.each {|x| @warnings << x}
         # construct a geometry if we have coordinates
         if @geocoding_service.coords.present?
           # if a single pair create a point
