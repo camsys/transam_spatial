@@ -11,6 +11,7 @@ class GisService
   DD_TO_MILES         = 65.5375   # Approximate number of miles in a decimal degree
   MILES_TO_METERS     = Uom.convert(1, Uom::MILE, Uom::METER)      # Number of meters in a mile
   MILES_TO_KM         = Uom.convert(1, Uom::MILE, Uom::KILOMETER)  # Number of kilometers in a mile
+  MILES_TO_FEET       = Uom.convert(1, Uom::MILE, Uom::FEET)       # Number of feet in a mile
 
   # Allow an optional SRID to be configured. This will be added to all geometries created
   attr_accessor       :srid
@@ -62,6 +63,13 @@ class GisService
     as_polygon(coords, true)
   end
 
+  # Returns a scale factor for converting decimal degrees to a unit of measure
+  def self.convert_dd_to_uom(length, uom)
+    Uom.convert(1, uom, Uom::MILE) * DD_TO_MILES * length
+  end
+  def self.convert_uom_to_dd(length, uom)
+    Uom.convert(1, uom, Uom::MILE) / DD_TO_MILES * length
+  end
   # Creates a Polygon geometry that can be used as a search box for spatial
   # queries. Defaults to mile
   def search_box_from_point(point, radius, unit = MILE)
