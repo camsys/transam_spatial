@@ -34,13 +34,17 @@ module TransamGeoJSONFeature
     # ----------------------------------------------------
 
     # ----------------------------------------------------
-    # Validations
-    # ----------------------------------------------------
-
-    # ----------------------------------------------------
     # Attributes
     # ----------------------------------------------------
-    class_attribute :geometry_attribute_name
+    # The name of the attribute to use for encoding the geoJSON feature. This
+    # atribute must erespond to :x and :y
+    class_attribute :_geojson_geometry_attribute_name
+    # A collection of attributes to encode into the geoJSON properties list
+    class_attribute :_geojson_properties
+
+    # ----------------------------------------------------
+    # Validations
+    # ----------------------------------------------------
 
   end
 
@@ -53,7 +57,8 @@ module TransamGeoJSONFeature
   module ClassMethods
 
     def configure_geojson(options = {})
-      self.geometry_attribute_name = (options[:geometry_attribute_name] || "geometry").to_s
+      self._geojson_geometry_attribute_name = (options[:geometry_attribute_name] || :geometry).to_s
+      self._geojson_properties = (options[:geojson_properties] || [:object_key])
     end
 
   end
@@ -65,16 +70,16 @@ module TransamGeoJSONFeature
   #-----------------------------------------------------------------------------
 
   def to_geoJSON
-    g = self.send(geometry_attribute_name)
-    props = {}
-    props[:id] = self.object_key
-    geoJSON_property_names.each {|x| props[x] = self.send(x).to_s}
-    unless g.nil?
+    geom_column = self.send(_geojson_geometry_attribute_name)
+    unless geom_column.nil?
+      props = {}
+      props[:id] = self.object_key
+      _geojson_properties.each {|x| props[x] = self.send(x).to_s}
       {
         type: 'Feature',
         geometry: {
           type: 'Point',
-          coordinates: [g.longitude, g.latitude]
+          coordinates: [geom_column.x, geom_column.y]
         },
         properties: props
       }
