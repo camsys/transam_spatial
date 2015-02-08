@@ -7,6 +7,11 @@
 #-------------------------------------------------------------------------------
 class RgeoGeometryAdapter
 
+  RGEO_FACTORY  = RGeo::Geographic.projected_factory(:projection_proj4 => Rails.application.config.nycdot_proj4, :projection_srid => Rails.application.config.nycdot_proj_srid)
+
+  attr_reader :geometry_factory
+  attr_reader :srid
+
   def create_point(lat, lon)
     Rails.logger.debug "Creating point geometry from lat = #{lat}, lon = #{lon}"
     @geometry_factory.point(lat, lon)
@@ -36,8 +41,8 @@ class RgeoGeometryAdapter
     @geometry_factory.parse_wkt(wkt)
   end
 
-  def initialize(klass, column_name)
-    col = column_name.blank? ? "geometry" : column_name
-    @geometry_factory = klass.rgeo_factory_for_column(col)
+  def initialize
+    @geometry_factory = RGEO_FACTORY
+    @srid = Rails.application.config.nycdot_proj_srid
   end
 end

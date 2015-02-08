@@ -21,7 +21,8 @@
 #------------------------------------------------------------------------------
 class AbstractGeocodingService
 
-  COORD_REGEX = /^(\()([-+]?)([\d]{1,2})(((\.)(\d+)(,)))(\s*)(([-+]?)([\d]{1,3})((\.)(\d+))?(\)))$/
+  LATLNG_REGEX = /^(\()([-+]?)([\d]{1,2})(((\.)(\d+)(,)))(\s*)(([-+]?)([\d]{1,3})((\.)(\d+))?(\)))$/
+  PROJ_REGEX = /^(\()([-+]?)([\d]*)(((\.)(\d+)(,)))(\s*)(([-+]?)([\d]*)((\.)(\d+))?(\)))$/
   FLOAT_REGEX = /([+-]?\d+\.?\d+)\s*,\s*([+-]?\d+\.?\d+)/
 
   # Stores the raw (input) location reference for the last request
@@ -89,6 +90,17 @@ class AbstractGeocodingService
   #------------------------------------------------------------------------------
   # generic parsers which don't need to be implemented by concrete classes
   #------------------------------------------------------------------------------
+
+  # Derived location references must be handled in the model. This is a generic
+  # placeholder to that errors are not thrown
+  def parse_derived(raw_location_reference = nil)
+    Rails.logger.debug "parse_derived #{raw_location_reference}"
+    # reset the current state
+    reset
+  end
+
+  # Parse a simple coordinate. Coordinates may be in lat/lng format
+  # such as (40.123, -73.456) or projected eg (989329.0 211213.3)
   def parse_coordinate(raw_location_reference)
 
     Rails.logger.debug "parse_coordinate #{raw_location_reference}"
@@ -96,14 +108,21 @@ class AbstractGeocodingService
     reset
 
     @location_reference = raw_location_reference
-    m = COORD_REGEX.match(@location_reference)
-    if m
+    if LATLNG_REGEX.match(@location_reference)
       # match floats in the string which are returned as an array
       matches = @location_reference.scan(FLOAT_REGEX).flatten
-      longitude = matches[0]
-      latitude = matches[1]
-      @formatted_location_reference = encode_coordinate(latitude, longitude)
+      longitude = matches[0].to_f
+      latitude = matches[1].to_f
+      @formatted_location_reference = encode_latlng(longitude, latitude)
       @coords = [longitude, latitude]
+      @results << @formatted_location_reference
+    elsif PROJ_REGEX.match(@location_reference)
+      # match floats in the string which are returned as an array
+      matches = @location_reference.scan(FLOAT_REGEX).flatten
+      x = matches[0].to_f
+      y = matches[1].to_f
+      @formatted_location_reference = encode_coord(x, y)
+      @coords = [x, y]
       @results << @formatted_location_reference
     else
       message = "Coordinate is incorrectly formatted. Use '(logitude,latitude)' format."
@@ -146,12 +165,15 @@ class AbstractGeocodingService
   protected
   #-----------------------------------------------------------------------------
 
-  def encode_coordinate(lng, lat)
-    "(#{format_coord_part(lng)},#{format_coord_part(lat)})"
+  def encode_coord(x, y)
+    "(#{x}, #{y})"
+  end
+  def encode_latlng(lng, lat)
+    "(#{format_latlng(lng)}, #{format_latlng(lat)})"
   end
 
-  def format_coord_part(val)
-    sprintf('%0.8f', val)
+  def format_latlng(val)
+    sprintf('%0.08f', val)
   end
 
   def reset

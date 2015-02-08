@@ -7,6 +7,11 @@
 #-------------------------------------------------------------------------------
 class GeorubyGeometryAdapter
 
+  DEFAULT_SRID = SystemConfig.instance.srid
+
+  attr_reader :srid
+  attr_reader :geometry_factory
+
   def create_point(lat, lon)
     Rails.logger.debug "Creating point geometry from lat = #{lat}, lon = #{lon}"
     @geometry_factory.reset
@@ -47,9 +52,9 @@ class GeorubyGeometryAdapter
     Geometry.from_ewkt(wkt)
   end
 
-  def initialize(srid)
+  def initialize
     @geometry_factory = GeometryFactory.new
-    @srid = srid
+    @srid = DEFAULT_SRID
   end
 
 end

@@ -1,7 +1,5 @@
 class GisService
 
-  DEFAULT_SRID        = SystemConfig.instance.srid
-
   DEG2RAD             = 0.0174532925199433    # Pi / 180
   RAD2DEG             = 57.29577951308232     # 180 / Pi
 
@@ -30,8 +28,8 @@ class GisService
     attrs.each do |k, v|
       self.send "#{k}=", v
     end
-    # Create the geometry factory by using the adapter configured in the app
-    @geometry_factory = TransamGeometryFactory.new(Rails.application.config.transam_spatial_geometry_adapter, @klass, @column_name, DEFAULT_SRID)
+    # Create the geometry factory by using the adapter configured in the app and the default SRID
+    @geometry_factory = TransamGeometryFactory.new(Rails.application.config.transam_spatial_geometry_adapter)
   end
 
   # Calulates the euclidean distance between two points and convert the units to output units

@@ -138,9 +138,27 @@ module TransamGeoLocatable
         errors.add(:location_reference, parser.errors)
         false
       else
-        # otherwise we can store the geometry and continue with validation
-        self.send "#{_geolocatable_geometry_attribute_name}=", parser.geometry
         self.location_reference = parser.formatted_location_reference
+        # otherwise we can store the geometry and continue with validation
+        coords = parser.coords
+        unless coords.empty?
+          # Create a geometry factory based on whatever is configured. This assumes that all coordinates are
+          # actually lat/lngs using WGS/84
+          geometry_factory = TransamGeometryFactory.new(Rails.application.config.transam_spatial_geometry_adapter)
+          if coords.size == 1
+            # create a point
+            geom = geometry_factory.as_point(coords.first)
+          elsif coords.size > 1
+            # create a line string
+            geom = geometry_factory.as_linestring(coords.first)
+          else
+            geom = nil
+          end
+          # save it to the model. If this is using the RGeo adapter we send
+          # the geometry we just created to the latlng method and RGeo automatically
+          # projects it
+          self.send "#{_geolocatable_geometry_attribute_name}=", geom
+        end
         true
       end
     end
