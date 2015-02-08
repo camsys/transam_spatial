@@ -7,7 +7,7 @@
 #-------------------------------------------------------------------------------
 class RgeoGeometryAdapter
 
-  RGEO_FACTORY  = RGeo::Geographic.projected_factory(:projection_proj4 => Rails.application.config.nycdot_proj4, :projection_srid => Rails.application.config.nycdot_proj_srid)
+  RGEO_FACTORY  = RGeo::Geographic.projected_factory(:projection_proj4 => Rails.application.config.rgeo_proj4, :projection_srid => Rails.application.config.rgeo_proj4_srid)
 
   attr_reader :geometry_factory
   attr_reader :srid
