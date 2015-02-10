@@ -12,14 +12,22 @@ class RgeoGeometryAdapter
   attr_reader :geometry_factory
   attr_reader :srid
 
-  def create_point(lat, lon)
-    Rails.logger.debug "Creating point geometry from lat = #{lat}, lon = #{lon}"
-    @geometry_factory.point(lat, lon)
+  # Create an unprojected point from a projected coordinate
+  def create_unprojected_point(x, y)
+    Rails.logger.debug "RgeoGeometryAdapter Creating unprojected point geometry from x = #{x}, y = #{y}"
+    projected_geometry = @geometry_factory.projection_factory.point(x, y)
+    Rails.logger.debug "Projected Point = #{projected_geometry.to_s}"
+    @geometry_factory.unproject(projected_geometry)
+  end
+
+  def create_point(lng, lat)
+    Rails.logger.debug "RgeoGeometryAdapter Creating point geometry from lng = #{lng}, lat = #{lat}"
+    @geometry_factory.point(lng, lat)
   end
 
   # create a line string from an array of arrays
   def create_linestring(coords)
-    Rails.logger.debug "Creating line string geometry from #{coords.inspect}"
+    Rails.logger.debug "RgeoGeometryAdapter Creating line string geometry from #{coords.inspect}"
     a = []
     coords.each do |c|
       a << @geometry_factory.point(c.first, c.last)
@@ -28,7 +36,7 @@ class RgeoGeometryAdapter
   end
 
   def create_polygon(coords, closed = false)
-    Rails.logger.debug "Creating polygon geometry from #{coords.inspect}"
+    Rails.logger.debug "RgeoGeometryAdapter Creating polygon geometry from #{coords.inspect}"
     # If the polygon is not closed we close it before creating the geometry
     a = coords
     unless closed
@@ -43,6 +51,6 @@ class RgeoGeometryAdapter
 
   def initialize
     @geometry_factory = RGEO_FACTORY
-    @srid = Rails.application.config.nycdot_proj_srid
+    @srid = Rails.application.config.rgeo_proj4_srid
   end
 end

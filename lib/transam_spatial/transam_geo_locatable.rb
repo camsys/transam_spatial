@@ -77,7 +77,7 @@ module TransamGeoLocatable
     self.send(_geolocatable_geometry_attribute_name).present?
   end
 
-  # Returns an array of geo hashes hash representing the map markers for this asset
+  # Returns an array of geo hashes hash representing the map markers for this feature
   def map_markers(draggable=false, zindex = 0, icon = _icon_class)
     a = []
     a << map_marker(draggable, zindex, icon)
@@ -138,8 +138,11 @@ module TransamGeoLocatable
         errors.add(:location_reference, parser.errors)
         false
       else
-        self.location_reference = parser.formatted_location_reference
         # otherwise we can store the geometry and continue with validation
+
+        # Update the location reference with the canonical form if provided by the geocoder
+        self.location_reference = parser.formatted_location_reference unless parser.formatted_location_reference.blank?
+
         coords = parser.coords
         unless coords.empty?
           # Create a geometry factory based on whatever is configured. This assumes that all coordinates are
@@ -147,13 +150,14 @@ module TransamGeoLocatable
           geometry_factory = TransamGeometryFactory.new(Rails.application.config.transam_spatial_geometry_adapter)
           if coords.size == 1
             # create a point
-            geom = geometry_factory.as_point(coords.first)
+            geom = geometry_factory.create_point(coords[0].first, coords[0].last)
           elsif coords.size > 1
             # create a line string
-            geom = geometry_factory.as_linestring(coords.first)
+            geom = geometry_factory.create_linestring(coords)
           else
             geom = nil
           end
+          Rails.logger.debug "Geometry created = #{geom}"
           # save it to the model. If this is using the RGeo adapter we send
           # the geometry we just created to the latlng method and RGeo automatically
           # projects it

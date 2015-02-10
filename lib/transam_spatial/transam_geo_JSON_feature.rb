@@ -72,15 +72,19 @@ module TransamGeoJSONFeature
   def to_geoJSON
     geom_column = self.send(_geojson_geometry_attribute_name)
     unless geom_column.nil?
+      if geom_column.dimension == 0
+        geo = {type: 'Point', coordinates: [geom_column.x, geom_column.y]}
+      else
+        coords = []
+        geom_column.points.each {|pt| coords << [pt.x, pt.y]}
+        geo = {type: 'LineString', coordinates: coords}
+      end
       props = {}
       props[:id] = self.object_key
       _geojson_properties.each {|x| props[x] = self.send(x).to_s}
       {
         type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [geom_column.x, geom_column.y]
-        },
+        geometry: geo,
         properties: props
       }
     end

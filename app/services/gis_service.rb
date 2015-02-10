@@ -20,9 +20,9 @@ class GisService
   # klass being manipulated
   attr_accessor       :klass
   attr_accessor       :column_name
+  attr_accessor       :geometry_factory
 
   def initialize(attrs = {})
-    @srid = DEFAULT_SRID
     @input_unit = Uom::MILE
     @output_unit = Uom::MILE
     attrs.each do |k, v|

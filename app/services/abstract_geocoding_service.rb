@@ -97,6 +97,7 @@ class AbstractGeocodingService
     Rails.logger.debug "parse_derived #{raw_location_reference}"
     # reset the current state
     reset
+    @formatted_location_reference = raw_location_reference
   end
 
   # Parse a simple coordinate. Coordinates may be in lat/lng format
