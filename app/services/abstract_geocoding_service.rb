@@ -115,7 +115,7 @@ class AbstractGeocodingService
       longitude = matches[0].to_f
       latitude = matches[1].to_f
       @formatted_location_reference = encode_latlng(longitude, latitude)
-      @coords = [longitude, latitude]
+      @coords << [longitude, latitude]
       @results << @formatted_location_reference
     elsif PROJ_REGEX.match(@location_reference)
       # match floats in the string which are returned as an array
@@ -123,7 +123,7 @@ class AbstractGeocodingService
       x = matches[0].to_f
       y = matches[1].to_f
       @formatted_location_reference = encode_coord(x, y)
-      @coords = [x, y]
+      @coords << [x, y]
       @results << @formatted_location_reference
     else
       message = "Coordinate is incorrectly formatted. Use '(logitude,latitude)' format."
