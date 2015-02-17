@@ -32,6 +32,19 @@ class GisService
     @geometry_factory = TransamGeometryFactory.new(Rails.application.config.transam_spatial_geometry_adapter)
   end
 
+  # Calcuates a point at offset_m along the line segment (x0,y0),(x1,y1)
+  # if the line segment is degenerate it retuns the start point (x0,y0) and
+  # if the offset m is greater than length m it returns (x1,y1)
+  def calulate_offset_along_line_segment(pt0, pt1, dist, offset_m)
+    if offset_m < 0
+      [pt0.x, pt0.y]
+    elsif offset_m > dist
+      [pt1.x, pt1.y]
+    else
+      # calculate the offset
+    end
+    
+  end
   # Calulates the euclidean distance between two points and convert the units to output units
   def euclidean_distance(point1, point2)
     dist = Uom.convert(point1.euclidean_distance(point2), @input_unit, @output_unit)
