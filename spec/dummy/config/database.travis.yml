@@ -8,8 +8,7 @@ mysql: &mysql
   adapter: mysql2
   username: root
   password:
-  database: transam_spatial
-  _testing
+  database: transam_spatial_testing
 
 # postgresql: &postgresql
 #   adapter: postgresql
