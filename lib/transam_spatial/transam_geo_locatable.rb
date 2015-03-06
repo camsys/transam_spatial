@@ -46,7 +46,7 @@ module TransamGeoLocatable
     # Validations
     # ----------------------------------------------------
     # custom validator for location_reference
-    validate  :validate_location_reference
+    #validate  :validate_location_reference
 
   end
 
