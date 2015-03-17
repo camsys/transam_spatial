@@ -158,7 +158,7 @@ class AbstractGeocodingService
   #-----------------------------------------------------------------------------
   # this is for symmetry and simply delegates to the lookup method
   def parse_address(raw_address)
-    Rails.logger.debug "lookup #{raw_location_reference}"
+    Rails.logger.debug "lookup #{raw_address}"
     lookup(raw_address)
   end
 
