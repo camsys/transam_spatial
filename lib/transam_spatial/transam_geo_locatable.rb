@@ -137,7 +137,7 @@ module TransamGeoLocatable
     # Can't have an unset location reference type
     if self.location_reference_type.nil?
       raise ArgumentError, "location reference type is not set"
-    if self.location_reference_type.format == 'NULL'
+    elsif self.location_reference_type.format == 'NULL'
       # Set geom to nil
       self.send "#{_geolocatable_geometry_attribute_name}=", nil
     elsif self.location_reference_type.format == 'DERIVED'
