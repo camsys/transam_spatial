@@ -1,6 +1,7 @@
 #------------------------------------------------------------------------------
 #
 # TransamGeolocatable
+# -------------------
 #
 # Injects methods and associations for maintaining assets as spatial objects
 #
@@ -17,6 +18,23 @@
 #      derive_geometry        -- this method is called if the location_reference_type
 #                                is DERIVED. This method should create and return
 #                                a geometry object from its relationships
+#
+#
+#
+# Configuration
+#   There are 3 configurable params that need to be passed to the plugin using the
+#   configure_geolocatable() method.
+#
+#     geometry_attribute_name -- the name of the model attribute containing the
+#                                spatial data. Defaults to "geometry"
+#
+#     icon_class              -- the name of a method or string that returns an
+#                                icon name for displaying the model when map_marker()
+#                                or map_markers() is called.
+#
+#     update_on_save          -- a boolean that controls wether the spatial data
+#                                is updated when the model is validated. Defaults
+#                                to "true"
 #
 #------------------------------------------------------------------------------
 module TransamGeoLocatable
@@ -41,12 +59,13 @@ module TransamGeoLocatable
     # ----------------------------------------------------
     class_attribute :_geolocatable_geometry_attribute_name
     class_attribute :_icon_class
+    class_attribute :_update_on_save
 
     # ----------------------------------------------------
     # Validations
     # ----------------------------------------------------
     # custom validator for location_reference
-    #validate  :validate_location_reference
+    validate  :validate_location_reference
 
   end
 
@@ -61,6 +80,8 @@ module TransamGeoLocatable
     def configure_geolocatable(options = {})
       self._geolocatable_geometry_attribute_name = (options[:geometry_attribute_name] || "geometry").to_s
       self._icon_class = (options[:icon_class] || "blueIcon").to_s
+      # Default update to true
+      self._update_on_save = options[:update_on_save] || true
     end
 
   end
@@ -109,25 +130,19 @@ module TransamGeoLocatable
     end
   end
 
-  # validation to ensure that a geometry can be derived from the location reference
-  def validate_location_reference
+  # Updates the spatial reference for the model based on the location reference
+  # provided
+  def update_location
 
-    Rails.logger.debug "in validate_location_reference"
-
-    # Fail validation if the location reference type is not set
+    # Can't have an unset location reference type
     if self.location_reference_type.nil?
-      errors.add(:location_reference, "Location reference type is missing.")
-      false
-    elsif self.location_reference_type.format == 'NULL'
-      # If the user explicitly set the type to NULL then always pass validation
-      # and ensure that the geometry column is nulled
+      raise ArgumentError, "location reference type is not set"
+    if self.location_reference_type.format == 'NULL'
+      # Set geom to nil
       self.send "#{_geolocatable_geometry_attribute_name}=", nil
-      true
     elsif self.location_reference_type.format == 'DERIVED'
-      # If the format is derived then call the method to derive the geometry. This
-      # method must be provided by the class
+      # Have the geom derived using the callback
       self.send "#{_geolocatable_geometry_attribute_name}=", derive_geometry
-      true
     else
       # If we get here then we use the LocationReferenceService to parse the location
       # reference and generate the geometry for us
@@ -135,14 +150,12 @@ module TransamGeoLocatable
       parser.parse(location_reference, location_reference_type.format)
       # If we found errors then stop validation and report them
       if parser.has_errors?
-        errors.add(:location_reference, parser.errors)
-        false
+        raise ArgumentError, "location reference service returned errors"
       else
-        # otherwise we can store the geometry and continue with validation
-
         # Update the location reference with the canonical form if provided by the geocoder
         self.location_reference = parser.formatted_location_reference unless parser.formatted_location_reference.blank?
 
+        # otherwise we can store the geometry and continue with validation
         coords = parser.coords
         unless coords.empty?
           # Create a geometry factory based on whatever is configured. This assumes that all coordinates are
@@ -163,8 +176,45 @@ module TransamGeoLocatable
           # projects it
           self.send "#{_geolocatable_geometry_attribute_name}=", geom
         end
-        true
       end
     end
+  end
+
+  # validation to ensure that a geometry can be derived from the location reference
+  def validate_location_reference
+
+    Rails.logger.debug "in validate_location_reference"
+
+    # Fail validation if the location reference type is not set
+    if self.location_reference_type.nil?
+      errors.add(:location_reference, "Location reference type is missing.")
+      result = false
+    elsif self.location_reference_type.format == 'NULL'
+      # If the user explicitly set the type to NULL then always pass validation
+      # and ensure that the geometry column is nulled
+      result = true
+    elsif self.location_reference_type.format == 'DERIVED'
+      # If the format is derived then call the method to derive the geometry. This
+      # method must be provided by the class
+      result = true
+    else
+      # If we get here then we use the LocationReferenceService to parse the location
+      # reference and generate the geometry for us
+      parser = LocationReferenceService.new
+      parser.parse(location_reference, location_reference_type.format)
+      # If we found errors then stop validation and report them
+      if parser.has_errors?
+        errors.add(:location_reference, parser.errors)
+        result = false
+      else
+        result = true
+      end
+    end
+    # If there are no validation errrors and the app requested that the geom is
+    # updated on validation then perform the update
+    if result == true and _update_on_save == true
+      update_location
+    end
+    result
   end
 end
