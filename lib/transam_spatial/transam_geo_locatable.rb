@@ -132,7 +132,7 @@ module TransamGeoLocatable
 
   # Updates the spatial reference for the model based on the location reference
   # provided
-  def update_location
+  def update_geometry
 
     # Can't have an unset location reference type
     if self.location_reference_type.nil?
@@ -213,7 +213,7 @@ module TransamGeoLocatable
     # If there are no validation errrors and the app requested that the geom is
     # updated on validation then perform the update
     if result == true and _update_on_save == true
-      update_location
+      update_geometry
     end
     result
   end
