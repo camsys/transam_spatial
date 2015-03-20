@@ -25,7 +25,7 @@ class GeorubyGeometryAdapter
   def create_linestring(coords)
     Rails.logger.debug "Creating linestring geometry from #{coords.inspect}"
     @geometry_factory.reset
-    @geometry_factory.begin_geometry(Linestring, @srid)
+    @geometry_factory.begin_geometry(LineString, @srid)
     coords.each do |c|
       @geometry_factory.begin_geometry(Point, @srid)
       @geometry_factory.add_point_x_y(c.first, c.last)
