@@ -1,3 +1,3 @@
 module TransamSpatial
-  VERSION = "0.0.10c"
+  VERSION = "0.0.11"
 end
