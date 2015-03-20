@@ -80,8 +80,11 @@ module TransamGeoLocatable
     def configure_geolocatable(options = {})
       self._geolocatable_geometry_attribute_name = (options[:geometry_attribute_name] || "geometry").to_s
       self._icon_class = (options[:icon_class] || "blueIcon").to_s
-      # Default update to true
-      self._update_on_save = options[:update_on_save] || true
+      # option must explicitly be set to false
+      # options[:update_on_save] = true # returns true
+      # options[:update_on_save] = false # returns false
+      # options[:update_on_save] = "string" # returns true
+      self._update_on_save = (options[:update_on_save] != false)
     end
 
   end
