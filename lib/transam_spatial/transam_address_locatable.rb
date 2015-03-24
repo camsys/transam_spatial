@@ -13,9 +13,9 @@
 #------------------------------------------------------------------------------
 module TransamAddressLocatable
   extend ActiveSupport::Concern
-  
+
   included do
-        
+
   end
 
   #------------------------------------------------------------------------------
@@ -35,7 +35,7 @@ module TransamAddressLocatable
   #------------------------------------------------------------------------------
 
   def icon_class
-    return 'greenIcon'
+    return 'greenDotIcon'
   end
 
   # Populates the location reference with the address of the asset
@@ -52,7 +52,7 @@ module TransamAddressLocatable
     elems << city unless city.blank?
     elems << state unless state.blank?
     elems << zip unless zip.blank?
-    elems.compact.join(', ')    
+    elems.compact.join(', ')
   end
 
-end      
+end
