@@ -1,5 +1,5 @@
 = LeafletMap({:mapid => 'lmap',
-  :markers => @markers,
+  :markers => @asset.map_markers.to_json,
   :tile_provider => Rails.application.config.map_tile_provider,
   :map_key => Rails.application.config.map_tile_key,
   :access_token => Rails.application.config.map_access_token,
