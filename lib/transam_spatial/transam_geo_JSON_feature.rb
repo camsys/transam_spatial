@@ -81,6 +81,7 @@ module TransamGeoJSONFeature
       end
       props = {}
       props[:id] = self.object_key
+      props[:feature_class] = self.class.name
       _geojson_properties.each {|x| props[x] = self.send(x).to_s}
       {
         type: 'Feature',
