@@ -21,7 +21,7 @@ RSpec.describe GisService, :type => :service do
     pt1.y = 14.0
   end
 
-  describe '#calulate_offset_along_line_segment' do
+  describe '.calulate_offset_along_line_segment' do
     it 'offset distance cannot be more than distance of line' do
       expect(test_gis_service.calculate_offset_along_line_segment(pt0,pt1,13,20)).to eq([pt1.x,pt1.y])
     end
