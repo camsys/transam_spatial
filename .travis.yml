@@ -13,5 +13,6 @@ script:
 before_script:
 - cp spec/dummy/config/database.travis.yml spec/dummy/config/database.yml
 before_install:
+- mysql -e "create database IF NOT EXISTS transam_spatial_testing;" -uroot
 - openssl aes-256-cbc -K $encrypted_9dfe64c4fe2c_key -iv $encrypted_9dfe64c4fe2c_iv
   -in spec/dummy/db/schema.rb.enc -out spec/dummy/db/schema.rb -d
