@@ -5,6 +5,7 @@ require File.expand_path("../dummy/config/environment", __FILE__)
 require 'rspec/rails'
 require 'factory_girl_rails'
 require 'database_cleaner'
+require 'shoulda-matchers'
 require 'devise'
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
@@ -25,4 +26,13 @@ RSpec.configure do |config|
   config.color = true                  # Use color in STDOUT
   config.tty = true                    # Use color not only in STDOUT but also in pagers and files
   config.formatter = :documentation    # Use the specified formatter
+end
+
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    # Choose a test framework:
+    with.test_framework :rspec
+
+    with.library :rails
+  end
 end
