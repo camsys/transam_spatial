@@ -353,8 +353,9 @@ DEPENDENCIES
   mysql2 (~> 0.3.20)
   rspec-rails
   shoulda-matchers
+  simplecov
   transam_core!
   transam_spatial!
 
 BUNDLED WITH
-   1.10.4
+   1.10.6
