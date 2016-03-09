@@ -15,4 +15,4 @@ before_script:
 - cp spec/dummy/config/database.travis.yml spec/dummy/config/database.yml
 script:
 - bundle exec rake app:transam_spatial:prepare_rspec
-- bundle exec rspec RAILS_VERSION=4.1.9
+- bundle exec rspec
