@@ -4,9 +4,6 @@ rvm:
 branches:
   only:
   - master
-env:
-- TEST_SUITE=rspec RAILS_VERSION=4.1.9
-- TEST_SUITE=cucumber RAILS_VERSION=4.1.9
 before_install:
 - mysql -e "create database IF NOT EXISTS transam_spatial_testing;" -uroot
 - openssl aes-256-cbc -K $encrypted_9dfe64c4fe2c_key -iv $encrypted_9dfe64c4fe2c_iv
@@ -18,4 +15,4 @@ before_script:
 - cp spec/dummy/config/database.travis.yml spec/dummy/config/database.yml
 script:
 - bundle exec rake app:transam_spatial:prepare_rspec
-- bundle exec $TEST_SUITE
+- bundle exec rspec RAILS_VERSION=4.1.9
