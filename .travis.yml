@@ -5,6 +5,9 @@ branches:
   only:
   - master
 before_install:
+- sudo apt-get update
+- gem update bundler
+- sudo apt-get install libgeos-dev libproj-dev
 - mysql -e "create database IF NOT EXISTS transam_spatial_testing;" -uroot
 addons:
   code_climate:
