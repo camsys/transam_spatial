@@ -3,6 +3,13 @@ Dummy::Application.configure do
 
   # Configure to use the rgeo geometry adapter
   config.transam_spatial_geometry_adapter = "rgeo"
+  # setup the Rgeo projection to use. In this case Rgeo will use New York Long Island
+  # State Plane (ft) as the projection system.
+  config.rgeo_proj4       = '+proj=lcc +lat_1=41.03333333333333 +lat_2=40.66666666666666 +lat_0=40.16666666666666 +lon_0=-74 +x_0=300000.0000000001 +y_0=0 +ellps=GRS80 +datum=NAD83 +to_meter=0.3048006096012192 +no_defs'
+  config.rgeo_proj4_srid  = 2263
+
+  # Specify the test geocoding service
+  Rails.application.config.geocoding_service  = "GoogleGeocodingService"
 
   # The test environment is used exclusively to run your application's
   # test suite. You never need to work with it otherwise. Remember that
