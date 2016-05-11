@@ -30,6 +30,13 @@
 #     warnings                     -- An array of warning messages returned by the
 #                                     geocoder
 #
+# If GEOCODING_SERVICE supports nodes, then the service will also store:
+#
+#     from_node -- id of an intersection node, or the first node in a cross street list,
+#                  or the last FromId in a block face list.
+#     to_node   -- empty an intersection, or the last node in a cross street list,
+#                  or the last ToId in a block face list.
+#
 # If the geocode failed, error messages will be returned in the errors array
 #
 #-------------------------------------------------------------------------------
@@ -57,7 +64,10 @@ class LocationReferenceService
   attr_accessor :errors
   # an array of warnings from the geocoder service
   attr_accessor :warnings
-
+  # from and to node ids if supported by the geocoder service
+  attr_reader :from_node
+  attr_reader :to_node
+  
   #-----------------------------------------------------------------------------
   # Configurations
   #-----------------------------------------------------------------------------
@@ -104,6 +114,8 @@ class LocationReferenceService
         @coords = @geocoding_service.coords
         # cache the canoical representation of the address, if one is provided
         @formatted_location_reference = @geocoding_service.formatted_location_reference
+        @from_node = @geocoding_service.try(:from_node)
+        @to_node = @geocoding_service.try(:to_node)
       end
     else
       @errors << "Geocoder method #{parse_method} is not supported for geocoding service #{GEOCODING_SERVICE}"
@@ -136,6 +148,8 @@ class LocationReferenceService
     @coords = []
     @errors = []
     @warnings = []
+    @from_node = nil
+    @to_node = nil
   end
 
 end

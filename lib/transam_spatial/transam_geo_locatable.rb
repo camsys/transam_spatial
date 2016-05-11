@@ -22,7 +22,7 @@
 #
 #
 # Configuration
-#   There are 3 configurable params that need to be passed to the plugin using the
+#   There are 4 configurable params that need to be passed to the plugin using the
 #   configure_geolocatable() method.
 #
 #     geometry_attribute_name -- the name of the model attribute containing the
@@ -35,6 +35,10 @@
 #     update_on_save          -- a boolean that controls wether the spatial data
 #                                is updated when the model is validated. Defaults
 #                                to "true"
+#
+#     use_nodes               -- a boolean that indicates whether the geocoding
+#                                service supports "nodes", primarily for SIMS.
+#                                Defaults to "false".                                
 #
 #------------------------------------------------------------------------------
 module TransamGeoLocatable
@@ -60,7 +64,8 @@ module TransamGeoLocatable
     class_attribute :_geolocatable_geometry_attribute_name
     class_attribute :_icon_class
     class_attribute :_update_on_save
-
+    class_attribute :_use_nodes
+    
     # ----------------------------------------------------
     # Validations
     # ----------------------------------------------------
@@ -85,6 +90,8 @@ module TransamGeoLocatable
       # options[:update_on_save] = false # returns false
       # options[:update_on_save] = "string" # returns true
       self._update_on_save = (options[:update_on_save] != false)
+      # option must explicitly be set to true
+      self._use_nodes = (options[:use_nodes] == true)
     end
 
   end
@@ -178,6 +185,20 @@ module TransamGeoLocatable
           # the geometry we just created to the latlng method and RGeo automatically
           # projects it
           self.send "#{_geolocatable_geometry_attribute_name}=", geom
+        end
+
+        # set nodes if used
+        if _use_nodes
+          if self.from_node && (self.from_node != parser.from_node)
+            puts "node mismatch for #{order_number}! #{self.from_node} != #{parser.from_node}"
+          else
+            self.from_node == parser.from_node
+          end
+          if self.to_node && (self.to_node != parser.to_node)
+            puts "node mismatch for #{order_number}! #{self.to_node} != #{parser.to_node}"
+          else
+            self.to_node == parser.to_node
+          end
         end
       end
     end
