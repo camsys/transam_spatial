@@ -192,12 +192,12 @@ module TransamGeoLocatable
           if self.from_node && (self.from_node != parser.from_node)
             puts "node mismatch for #{order_number}! #{self.from_node} != #{parser.from_node}"
           else
-            self.from_node == parser.from_node
+            self.from_node = parser.from_node
           end
           if self.to_node && (self.to_node != parser.to_node)
             puts "node mismatch for #{order_number}! #{self.to_node} != #{parser.to_node}"
           else
-            self.to_node == parser.to_node
+            self.to_node = parser.to_node
           end
         end
       end
