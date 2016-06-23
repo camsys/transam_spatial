@@ -65,6 +65,7 @@ module TransamGeoLocatable
     class_attribute :_icon_class
     class_attribute :_update_on_save
     class_attribute :_use_nodes
+    class_attribute :_tolerate_update_geometry_error
     
     # ----------------------------------------------------
     # Validations
