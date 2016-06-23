@@ -92,6 +92,8 @@ module TransamGeoLocatable
       self._update_on_save = (options[:update_on_save] != false)
       # option must explicitly be set to true
       self._use_nodes = (options[:use_nodes] == true)
+      # option whether to raise error during update geometry
+      self._tolerate_update_geometry_error = (options[:tolerate_update_geometry_error] == true)
     end
 
   end
@@ -146,7 +148,10 @@ module TransamGeoLocatable
 
     # Can't have an unset location reference type
     if self.location_reference_type.nil?
-      raise ArgumentError, "location reference type is not set"
+      Rails.logger.debug "location reference type is not set"
+      unless _tolerate_update_geometry_error
+        raise ArgumentError, "location reference type is not set"
+      end
     elsif self.location_reference_type.format == 'NULL'
       # Set geom to nil
       self.send "#{_geolocatable_geometry_attribute_name}=", nil
@@ -160,7 +165,10 @@ module TransamGeoLocatable
       parser.parse(location_reference, location_reference_type.format)
       # If we found errors then stop validation and report them
       if parser.has_errors?
-        raise ArgumentError, "location reference service returned errors"
+        Rails.logger.debug "location reference service returned errors"
+        unless _tolerate_update_geometry_error
+          raise ArgumentError, "location reference service returned errors"
+        end
       else
         # Update the location reference with the canonical form if provided by the geocoder
         self.location_reference = parser.formatted_location_reference unless parser.formatted_location_reference.blank?
