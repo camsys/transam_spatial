@@ -24,7 +24,7 @@ GIT
 PATH
   remote: .
   specs:
-    transam_spatial (0.0.22)
+    transam_spatial (0.0.23)
       geocoder
       rails (>= 4.0.9)
 
@@ -381,3 +381,6 @@ DEPENDENCIES
   simplecov
   transam_core!
   transam_spatial!
+
+BUNDLED WITH
+   1.11.2
