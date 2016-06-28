@@ -11,7 +11,7 @@
 <% end %>
 
 <% if Rails.application.config.transam_spatial_tile_provider = "google" %>
-  <%= javascript_include_tag "http://maps.google.com/maps/api/js?v=3.2&sensor=false" %>
+  <%= javascript_include_tag "http://maps.google.com/maps/api/js?v=3.2&sensor=false#{Rails.env.development? ? '&key=' + ENV['GOOGLE_API_KEY'] : ''}" %>
 <% end %>
 
 
