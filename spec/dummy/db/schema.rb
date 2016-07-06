@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151013163940) do
+ActiveRecord::Schema.define(version: 20160610142004) do
 
   create_table "activities", force: true do |t|
     t.string   "object_key",           limit: 12
@@ -96,19 +96,19 @@ ActiveRecord::Schema.define(version: 20151013163940) do
     t.integer  "annual_affected_ridership"
     t.integer  "annual_dollars_generated"
     t.integer  "sales_proceeds"
-    t.string   "new_owner_name",                 limit: 64
-    t.string   "address1",                       limit: 128
-    t.string   "address2",                       limit: 128
-    t.string   "city",                           limit: 64
-    t.string   "state",                          limit: 2
-    t.string   "zip",                            limit: 10
     t.text     "comments"
+    t.integer  "organization_id"
     t.datetime "created_at",                                                         null: false
     t.datetime "updated_at",                                                         null: false
+    t.string   "state",                          limit: 32
+    t.string   "document",                       limit: 128
+    t.string   "original_filename",              limit: 128
+    t.integer  "created_by_id"
   end
 
   add_index "asset_events", ["asset_event_type_id"], name: "asset_events_idx3", using: :btree
   add_index "asset_events", ["asset_id"], name: "asset_events_idx2", using: :btree
+  add_index "asset_events", ["created_by_id"], name: "asset_events_creator_idx", using: :btree
   add_index "asset_events", ["event_date"], name: "asset_events_idx4", using: :btree
   add_index "asset_events", ["object_key"], name: "asset_events_idx1", using: :btree
   add_index "asset_events", ["upload_id"], name: "asset_events_idx5", using: :btree
@@ -199,6 +199,7 @@ ActiveRecord::Schema.define(version: 20151013163940) do
     t.integer  "scheduled_rehabilitation_year"
     t.integer  "scheduled_disposition_year"
     t.integer  "scheduled_replacement_cost"
+    t.text     "early_replacement_reason"
     t.boolean  "scheduled_replace_with_new"
     t.integer  "scheduled_rehabilitation_cost"
     t.integer  "replacement_reason_type_id"
@@ -280,6 +281,7 @@ ActiveRecord::Schema.define(version: 20151013163940) do
     t.integer  "updated_by_id"
     t.datetime "created_at",                                                              null: false
     t.datetime "updated_at",                                                              null: false
+    t.integer  "upload_id"
   end
 
   add_index "assets", ["asset_subtype_id"], name: "assets_idx4", using: :btree
@@ -768,6 +770,12 @@ ActiveRecord::Schema.define(version: 20151013163940) do
   add_index "images", ["imagable_id", "imagable_type"], name: "images_idx2", using: :btree
   add_index "images", ["object_key"], name: "images_idx1", using: :btree
 
+  create_table "issue_status_types", force: true do |t|
+    t.string  "name",        limit: 32,  null: false
+    t.string  "description", limit: 254, null: false
+    t.boolean "active"
+  end
+
   create_table "issue_types", force: true do |t|
     t.string  "name",        limit: 64,  null: false
     t.string  "description", limit: 254, null: false
@@ -775,11 +783,13 @@ ActiveRecord::Schema.define(version: 20151013163940) do
   end
 
   create_table "issues", force: true do |t|
-    t.string   "object_key",          limit: 12, null: false
-    t.integer  "issue_type_id",                  null: false
-    t.integer  "web_browser_type_id",            null: false
-    t.integer  "created_by_id",                  null: false
-    t.text     "comments",                       null: false
+    t.string   "object_key",           limit: 12,             null: false
+    t.integer  "issue_type_id",                               null: false
+    t.integer  "web_browser_type_id",                         null: false
+    t.integer  "created_by_id",                               null: false
+    t.text     "comments",                                    null: false
+    t.integer  "issue_status_type_id",            default: 1
+    t.text     "resolution_comments"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -828,6 +838,12 @@ ActiveRecord::Schema.define(version: 20151013163940) do
     t.boolean "active",                  null: false
   end
 
+  create_table "maintenance_types", force: true do |t|
+    t.string  "name",        limit: 32,  null: false
+    t.string  "description", limit: 254, null: false
+    t.boolean "active",                  null: false
+  end
+
   create_table "manufacturers", force: true do |t|
     t.string  "filter", limit: 32,  null: false
     t.string  "name",   limit: 128, null: false
@@ -846,6 +862,7 @@ ActiveRecord::Schema.define(version: 20151013163940) do
     t.integer  "thread_message_id"
     t.string   "subject",           limit: 64, null: false
     t.text     "body"
+    t.boolean  "active"
     t.datetime "opened_at"
     t.datetime "created_at",                   null: false
   end
@@ -1049,6 +1066,7 @@ ActiveRecord::Schema.define(version: 20151013163940) do
 
   create_table "roles", force: true do |t|
     t.string   "name",          limit: 64,                 null: false
+    t.integer  "weight"
     t.integer  "resource_id"
     t.string   "resource_type"
     t.datetime "created_at",                               null: false
@@ -1143,7 +1161,7 @@ ActiveRecord::Schema.define(version: 20151013163940) do
 
   create_table "uploads", force: true do |t|
     t.string   "object_key",              limit: 12,         null: false
-    t.integer  "organization_id",                            null: false
+    t.integer  "organization_id"
     t.integer  "user_id",                                    null: false
     t.integer  "file_content_type_id",                       null: false
     t.integer  "file_status_type_id",                        null: false
@@ -1176,6 +1194,7 @@ ActiveRecord::Schema.define(version: 20151013163940) do
     t.boolean  "active",                  null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "sort_order"
   end
 
   add_index "user_organization_filters", ["object_key"], name: "user_organization_filters_idx1", using: :btree
