@@ -74,11 +74,13 @@
     };
 
     map.eachLayer(function(layer) {
-      marker.unbindPopup();
-      // Bind a popup handler
-      layer.on('click', function(e){
-        show_popup_for_selected(layer);
-      });
+      if(layer instanceof L.Marker) {
+        layer.unbindPopup();
+        // Bind a popup handler
+        layer.on('click', function(e){
+          show_popup_for_selected(layer);
+        });
+      }
     });
 
     // Show or hide map container
