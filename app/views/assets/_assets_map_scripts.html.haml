@@ -1,7 +1,23 @@
+:ruby 
+  markers = []
+  if @assets.count <= Rails.application.config.max_num_map_objects.to_i
+    @assets.each do |a|
+      asset = Asset.get_typed_asset(a)
+      if asset.mappable?
+        markers << asset.map_marker_without_popup
+      end
+    end
+
+    markers = markers.to_json
+  else
+    @max_assets_on_map_reached = true
+  end
+
 :javascript
   $(function() {
     // store the map object for convienience
     var map = leaflet_tools.map();
+    var markers_layer;
 
     // More customization in the map providing more tools
     var locate_option = #{(Rails.application.config.transam_spatial_map_options.include? "locate").to_s};
@@ -16,7 +32,11 @@
 
     if (marker_cluster_option) {
       // Enable marker clusters
+      markers_layer = new L.markerClusterGroup();
+    } else {
+      markers_layer = new L.featureGroup();
     }
+    map.addLayer(markers_layer);
 
     if (full_screen_option) {
       // Allow the user to go full screen if the browser supports it
@@ -40,6 +60,35 @@
 
     // Add the mouse position plugin
     L.control.mousePosition().addTo(map);
+
+    // draw markers
+    function draw_markers() {
+      var arr = #{markers || []};
+      for(var i=0;i < arr.length;i++){
+        var obj = arr[i];
+        if (obj.lat == null || obj.lng == null) {
+          continue;
+        }
+        var id = obj.id;
+        var lat = obj.lat;
+        var lng = obj.lng;
+        var iconClass = obj.iconClass;
+        var popupText = obj.description;
+        var title = obj.title;
+        var zindex = obj.zindex;
+        var open = false;
+        if (obj.open) {
+          open = obj.open;
+        }
+        var draggable = obj.draggable;
+        markers_layer.addLayer(leaflet_tools.create_marker(id, lat, lng, iconClass, popupText, title, open, draggable, zindex));
+      }
+    }
+    draw_markers();
+
+    if(markers_layer.getLayers().length > 0) {
+      map.fitBounds(markers_layer.getBounds());
+    }
 
     // Zoom to and show the popup for the selected marker
     function show_popup_for_selected(marker) {
@@ -73,14 +122,9 @@
       });
     };
 
-    map.eachLayer(function(layer) {
-      if(layer instanceof L.Marker) {
-        layer.unbindPopup();
-        // Bind a popup handler
-        layer.on('click', function(e){
-          show_popup_for_selected(layer);
-        });
-      }
+    // Bind a popup handler
+    markers_layer.on('click', function(e){
+      show_popup_for_selected(e.layer);
     });
 
     // Show or hide map container
