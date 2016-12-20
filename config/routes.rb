@@ -1,8 +1,12 @@
 Rails.application.routes.draw do
 
-  resources :maps, :only => [:index] do
+  resources :maps, :only => [] do
     collection do
       get 'markers'
+    end
+
+    member do 
+      get 'map_popup'
     end
   end
 

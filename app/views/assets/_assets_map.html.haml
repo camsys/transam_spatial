@@ -1,0 +1,29 @@
+:ruby 
+  markers = []
+  if @assets.count <= Rails.application.config.max_num_map_objects.to_i
+    @assets.each do |a|
+      asset = Asset.get_typed_asset(a)
+      if asset.mappable?
+        markers << asset.map_marker_without_popup
+      end
+    end
+
+    markers = markers.to_json
+  else
+    @max_assets_on_map_reached = true
+  end
+
+= LeafletMap({:mapid => 'lmap',
+  :markers => markers,
+  :tile_provider => Rails.application.config.map_tile_provider,
+  :map_key => Rails.application.config.map_tile_key,
+  :access_token => Rails.application.config.map_access_token,
+  :min_zoom => Rails.application.config.map_min_zoom_level,
+  :max_zoom => Rails.application.config.map_max_zoom_level,
+  :max_native_zoom => Rails.application.config.map_max_zoom_level,
+  :class => "map",
+  :style => "height:400px;"})
+
+= yield :scripts
+
+= render 'assets_map_scripts'

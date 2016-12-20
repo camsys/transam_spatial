@@ -123,24 +123,11 @@ module TransamGeoLocatable
   # TODO make this more generic for line and polygonal assets
   #
   def map_marker(draggable=false, zindex = 0, icon = _icon_class)
-    _geom_column = self.send(_geolocatable_geometry_attribute_name)
-    if _geom_column.present?
-      lat = _geom_column.y
-      lng = _geom_column.x
-      {
-        "id" => object_key,
-        "lat" =>lat,
-        "lng" => lng,
-        "zindex" => zindex,
-        "name" => name,
-        "iconClass" => icon,
-        "draggable" => draggable,
-        "title" => name,
-        "description" => description
-      }
-    else
-      {}
-    end
+    prepare_marker(draggable, zindex, icon)
+  end
+
+  def map_marker_without_popup(draggable=false, zindex = 0, icon = _icon_class)
+    prepare_marker(draggable, zindex, icon, true)
   end
 
   # Updates the spatial reference for the model based on the location reference
@@ -249,5 +236,30 @@ module TransamGeoLocatable
       update_geometry
     end
     result
+  end
+
+  private
+
+  def prepare_marker(draggable=false, zindex = 0, icon = _icon_class, no_popup = false)
+    _geom_column = self.send(_geolocatable_geometry_attribute_name)
+    if _geom_column.present?
+      lat = _geom_column.y
+      lng = _geom_column.x
+      marker = {
+        "id" => object_key,
+        "lat" =>lat,
+        "lng" => lng,
+        "zindex" => zindex,
+        "name" => name,
+        "iconClass" => icon,
+        "draggable" => draggable,
+        "title" => name
+      }
+
+      marker['description'] = description unless no_popup
+      marker
+    else
+      {}
+    end
   end
 end

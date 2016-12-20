@@ -403,6 +403,3 @@ DEPENDENCIES
   simplecov
   transam_core!
   transam_spatial!
-
-BUNDLED WITH
-   1.11.2
