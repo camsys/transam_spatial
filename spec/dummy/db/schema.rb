@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160610142004) do
+ActiveRecord::Schema.define(version: 20161102174139) do
 
   create_table "activities", force: true do |t|
     t.string   "object_key",           limit: 12
@@ -650,10 +650,10 @@ ActiveRecord::Schema.define(version: 20160610142004) do
   end
 
   create_table "fuel_types", force: true do |t|
-    t.string  "name",        limit: 64,  null: false
-    t.string  "code",        limit: 2,   null: false
-    t.string  "description", limit: 254, null: false
-    t.boolean "active",                  null: false
+    t.string  "name",        null: false
+    t.string  "code",        null: false
+    t.string  "description", null: false
+    t.boolean "active",      null: false
   end
 
   create_table "funding_source_types", force: true do |t|
@@ -895,6 +895,26 @@ ActiveRecord::Schema.define(version: 20160610142004) do
     t.datetime "updated_at"
   end
 
+  create_table "notifications", force: true do |t|
+    t.string   "object_key",      limit: 12, null: false
+    t.string   "text",                       null: false
+    t.string   "link",                       null: false
+    t.integer  "notifiable_id"
+    t.string   "notifiable_type"
+    t.boolean  "active"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "notifications", ["notifiable_id", "notifiable_type"], name: "index_notifications_on_notifiable_id_and_notifiable_type", using: :btree
+
+  create_table "organization_role_mappings", force: true do |t|
+    t.integer  "organization_id", null: false
+    t.integer  "role_id",         null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "organization_types", force: true do |t|
     t.string  "name",              limit: 64,  null: false
     t.string  "class_name",        limit: 64,  null: false
@@ -1032,6 +1052,14 @@ ActiveRecord::Schema.define(version: 20160610142004) do
     t.boolean "active",                  null: false
   end
 
+  create_table "query_params", force: true do |t|
+    t.string  "name"
+    t.string  "description"
+    t.text    "query_string"
+    t.string  "class_name"
+    t.boolean "active"
+  end
+
   create_table "replacement_reason_types", force: true do |t|
     t.string  "name",        limit: 64,  null: false
     t.string  "description", limit: 254, null: false
@@ -1072,6 +1100,7 @@ ActiveRecord::Schema.define(version: 20160610142004) do
     t.datetime "created_at",                               null: false
     t.datetime "updated_at",                               null: false
     t.boolean  "privilege",                default: false, null: false
+    t.string   "label"
   end
 
   add_index "roles", ["name"], name: "roles_idx1", using: :btree
@@ -1186,19 +1215,33 @@ ActiveRecord::Schema.define(version: 20160610142004) do
   add_index "uploads", ["organization_id"], name: "uploads_idx2", using: :btree
   add_index "uploads", ["user_id"], name: "uploads_idx3", using: :btree
 
+  create_table "user_notifications", force: true do |t|
+    t.integer  "user_id",         null: false
+    t.integer  "notification_id", null: false
+    t.datetime "opened_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "user_notifications", ["notification_id"], name: "index_user_notifications_on_notification_id", using: :btree
+  add_index "user_notifications", ["user_id"], name: "index_user_notifications_on_user_id", using: :btree
+
   create_table "user_organization_filters", force: true do |t|
-    t.string   "object_key",  limit: 12,  null: false
-    t.integer  "user_id",                 null: false
-    t.string   "name",        limit: 64,  null: false
-    t.string   "description", limit: 254, null: false
-    t.boolean  "active",                  null: false
+    t.string   "object_key",         limit: 12,  null: false
+    t.string   "name",               limit: 64,  null: false
+    t.string   "description",        limit: 254, null: false
+    t.boolean  "active",                         null: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "sort_order"
+    t.integer  "created_by_user_id"
+    t.text     "query_string"
+    t.integer  "resource_id"
+    t.string   "resource_type"
   end
 
+  add_index "user_organization_filters", ["created_by_user_id"], name: "index_user_organization_filters_on_created_by_user_id", using: :btree
   add_index "user_organization_filters", ["object_key"], name: "user_organization_filters_idx1", using: :btree
-  add_index "user_organization_filters", ["user_id"], name: "user_organization_filters_idx2", using: :btree
 
   create_table "user_organization_filters_organizations", id: false, force: true do |t|
     t.integer "user_organization_filter_id", null: false
@@ -1268,6 +1311,14 @@ ActiveRecord::Schema.define(version: 20160610142004) do
 
   add_index "users_roles", ["active"], name: "users_roles_idx3", using: :btree
   add_index "users_roles", ["user_id", "role_id"], name: "users_roles_idx2", using: :btree
+
+  create_table "users_user_organization_filters", force: true do |t|
+    t.integer "user_id",                     null: false
+    t.integer "user_organization_filter_id", null: false
+  end
+
+  add_index "users_user_organization_filters", ["user_id"], name: "users_user_organization_filters_idx1", using: :btree
+  add_index "users_user_organization_filters", ["user_organization_filter_id"], name: "users_user_organization_filters_idx2", using: :btree
 
   create_table "vehicle_features", force: true do |t|
     t.string  "name",        limit: 64,  null: false
