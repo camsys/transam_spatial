@@ -17,6 +17,11 @@
   $(function() {
     // store the map object for convienience
     var map = leaflet_tools.map();
+
+    // add TransAM map customizations
+    leaflet_tools.addZoomSlider();
+    leaflet_tools.addLayerControl();
+
     var markers_layer;
 
     // More customization in the map providing more tools
@@ -24,6 +29,7 @@
     var marker_cluster_option = #{(Rails.application.config.transam_spatial_map_options.include? "marker_cluster").to_s};
     var full_screen_option = #{(Rails.application.config.transam_spatial_map_options.include? "full_screen").to_s};
     var draw_option = #{(Rails.application.config.transam_spatial_map_options.include? "draw").to_s};
+    var esri_option = #{(Rails.application.config.transam_spatial_map_options.include? "esri").to_s};
     
     if (locate_option) {
       // Allow the user to locate themselves on the map using the HTML 5 fuctions
@@ -37,6 +43,7 @@
       markers_layer = new L.featureGroup();
     }
     map.addLayer(markers_layer);
+    leaflet_tools.layerControl.addOverlay(markers_layer, 'Asset Markers');
 
     if (full_screen_option) {
       // Allow the user to go full screen if the browser supports it
