@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161102174139) do
+ActiveRecord::Schema.define(version: 20170103225100) do
 
   create_table "activities", force: true do |t|
     t.string   "object_key",           limit: 12
@@ -66,30 +66,32 @@ ActiveRecord::Schema.define(version: 20161102174139) do
   add_index "asset_event_types", ["class_name"], name: "asset_event_types_idx1", using: :btree
 
   create_table "asset_events", force: true do |t|
-    t.string   "object_key",                     limit: 12,                          null: false
-    t.integer  "asset_id",                                                           null: false
-    t.integer  "asset_event_type_id",                                                null: false
+    t.string   "object_key",                   limit: 12,                          null: false
+    t.integer  "asset_id",                                                         null: false
+    t.integer  "asset_event_type_id",                                              null: false
     t.integer  "upload_id"
-    t.date     "event_date",                                                         null: false
-    t.decimal  "assessed_rating",                            precision: 9, scale: 2
+    t.date     "event_date",                                                       null: false
+    t.decimal  "assessed_rating",                          precision: 9, scale: 2
     t.integer  "condition_type_id"
     t.integer  "current_mileage"
     t.integer  "parent_id"
     t.integer  "replacement_year"
     t.integer  "rebuild_year"
     t.integer  "disposition_year"
+    t.integer  "extended_useful_life_miles"
+    t.integer  "extended_useful_life_months"
     t.integer  "replacement_reason_type_id"
     t.date     "disposition_date"
     t.integer  "disposition_type_id"
     t.integer  "service_status_type_id"
+    t.integer  "maintenance_type_id"
     t.integer  "pcnt_5311_routes"
     t.integer  "avg_daily_use_hours"
     t.integer  "avg_daily_use_miles"
     t.integer  "avg_daily_passenger_trips"
     t.integer  "maintenance_provider_type_id"
-    t.integer  "vehicle_storage_method_type_id"
-    t.decimal  "avg_cost_per_mile",                          precision: 9, scale: 2
-    t.decimal  "avg_miles_per_gallon",                       precision: 9, scale: 2
+    t.decimal  "avg_cost_per_mile",                        precision: 9, scale: 2
+    t.decimal  "avg_miles_per_gallon",                     precision: 9, scale: 2
     t.integer  "annual_maintenance_cost"
     t.integer  "annual_insurance_cost"
     t.boolean  "actual_costs"
@@ -98,11 +100,11 @@ ActiveRecord::Schema.define(version: 20161102174139) do
     t.integer  "sales_proceeds"
     t.text     "comments"
     t.integer  "organization_id"
-    t.datetime "created_at",                                                         null: false
-    t.datetime "updated_at",                                                         null: false
-    t.string   "state",                          limit: 32
-    t.string   "document",                       limit: 128
-    t.string   "original_filename",              limit: 128
+    t.datetime "created_at",                                                       null: false
+    t.datetime "updated_at",                                                       null: false
+    t.string   "state",                        limit: 32
+    t.string   "document",                     limit: 128
+    t.string   "original_filename",            limit: 128
     t.integer  "created_by_id"
   end
 
@@ -112,13 +114,6 @@ ActiveRecord::Schema.define(version: 20161102174139) do
   add_index "asset_events", ["event_date"], name: "asset_events_idx4", using: :btree
   add_index "asset_events", ["object_key"], name: "asset_events_idx1", using: :btree
   add_index "asset_events", ["upload_id"], name: "asset_events_idx5", using: :btree
-
-  create_table "asset_events_vehicle_usage_codes", id: false, force: true do |t|
-    t.integer "asset_event_id"
-    t.integer "vehicle_usage_code_id"
-  end
-
-  add_index "asset_events_vehicle_usage_codes", ["asset_event_id", "vehicle_usage_code_id"], name: "asset_events_vehicle_usage_codes_idx1", using: :btree
 
   create_table "asset_groups", force: true do |t|
     t.string   "object_key",      limit: 12,  null: false
@@ -159,6 +154,14 @@ ActiveRecord::Schema.define(version: 20161102174139) do
 
   add_index "asset_subtypes", ["asset_type_id"], name: "asset_subtypes_idx1", using: :btree
 
+  create_table "asset_tags", force: true do |t|
+    t.integer "asset_id"
+    t.integer "user_id"
+  end
+
+  add_index "asset_tags", ["asset_id"], name: "asset_tags_idx1", using: :btree
+  add_index "asset_tags", ["user_id"], name: "asset_tags_idx2", using: :btree
+
   create_table "asset_types", force: true do |t|
     t.string  "name",              limit: 64,  null: false
     t.string  "class_name",        limit: 64,  null: false
@@ -179,15 +182,16 @@ ActiveRecord::Schema.define(version: 20161102174139) do
   add_index "asset_types_manufacturers", ["asset_type_id", "manufacturer_id"], name: "asset_types_manufacturers_idx1", using: :btree
 
   create_table "assets", force: true do |t|
-    t.string   "object_key",                         limit: 12,                           null: false
-    t.integer  "organization_id",                                                         null: false
-    t.integer  "asset_type_id",                                                           null: false
-    t.integer  "asset_subtype_id",                                                        null: false
-    t.string   "asset_tag",                          limit: 32,                           null: false
-    t.string   "external_id",                        limit: 32
+    t.string   "object_key",                      limit: 12,                           null: false
+    t.integer  "organization_id",                                                      null: false
+    t.integer  "asset_type_id",                                                        null: false
+    t.integer  "asset_subtype_id",                                                     null: false
+    t.string   "asset_tag",                       limit: 32,                           null: false
+    t.string   "external_id",                     limit: 32
     t.integer  "parent_id"
+    t.integer  "superseded_by_id"
     t.integer  "manufacturer_id"
-    t.string   "manufacturer_model",                 limit: 128
+    t.string   "manufacturer_model",              limit: 128
     t.integer  "manufacture_year"
     t.integer  "pcnt_capital_responsibility"
     t.integer  "vendor_id"
@@ -205,58 +209,54 @@ ActiveRecord::Schema.define(version: 20161102174139) do
     t.integer  "replacement_reason_type_id"
     t.boolean  "in_backlog"
     t.integer  "reported_condition_type_id"
-    t.decimal  "reported_condition_rating",                      precision: 10, scale: 1
+    t.decimal  "reported_condition_rating",                   precision: 10, scale: 1
     t.integer  "reported_mileage"
+    t.date     "reported_mileage_date"
     t.date     "reported_condition_date"
     t.integer  "estimated_condition_type_id"
-    t.decimal  "estimated_condition_rating",                     precision: 9,  scale: 2
+    t.decimal  "estimated_condition_rating",                  precision: 9,  scale: 2
     t.integer  "service_status_type_id"
     t.date     "service_status_date"
+    t.date     "last_maintenance_date"
     t.boolean  "depreciable"
-    t.date     "depreciation_start_date"
-    t.date     "current_depreciation_date"
     t.integer  "book_value"
     t.integer  "salvage_value"
     t.date     "disposition_date"
     t.integer  "disposition_type_id"
     t.date     "last_rehabilitation_date"
     t.integer  "maintenance_provider_type_id"
-    t.integer  "vehicle_storage_method_type_id"
-    t.integer  "vehicle_rebuild_type_id"
     t.integer  "location_reference_type_id"
-    t.string   "location_reference",                 limit: 254
+    t.string   "location_reference",              limit: 254
     t.text     "location_comments"
     t.integer  "fuel_type_id"
     t.integer  "vehicle_length"
     t.integer  "gross_vehicle_weight"
-    t.string   "title_number",                       limit: 32
-    t.integer  "title_owner_organization_id"
-    t.string   "serial_number",                      limit: 32
+    t.string   "title_number",                    limit: 32
+    t.string   "serial_number",                   limit: 32
     t.boolean  "purchased_new"
     t.integer  "purchase_cost"
     t.date     "purchase_date"
+    t.date     "warranty_date"
     t.date     "in_service_date"
     t.integer  "expected_useful_life"
     t.integer  "expected_useful_miles"
-    t.integer  "purchase_method_type_id"
     t.integer  "rebuild_year"
-    t.string   "license_plate",                      limit: 32
+    t.string   "license_plate",                   limit: 32
     t.integer  "seating_capacity"
     t.integer  "standing_capacity"
     t.integer  "wheelchair_capacity"
     t.integer  "fta_ownership_type_id"
     t.integer  "fta_vehicle_type_id"
     t.integer  "fta_funding_type_id"
-    t.integer  "fta_bus_mode_type_id"
     t.boolean  "ada_accessible_lift"
     t.boolean  "ada_accessible_ramp"
     t.boolean  "fta_emergency_contingency_fleet"
-    t.string   "description",                        limit: 128
-    t.string   "address1",                           limit: 128
-    t.string   "address2",                           limit: 128
-    t.string   "city",                               limit: 64
-    t.string   "state",                              limit: 2
-    t.string   "zip",                                limit: 10
+    t.string   "description",                     limit: 128
+    t.string   "address1",                        limit: 128
+    t.string   "address2",                        limit: 128
+    t.string   "city",                            limit: 64
+    t.string   "state",                           limit: 2
+    t.string   "zip",                             limit: 10
     t.integer  "facility_size"
     t.boolean  "section_of_larger_facility"
     t.integer  "pcnt_operational"
@@ -266,21 +266,14 @@ ActiveRecord::Schema.define(version: 20161102174139) do
     t.integer  "num_escalators"
     t.integer  "num_parking_spaces_public"
     t.integer  "num_parking_spaces_private"
-    t.decimal  "lot_size",                                       precision: 9,  scale: 2
-    t.string   "line_number",                        limit: 128
-    t.integer  "land_ownership_type_id"
-    t.integer  "land_ownership_organization_id"
-    t.integer  "building_ownership_type_id"
-    t.integer  "building_ownership_organization_id"
-    t.integer  "facility_capacity_type_id"
-    t.integer  "fta_facility_type_id"
-    t.integer  "leed_certification_type_id"
+    t.decimal  "lot_size",                                    precision: 9,  scale: 2
+    t.string   "line_number",                     limit: 128
     t.integer  "quantity"
-    t.string   "quantity_units",                     limit: 16
+    t.string   "quantity_units",                  limit: 16
     t.integer  "created_by_id"
     t.integer  "updated_by_id"
-    t.datetime "created_at",                                                              null: false
-    t.datetime "updated_at",                                                              null: false
+    t.datetime "created_at",                                                           null: false
+    t.datetime "updated_at",                                                           null: false
     t.integer  "upload_id"
   end
 
@@ -296,93 +289,7 @@ ActiveRecord::Schema.define(version: 20161102174139) do
   add_index "assets", ["organization_id", "policy_replacement_year"], name: "assets_idx9", using: :btree
   add_index "assets", ["organization_id"], name: "assets_idx2", using: :btree
   add_index "assets", ["reported_condition_type_id"], name: "assets_idx6", using: :btree
-
-  create_table "assets_districts", id: false, force: true do |t|
-    t.integer "asset_id"
-    t.integer "district_id"
-  end
-
-  add_index "assets_districts", ["asset_id", "district_id"], name: "assets_districts_idx1", using: :btree
-
-  create_table "assets_expenditures", id: false, force: true do |t|
-    t.integer "asset_id",       null: false
-    t.integer "expenditure_id", null: false
-  end
-
-  add_index "assets_expenditures", ["asset_id", "expenditure_id"], name: "assets_expenditures_idx1", using: :btree
-
-  create_table "assets_facility_features", id: false, force: true do |t|
-    t.integer "asset_id",            null: false
-    t.integer "facility_feature_id", null: false
-  end
-
-  add_index "assets_facility_features", ["asset_id", "facility_feature_id"], name: "assets_facility_features_idx1", using: :btree
-
-  create_table "assets_fta_mode_types", id: false, force: true do |t|
-    t.integer "asset_id"
-    t.integer "fta_mode_type_id"
-  end
-
-  add_index "assets_fta_mode_types", ["asset_id", "fta_mode_type_id"], name: "assets_fta_mode_types_idx1", using: :btree
-
-  create_table "assets_fta_service_types", id: false, force: true do |t|
-    t.integer "asset_id"
-    t.integer "fta_service_type_id"
-  end
-
-  add_index "assets_fta_service_types", ["asset_id", "fta_service_type_id"], name: "assets_fta_service_types_idx1", using: :btree
-
-  create_table "assets_general_ledger_accounts", id: false, force: true do |t|
-    t.integer "asset_id",                  null: false
-    t.integer "general_ledger_account_id", null: false
-  end
-
-  add_index "assets_general_ledger_accounts", ["asset_id", "general_ledger_account_id"], name: "assets_general_ledger_accounts_idx1", using: :btree
-
-  create_table "assets_usage_codes", id: false, force: true do |t|
-    t.integer "asset_id"
-    t.integer "usage_code_id"
-  end
-
-  add_index "assets_usage_codes", ["asset_id", "usage_code_id"], name: "assets_usage_codes_idx1", using: :btree
-
-  create_table "assets_vehicle_features", id: false, force: true do |t|
-    t.integer "asset_id"
-    t.integer "vehicle_feature_id"
-  end
-
-  add_index "assets_vehicle_features", ["asset_id", "vehicle_feature_id"], name: "assets_vehicle_features_idx1", using: :btree
-
-  create_table "assets_vehicle_usage_codes", id: false, force: true do |t|
-    t.integer "asset_id",              null: false
-    t.integer "vehicle_usage_code_id", null: false
-  end
-
-  add_index "assets_vehicle_usage_codes", ["asset_id", "vehicle_usage_code_id"], name: "assets_vehicle_usage_codes_idx1", using: :btree
-
-  create_table "budget_amounts", force: true do |t|
-    t.string   "object_key",        limit: 12, null: false
-    t.integer  "organization_id",              null: false
-    t.integer  "funding_source_id",            null: false
-    t.integer  "fy_year",                      null: false
-    t.integer  "amount",                       null: false
-    t.boolean  "estimated"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "budget_amounts", ["object_key"], name: "budget_amounts_idx1", using: :btree
-  add_index "budget_amounts", ["organization_id", "funding_source_id", "fy_year"], name: "budget_amounts_idx2", using: :btree
-
-  create_table "chart_of_accounts", force: true do |t|
-    t.string   "object_key",      limit: 12
-    t.integer  "organization_id"
-    t.boolean  "active"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "chart_of_accounts", ["organization_id"], name: "chart_of_accounts_idx1", using: :btree
+  add_index "assets", ["superseded_by_id"], name: "assets_idx13", using: :btree
 
   create_table "comments", force: true do |t|
     t.string   "object_key",       limit: 12,  null: false
@@ -429,6 +336,13 @@ ActiveRecord::Schema.define(version: 20161102174139) do
     t.datetime "updated_at",                 null: false
   end
 
+  create_table "delayed_job_priorities", force: true do |t|
+    t.string   "class_name",             null: false
+    t.integer  "priority",   default: 0, null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "delayed_jobs", force: true do |t|
     t.integer  "priority"
     t.integer  "attempts"
@@ -445,43 +359,12 @@ ActiveRecord::Schema.define(version: 20161102174139) do
 
   add_index "delayed_jobs", ["priority", "run_at"], name: "delayed_jobs_priority", using: :btree
 
-  create_table "depreciation_calculation_types", force: true do |t|
-    t.string  "name",        limit: 64,  null: false
-    t.string  "class_name",  limit: 64,  null: false
-    t.string  "description", limit: 254, null: false
-    t.boolean "active",                  null: false
-  end
-
-  create_table "depreciation_interval_types", force: true do |t|
-    t.string  "name",        limit: 64,  null: false
-    t.string  "description", limit: 254, null: false
-    t.integer "months",                  null: false
-    t.boolean "active",                  null: false
-  end
-
   create_table "disposition_types", force: true do |t|
     t.string  "name",        limit: 64,  null: false
     t.string  "code",        limit: 2,   null: false
     t.string  "description", limit: 254, null: false
     t.boolean "active",                  null: false
   end
-
-  create_table "district_types", force: true do |t|
-    t.string  "name",        limit: 64,  null: false
-    t.string  "description", limit: 254, null: false
-    t.boolean "active",                  null: false
-  end
-
-  create_table "districts", force: true do |t|
-    t.integer "district_type_id",             null: false
-    t.string  "name",             limit: 64,  null: false
-    t.string  "code",             limit: 6,   null: false
-    t.string  "description",      limit: 254, null: false
-    t.boolean "active",                       null: false
-  end
-
-  add_index "districts", ["district_type_id"], name: "districts_idx1", using: :btree
-  add_index "districts", ["name"], name: "districts_idx2", using: :btree
 
   create_table "documents", force: true do |t|
     t.string   "object_key",        limit: 12,  null: false
@@ -499,50 +382,6 @@ ActiveRecord::Schema.define(version: 20161102174139) do
 
   add_index "documents", ["documentable_id", "documentable_type"], name: "documents_idx2", using: :btree
   add_index "documents", ["object_key"], name: "documents_idx1", using: :btree
-
-  create_table "expenditures", force: true do |t|
-    t.string   "object_key",                limit: 12,  null: false
-    t.integer  "organization_id",                       null: false
-    t.integer  "vendor_id"
-    t.integer  "general_ledger_account_id"
-    t.integer  "grant_id"
-    t.integer  "expense_type_id",                       null: false
-    t.string   "external_id",               limit: 32
-    t.date     "expense_date",                          null: false
-    t.string   "description",               limit: 254
-    t.integer  "amount",                                null: false
-    t.integer  "pcnt_from_grant"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "expenditures", ["expense_type_id"], name: "expenditures_idx4", using: :btree
-  add_index "expenditures", ["general_ledger_account_id"], name: "expenditures_idx3", using: :btree
-  add_index "expenditures", ["object_key"], name: "expenditures_idx1", using: :btree
-  add_index "expenditures", ["organization_id"], name: "expenditures_idx2", using: :btree
-
-  create_table "expense_types", force: true do |t|
-    t.integer "organization_id",             null: false
-    t.string  "name",            limit: 64,  null: false
-    t.string  "description",     limit: 254, null: false
-    t.boolean "active",                      null: false
-  end
-
-  add_index "expense_types", ["name"], name: "expense_types_idx2", using: :btree
-  add_index "expense_types", ["organization_id"], name: "expense_types_idx1", using: :btree
-
-  create_table "facility_capacity_types", force: true do |t|
-    t.string  "name",        limit: 64,  null: false
-    t.string  "description", limit: 254, null: false
-    t.boolean "active",                  null: false
-  end
-
-  create_table "facility_features", force: true do |t|
-    t.string  "name",        limit: 64,  null: false
-    t.string  "code",        limit: 4,   null: false
-    t.string  "description", limit: 254, null: false
-    t.boolean "active"
-  end
 
   create_table "file_content_types", force: true do |t|
     t.string  "name",         limit: 64,  null: false
@@ -582,176 +421,12 @@ ActiveRecord::Schema.define(version: 20161102174139) do
     t.boolean "active",                  null: false
   end
 
-  create_table "fta_agency_types", force: true do |t|
-    t.string  "name",        limit: 64,  null: false
-    t.string  "description", limit: 256, null: false
-    t.boolean "active",                  null: false
-  end
-
-  create_table "fta_bus_mode_types", force: true do |t|
-    t.string  "code",        limit: 4,   null: false
-    t.string  "name",        limit: 64,  null: false
-    t.string  "description", limit: 254, null: false
-    t.boolean "active",                  null: false
-  end
-
-  create_table "fta_facility_types", force: true do |t|
-    t.string  "name",        limit: 64,  null: false
-    t.string  "description", limit: 254, null: false
-    t.boolean "active",                  null: false
-  end
-
-  create_table "fta_funding_types", force: true do |t|
-    t.string  "name",        limit: 64,  null: false
-    t.string  "code",        limit: 4,   null: false
-    t.string  "description", limit: 256, null: false
-    t.boolean "active",                  null: false
-  end
-
-  create_table "fta_mode_types", force: true do |t|
-    t.string  "name",        limit: 64,  null: false
-    t.string  "code",        limit: 2,   null: false
-    t.string  "description", limit: 254, null: false
-    t.boolean "active",                  null: false
-  end
-
-  create_table "fta_mode_types_organizations", id: false, force: true do |t|
-    t.integer "organization_id",  null: false
-    t.integer "fta_mode_type_id", null: false
-  end
-
-  add_index "fta_mode_types_organizations", ["organization_id", "fta_mode_type_id"], name: "fta_mode_types_organizations_idx1", using: :btree
-
-  create_table "fta_ownership_types", force: true do |t|
-    t.string  "name",        limit: 64,  null: false
-    t.string  "code",        limit: 4,   null: false
-    t.string  "description", limit: 254, null: false
-    t.boolean "active",                  null: false
-  end
-
-  create_table "fta_service_area_types", force: true do |t|
-    t.string  "name",        limit: 64,  null: false
-    t.string  "description", limit: 254, null: false
-    t.boolean "active",                  null: false
-  end
-
-  create_table "fta_service_types", force: true do |t|
-    t.string  "name",        limit: 64,  null: false
-    t.string  "code",        limit: 2,   null: false
-    t.string  "description", limit: 254, null: false
-    t.boolean "active",                  null: false
-  end
-
-  create_table "fta_vehicle_types", force: true do |t|
-    t.string  "name",        limit: 64,  null: false
-    t.string  "code",        limit: 2,   null: false
-    t.string  "description", limit: 254, null: false
-    t.boolean "active",                  null: false
-  end
-
   create_table "fuel_types", force: true do |t|
     t.string  "name",        null: false
     t.string  "code",        null: false
     t.string  "description", null: false
     t.boolean "active",      null: false
   end
-
-  create_table "funding_source_types", force: true do |t|
-    t.string  "name",        limit: 64,  null: false
-    t.string  "description", limit: 254, null: false
-    t.boolean "active",                  null: false
-  end
-
-  create_table "funding_sources", force: true do |t|
-    t.string   "object_key",                      limit: 12, null: false
-    t.string   "name",                            limit: 64, null: false
-    t.text     "description",                                null: false
-    t.integer  "funding_source_type_id",                     null: false
-    t.string   "external_id",                     limit: 32
-    t.boolean  "state_administered_federal_fund"
-    t.boolean  "bond_fund"
-    t.boolean  "formula_fund"
-    t.boolean  "non_committed_fund"
-    t.boolean  "contracted_fund"
-    t.boolean  "discretionary_fund"
-    t.float    "state_match_required",            limit: 24
-    t.float    "federal_match_required",          limit: 24
-    t.float    "local_match_required",            limit: 24
-    t.boolean  "rural_providers"
-    t.boolean  "urban_providers"
-    t.boolean  "shared_ride_providers"
-    t.boolean  "inter_city_bus_providers"
-    t.boolean  "inter_city_rail_providers"
-    t.integer  "created_by_id"
-    t.integer  "updated_by_id"
-    t.boolean  "active"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "funding_sources", ["object_key"], name: "funding_sources_idx1", using: :btree
-
-  create_table "general_ledger_account_types", force: true do |t|
-    t.string  "name",        limit: 64,  null: false
-    t.string  "description", limit: 254, null: false
-    t.boolean "active",                  null: false
-  end
-
-  create_table "general_ledger_accounts", force: true do |t|
-    t.string   "object_key",                     limit: 12, null: false
-    t.integer  "chart_of_account_id",                       null: false
-    t.integer  "general_ledger_account_type_id",            null: false
-    t.string   "account_number",                 limit: 32, null: false
-    t.string   "name",                           limit: 64, null: false
-    t.boolean  "active",                                    null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "general_ledger_accounts", ["active"], name: "general_ledger_accounts_idx3", using: :btree
-  add_index "general_ledger_accounts", ["chart_of_account_id"], name: "general_ledger_accounts_idx2", using: :btree
-  add_index "general_ledger_accounts", ["object_key"], name: "general_ledger_accounts_idx1", using: :btree
-
-  create_table "governing_body_types", force: true do |t|
-    t.string  "name",        limit: 64,  null: false
-    t.string  "code",        limit: 2,   null: false
-    t.string  "description", limit: 254, null: false
-    t.boolean "active",                  null: false
-  end
-
-  create_table "grant_budgets", force: true do |t|
-    t.integer "general_ledger_account_id", null: false
-    t.integer "grant_id",                  null: false
-    t.integer "amount",                    null: false
-  end
-
-  add_index "grant_budgets", ["general_ledger_account_id", "grant_id"], name: "grant_budgets_idx1", using: :btree
-
-  create_table "grant_purchases", force: true do |t|
-    t.integer  "asset_id",           null: false
-    t.integer  "grant_id",           null: false
-    t.integer  "pcnt_purchase_cost", null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "grant_purchases", ["asset_id", "grant_id"], name: "grant_purchases_idx1", using: :btree
-
-  create_table "grants", force: true do |t|
-    t.string   "object_key",        limit: 12, null: false
-    t.integer  "organization_id",              null: false
-    t.integer  "funding_source_id",            null: false
-    t.integer  "fy_year",                      null: false
-    t.string   "grant_number",      limit: 64, null: false
-    t.integer  "amount",                       null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "grants", ["funding_source_id"], name: "grants_idx4", using: :btree
-  add_index "grants", ["fy_year"], name: "grants_idx3", using: :btree
-  add_index "grants", ["object_key"], name: "grants_idx1", using: :btree
-  add_index "grants", ["organization_id"], name: "grants_idx2", using: :btree
 
   create_table "images", force: true do |t|
     t.string   "object_key",        limit: 12,  null: false
@@ -810,12 +485,6 @@ ActiveRecord::Schema.define(version: 20161102174139) do
 
   add_index "keyword_search_indices", ["object_class"], name: "keyword_search_indices_idx1", using: :btree
 
-  create_table "leed_certification_types", force: true do |t|
-    t.string  "name",        limit: 64,  null: false
-    t.text    "description", limit: 255, null: false
-    t.boolean "active",                  null: false
-  end
-
   create_table "license_types", force: true do |t|
     t.string  "name",          limit: 64,  null: false
     t.string  "description",   limit: 254, null: false
@@ -852,6 +521,14 @@ ActiveRecord::Schema.define(version: 20161102174139) do
   end
 
   add_index "manufacturers", ["filter"], name: "manufacturers_idx1", using: :btree
+
+  create_table "message_tags", force: true do |t|
+    t.integer "message_id"
+    t.integer "user_id"
+  end
+
+  add_index "message_tags", ["message_id"], name: "message_tags_idx1", using: :btree
+  add_index "message_tags", ["user_id"], name: "message_tags_idx2", using: :btree
 
   create_table "messages", force: true do |t|
     t.string   "object_key",        limit: 12, null: false
@@ -927,57 +604,36 @@ ActiveRecord::Schema.define(version: 20161102174139) do
   add_index "organization_types", ["class_name"], name: "organization_types_idx1", using: :btree
 
   create_table "organizations", force: true do |t|
-    t.integer  "organization_type_id",                                          null: false
-    t.integer  "customer_id",                                                   null: false
-    t.string   "external_id",              limit: 32
-    t.string   "name",                     limit: 128,                          null: false
-    t.string   "short_name",               limit: 16,                           null: false
-    t.boolean  "license_holder",                                                null: false
-    t.string   "address1",                 limit: 128,                          null: false
-    t.string   "address2",                 limit: 128
-    t.string   "county",                   limit: 64
-    t.string   "city",                     limit: 64,                           null: false
-    t.string   "state",                    limit: 2,                            null: false
-    t.string   "zip",                      limit: 10,                           null: false
-    t.string   "phone",                    limit: 12,                           null: false
-    t.string   "phone_ext",                limit: 6
-    t.string   "fax",                      limit: 10
-    t.string   "url",                      limit: 128,                          null: false
-    t.integer  "grantor_id"
-    t.integer  "fta_agency_type_id"
+    t.integer  "organization_type_id",                                      null: false
+    t.integer  "customer_id",                                               null: false
+    t.string   "external_id",          limit: 32
+    t.string   "name",                 limit: 128,                          null: false
+    t.string   "short_name",           limit: 16,                           null: false
+    t.boolean  "license_holder",                                            null: false
+    t.string   "address1",             limit: 128,                          null: false
+    t.string   "address2",             limit: 128
+    t.string   "county",               limit: 64
+    t.string   "city",                 limit: 64,                           null: false
+    t.string   "state",                limit: 2,                            null: false
+    t.string   "zip",                  limit: 10,                           null: false
+    t.string   "phone",                limit: 12,                           null: false
+    t.string   "phone_ext",            limit: 6
+    t.string   "fax",                  limit: 10
+    t.string   "url",                  limit: 128,                          null: false
     t.boolean  "indian_tribe"
-    t.string   "subrecipient_number",      limit: 9
-    t.string   "ntd_id_number",            limit: 4
-    t.integer  "fta_service_area_type_id"
-    t.string   "governing_body",           limit: 128
-    t.integer  "governing_body_type_id"
-    t.boolean  "active",                                                        null: false
-    t.decimal  "latitude",                             precision: 11, scale: 6
-    t.decimal  "longitude",                            precision: 11, scale: 6
-    t.datetime "created_at",                                                    null: false
-    t.datetime "updated_at",                                                    null: false
+    t.string   "subrecipient_number",  limit: 9
+    t.string   "ntd_id_number",        limit: 4
+    t.boolean  "active",                                                    null: false
+    t.decimal  "latitude",                         precision: 11, scale: 6
+    t.decimal  "longitude",                        precision: 11, scale: 6
+    t.datetime "created_at",                                                null: false
+    t.datetime "updated_at",                                                null: false
   end
 
   add_index "organizations", ["customer_id"], name: "organizations_idx2", using: :btree
-  add_index "organizations", ["grantor_id"], name: "organizations_idx3", using: :btree
   add_index "organizations", ["organization_type_id"], name: "organizations_idx1", using: :btree
   add_index "organizations", ["short_name"], name: "organizations_idx4", using: :btree
   add_index "organizations", ["short_name"], name: "short_name", using: :btree
-
-  create_table "organizations_districts", id: false, force: true do |t|
-    t.integer "organization_id"
-    t.integer "district_id"
-  end
-
-  add_index "organizations_districts", ["organization_id", "district_id"], name: "organizations_districts_idx2", using: :btree
-
-  create_table "organizations_service_provider_types", id: false, force: true do |t|
-    t.integer "organization_id",          null: false
-    t.integer "service_provider_type_id", null: false
-  end
-
-  add_index "organizations_service_provider_types", ["organization_id"], name: "organization_spt_idx1", using: :btree
-  add_index "organizations_service_provider_types", ["service_provider_type_id"], name: "organization_spt_idx2", using: :btree
 
   create_table "policies", force: true do |t|
     t.string   "object_key",                       limit: 12,                          null: false
@@ -1001,24 +657,34 @@ ActiveRecord::Schema.define(version: 20161102174139) do
   add_index "policies", ["organization_id"], name: "policies_idx2", using: :btree
 
   create_table "policy_asset_subtype_rules", force: true do |t|
-    t.integer  "policy_id",                             null: false
-    t.integer  "asset_subtype_id",                      null: false
+    t.integer  "policy_id",                                       null: false
+    t.integer  "asset_subtype_id",                                null: false
     t.integer  "fuel_type_id"
-    t.integer  "min_service_life_months",               null: false
+    t.integer  "min_service_life_months",                         null: false
     t.integer  "min_service_life_miles"
-    t.integer  "replacement_cost",                      null: false
-    t.integer  "cost_fy_year",                          null: false
-    t.boolean  "replace_with_new",                      null: false
-    t.boolean  "replace_with_leased",                   null: false
+    t.integer  "replacement_cost",                                null: false
+    t.integer  "cost_fy_year",                                    null: false
+    t.boolean  "replace_with_new",                                null: false
+    t.boolean  "replace_with_leased",                             null: false
+    t.integer  "replace_asset_subtype_id"
     t.integer  "replace_fuel_type_id"
     t.integer  "lease_length_months"
     t.integer  "rehabilitation_service_month"
-    t.integer  "rehabilitation_cost"
+    t.integer  "rehabilitation_labor_cost"
+    t.integer  "rehabilitation_parts_cost"
     t.integer  "extended_service_life_months"
     t.integer  "extended_service_life_miles"
+    t.integer  "min_used_purchase_service_life_months",           null: false
+    t.string   "purchase_replacement_code",             limit: 8, null: false
+    t.string   "lease_replacement_code",                limit: 8
+    t.string   "purchase_expansion_code",               limit: 8
+    t.string   "lease_expansion_code",                  limit: 8
+    t.string   "rehabilitation_code",                   limit: 8, null: false
+    t.string   "engineering_design_code",               limit: 8
+    t.string   "construction_code",                     limit: 8
+    t.boolean  "default_rule"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "min_used_purchase_service_life_months"
   end
 
   add_index "policy_asset_subtype_rules", ["asset_subtype_id"], name: "policy_asset_subtype_rules_idx2", using: :btree
@@ -1042,13 +708,6 @@ ActiveRecord::Schema.define(version: 20161102174139) do
     t.string  "name",        limit: 64,  null: false
     t.string  "description", limit: 254, null: false
     t.boolean "is_default",              null: false
-    t.boolean "active",                  null: false
-  end
-
-  create_table "purchase_method_types", force: true do |t|
-    t.string  "name",        limit: 64,  null: false
-    t.string  "code",        limit: 2,   null: false
-    t.string  "description", limit: 254, null: false
     t.boolean "active",                  null: false
   end
 
@@ -1115,13 +774,6 @@ ActiveRecord::Schema.define(version: 20161102174139) do
 
   add_index "service_life_calculation_types", ["class_name"], name: "service_life_calculation_types_idx1", using: :btree
 
-  create_table "service_provider_types", force: true do |t|
-    t.string  "name",        limit: 64,  null: false
-    t.string  "code",        limit: 5,   null: false
-    t.string  "description", limit: 254, null: false
-    t.boolean "active",                  null: false
-  end
-
   create_table "service_status_types", force: true do |t|
     t.string  "name",        limit: 64,  null: false
     t.string  "code",        limit: 1,   null: false
@@ -1174,19 +826,6 @@ ActiveRecord::Schema.define(version: 20161102174139) do
   add_index "tasks", ["organization_id"], name: "tasks_idx4", using: :btree
   add_index "tasks", ["state"], name: "tasks_idx3", using: :btree
   add_index "tasks", ["user_id"], name: "tasks_idx2", using: :btree
-
-  create_table "team_ali_codes", force: true do |t|
-    t.string  "name",      limit: 64
-    t.integer "parent_id"
-    t.integer "lft"
-    t.integer "rgt"
-    t.string  "code",      limit: 8
-    t.boolean "active"
-  end
-
-  add_index "team_ali_codes", ["code"], name: "team_scope_ali_codes_idx3", using: :btree
-  add_index "team_ali_codes", ["name"], name: "team_scope_ali_codes_idx1", using: :btree
-  add_index "team_ali_codes", ["rgt"], name: "team_scope_ali_codes_idx2", using: :btree
 
   create_table "uploads", force: true do |t|
     t.string   "object_key",              limit: 12,         null: false
@@ -1281,6 +920,7 @@ ActiveRecord::Schema.define(version: 20161102174139) do
     t.string   "unlock_token",                limit: 128
     t.datetime "locked_at"
     t.boolean  "notify_via_email",                        null: false
+    t.integer  "weather_code_id"
     t.boolean  "active",                                  null: false
     t.datetime "created_at",                              null: false
     t.datetime "updated_at",                              null: false
@@ -1319,33 +959,6 @@ ActiveRecord::Schema.define(version: 20161102174139) do
 
   add_index "users_user_organization_filters", ["user_id"], name: "users_user_organization_filters_idx1", using: :btree
   add_index "users_user_organization_filters", ["user_organization_filter_id"], name: "users_user_organization_filters_idx2", using: :btree
-
-  create_table "vehicle_features", force: true do |t|
-    t.string  "name",        limit: 64,  null: false
-    t.string  "code",        limit: 3,   null: false
-    t.string  "description", limit: 254, null: false
-    t.boolean "active",                  null: false
-  end
-
-  create_table "vehicle_rebuild_types", force: true do |t|
-    t.string  "name",        limit: 64,  null: false
-    t.text    "description", limit: 255, null: false
-    t.boolean "active",                  null: false
-  end
-
-  create_table "vehicle_storage_method_types", force: true do |t|
-    t.string  "name",        limit: 64,  null: false
-    t.string  "code",        limit: 1,   null: false
-    t.string  "description", limit: 254, null: false
-    t.boolean "active",                  null: false
-  end
-
-  create_table "vehicle_usage_codes", force: true do |t|
-    t.string  "name",        limit: 64,  null: false
-    t.string  "code",        limit: 1,   null: false
-    t.string  "description", limit: 254, null: false
-    t.boolean "active",                  null: false
-  end
 
   create_table "vendors", force: true do |t|
     t.string   "object_key",      limit: 12,                           null: false
