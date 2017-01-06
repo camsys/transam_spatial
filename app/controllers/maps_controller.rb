@@ -1,5 +1,9 @@
 class MapsController < AssetsController
 
+  def map
+    add_breadcrumb "Map"
+  end
+
   # Called via Ajax to get the map marker for a selected asset
   # Asset is identified by its object key in the params hash
   def marker

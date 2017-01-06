@@ -5,14 +5,30 @@
   var LeafletTransAM = leaflet_tools || {};
 
   // Add Zoom Slider control
-  // Requires L.
-  if(! LeafletTransAM.addZoomSlider) {
-    LeafletTransAM.addZoomSlider = function() {
+  if(! LeafletTransAM.addZoomSliderControl) {
+    LeafletTransAM.addZoomSliderControl = function() {
       var map = this.map();
       if(map && L.control.zoomslider) {
         //remove default zoomControl
-        $('.leaflet-control-zoom').remove();
+        if(map.zoomControl) {
+          map.zoomControl.removeFrom(map);
+          map.zoomControl = null;
+        } else {
+          $('.leaflet-control-zoom').remove();
+        }
         this.zoomSliderControl = L.control.zoomslider().addTo(map);
+      }
+    };
+  }
+
+  // Add full screen control
+  if(! LeafletTransAM.addFullscreenControl) {
+    LeafletTransAM.addFullscreenControl = function(fullScreenEl) {
+      var map = this.map();
+      if(map && L.control.fullscreen) {
+        this.fullscreenControl = L.control.fullscreen({
+          fullScreenEl: fullScreenEl
+        }).addTo(map);
       }
     };
   }
@@ -27,5 +43,16 @@
       }
     };
   }
+
+  // Add expandable sidebar onto the map container
+  if(! LeafletTransAM.addSidebar) {
+    LeafletTransAM.addSidebar = function(sidebarId) {
+      var map = this.map();
+      if(map && L.control.sidebar) {
+        this.sidebarControl = L.control.sidebar(sidebarId).addTo(map);
+      }
+    };
+  }
+  
 
 })();

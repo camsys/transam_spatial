@@ -1,0 +1,12 @@
+.map-container:-webkit-full-screen { width: 100% !important; height: 100% !important; z-index: 99999; }
+
+.leaflet-control-zoom-fullscreen {
+  position:relative;
+}
+
+.leaflet-control-zoom-fullscreen:before {
+    font-family: FontAwesome;
+    top:0;
+    left:-5px;
+    content: "\f0b2"; 
+}

@@ -2,6 +2,7 @@ Rails.application.routes.draw do
 
   resources :maps, :only => [] do
     collection do
+      get 'map'
       get 'markers'
     end
 
