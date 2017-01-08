@@ -1,0 +1,168 @@
+:ruby
+  esri_enabled = Rails.application.config.transam_spatial_map_options.include? "esri"
+:javascript
+  var esri_enabled = #{esri_enabled || false};
+  var added_basemaps = [];
+
+  function show_bootbox_modal(title, message, callback) {
+    bootbox.dialog({
+      title: title,
+      message: message,
+      buttons: {
+        cancel: {
+          label: 'Cancel',
+          className: "btn-default"
+        },
+        success: {
+          label: "Submit",
+          className: "btn-success",
+          callback: callback
+        }
+      }
+    });
+  }
+
+  function show_dropdown_dialog(title, label, select_el_id, options, callback) {
+    var option_str = '';
+    for(var val in options) {
+      option_str += '<option value=' + val + '>' + options[val] + '</option>';
+    }
+
+    var message = '<div class="row">  ' +
+          '<div class="col-md-12 form-group"> ' +
+          '<label>' + label + ':</label>' +
+          '<select class="form-control" id="' + select_el_id + '"> ' +
+          option_str +
+          ' </select>' +
+          '</div></div>';
+
+    show_bootbox_modal(title, message, callback);
+  }
+  function show_add_layer_dialog() {
+    var types = {
+      basemap: 'Basemap',
+      overlay: 'Overlay',
+      asset: 'Asset'
+    }
+
+    var callback = function () {
+      process_new_layer_type($('#new_layer_type').val());
+    };
+    show_dropdown_dialog("Select Layer Type", "Layer Type", 'new_layer_type', types, callback);
+  }
+
+  function process_new_layer_type(type) {
+    if(type == 'basemap') {
+      show_basemaps();
+    } else if(type == 'overlay') {
+      show_overlays();
+    } else if(type == 'asset') {
+      show_asset_layers();
+    }
+  }
+
+  function show_basemaps() {
+    var types = {
+      esri_streets: 'Esri Streets',
+      esri_satellite: 'Esri Satellite',
+      esri_terrain: 'Esri Terrain'
+    };
+
+    var eligible_types = {};
+    for(var type in types) {
+      if(added_basemaps.indexOf(type) < 0) {
+        eligible_types[type] = types[type];
+      }
+    }
+
+    var callback = function () {
+      process_new_basemap($('#new_basemap_type').val(), $("#new_basemap_type option:selected").text());
+    };
+    show_dropdown_dialog("Select Basemap", "Basemap List", 'new_basemap_type', eligible_types, callback);
+  }
+
+  function process_new_basemap(type, label) {
+    var map = leaflet_tools.map();
+    if(!map) {
+      return;
+    }
+
+    var new_basemap;
+    if(type == 'esri_streets') {
+      new_basemap = L.esri.basemapLayer('Streets').addTo(map);
+    } else if(type == 'esri_satellite') {
+      new_basemap = L.esri.basemapLayer('Imagery').addTo(map);
+    } else if(type == 'esri_terrain') {
+      new_basemap = L.esri.basemapLayer('Terrain').addTo(map);
+    }
+
+    if(new_basemap && leaflet_tools.layerControl) {
+      leaflet_tools.layerControl.addBaseLayer(new_basemap, label);
+    }
+
+    added_basemaps.push(type);
+  }
+
+  function show_overlays() {
+    var types = {
+      esri_map: 'Esri Map Service',
+      esri_feature: 'Esri Feature Service'
+    };
+
+    var callback = function () {
+      show_new_overlay_form($('#new_overlay_type').val());
+    };
+    show_dropdown_dialog("Select Overlay", "Type", 'new_overlay_type', types, callback);
+  }
+
+  function show_new_overlay_form(type) {
+    var title = "Add Overlay";
+    if(type == "esri_map") {
+      title = "Add Esri Map Service"
+    } else if(type == "esri_feature") {
+      title = "Add Esri Feature Service"
+    }
+
+    var message = '<div class="row">  ' +
+          '<div class="col-md-12 form-group"> ' +
+          '<label>Name:</label>' +
+          '<input class="form-control" type="text" id="new_overlay_name"/> ' +
+          '<label>URL:</label>' +
+          '<input class="form-control" type="text" id="new_overlay_url"/> ' +
+          '</div></div>';
+    var callback = function() {
+      process_new_overlay(type, $($('#new_overlay_url')).val(), $('#new_overlay_name').val());
+    };
+
+    show_bootbox_modal(title, message, callback);
+  }
+
+  function process_new_overlay(type, url, name) {
+    var map = leaflet_tools.map();
+    var overlay;
+    if(type == 'esri_map') {
+      overlay = L.esri.dynamicMapLayer({
+        url: url,
+        opacity: 0.7
+      }).addTo(map).bringToBack();
+    } else if(type == 'esri_feature') {
+      overlay = L.esri.featureLayer({
+        url: url
+      }).addTo(map);
+    }
+
+    if(overlay && leaflet_tools.layerControl) {
+      leaflet_tools.layerControl.addOverlay(overlay, name);
+    }
+  }
+
+  function show_asset_layers() {
+
+  }
+
+  $(function() {
+     // Add layer
+    $('#add_layer').on('click', function() {
+      show_add_layer_dialog();
+    });
+  });

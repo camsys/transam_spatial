@@ -2,7 +2,7 @@
   .map-container {
     height: 100%;
     padding: 0px;
-    height: 480px;
+    height: 500px;
   }
 
   .transam-map {
@@ -22,11 +22,14 @@
   #map_sidebar.sidebar.collapsed
     %ul.sidebar-tabs{role:"tablist"}
       %li
-        %a{href:"#layers", title:"Add/remove layers", role:"tab"}
+        %a#add_layer{href:"#", title:"Add new layer"}
           %i.fa.fa-plus
+      %li
+        %a{href:"#layers", title:"Manage layers", role:"tab"}
+          %i.fa.fa-list
     .sidebar-content.active
       #layers.sidebar-pane
-        Layers
+        = render 'layers_panel'
 
   = LeafletMap({:mapid => 'lmap',
     :tile_provider => Rails.application.config.map_tile_provider,
@@ -40,3 +43,28 @@
 = yield :scripts
 
 = render 'map_scripts'
+
+= render 'add_layer_script'
+
+:javascript
+
+  $(function() {
+    // expand/collapse sidebar panels
+    $('ul.sidebar-tabs a[role=tab]').on('click', function(e) {
+      e.preventDefault(); 
+      if($('#map_sidebar').hasClass('collapsed')) {
+        $('.sidebar-pane').removeClass('active');
+        $($(this).attr('href')).addClass('active');
+        $('#map_sidebar').removeClass('collapsed');
+      } else {
+        var active_panel_id = $('.sidebar-pane.active').attr('id');
+        if( ("#" + active_panel_id) != $(this).attr('href')) {
+          $('.sidebar-pane').removeClass('active');
+          $($(this).attr('href')).addClass('active');
+        } else {
+          $('#map_sidebar').addClass('collapsed');
+        }
+      }
+      return false;
+    });
+  });

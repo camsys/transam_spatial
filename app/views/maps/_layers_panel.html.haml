@@ -1,0 +1,24 @@
+%h4
+  = "Layers"
+#layerContainer.panel-group{role:"tablist", "aria-multiselectable":"true"}
+  .panel.panel-default
+    .panel-heading{role:"tab"}
+      %h5.panel-title
+        %a.collapsed{href:"#basemap_list", "aria-expanded": "false", "aria-controls":"basemap_list", data: { toggle:"collapse", parent:"#layerContainer" }}
+          Basemap
+    .panel-collapse.collapse{role:"tabpanel", id:"basemap_list"}
+      .panel-body
+  .panel.panel-default
+    .panel-heading{role:"tab"}
+      %h5.panel-title
+        %a.collapsed{href:"#overlay_list", "aria-expanded": "false", "aria-controls":"overlay_list", data: { toggle:"collapse", parent:"#layerContainer" }}
+          Overlay
+    .panel-collapse.collapse{role:"tabpanel", id:"overlay_list"}
+      .panel-body
+  .panel.panel-default
+    .panel-heading{role:"tab"}
+      %h5.panel-title
+        %a.collapsed{href:"#asset_layer_list", "aria-expanded": "false", "aria-controls":"asset_layer_list", data: { toggle:"collapse", parent:"#layerContainer" }}
+          Data
+    .panel-collapse.collapse{role:"tabpanel", id:"asset_layer_list"}
+      .panel-body
