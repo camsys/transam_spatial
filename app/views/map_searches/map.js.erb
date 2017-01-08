@@ -1,0 +1,78 @@
+console.log('test');
+$(function() {
+  var map = leaflet_tools.map();
+  var markers_layer;
+  var layer_name = "<%= @layer_name %>";
+
+  var marker_cluster_option = <%= (Rails.application.config.transam_spatial_map_options.include? "marker_cluster").to_s %>;
+
+  if (marker_cluster_option) {
+    markers_layer = new L.markerClusterGroup();
+  } else {
+    markers_layer = new L.featureGroup();
+  }
+  map.addLayer(markers_layer);
+
+  if(leaflet_tools.layerControl) {
+    leaflet_tools.layerControl.addOverlay(markers_layer, layer_name);
+  }
+
+  function draw_markers() {
+    var arr = <%= @markers.html_safe || [] %>;
+    for(var i=0;i < arr.length;i++){
+      var obj = arr[i];
+      if (obj.lat == null || obj.lng == null) {
+        continue;
+      }
+      var id = obj.id;
+      var lat = obj.lat;
+      var lng = obj.lng;
+      var iconClass = obj.iconClass;
+      var popupText = obj.description;
+      var title = obj.title;
+      var zindex = obj.zindex;
+      var open = false;
+      if (obj.open) {
+        open = obj.open;
+      }
+      var draggable = obj.draggable;
+      markers_layer.addLayer(leaflet_tools.create_marker(id, lat, lng, iconClass, popupText, title, open, draggable, zindex));
+    }
+  }
+  draw_markers();
+
+  if(markers_layer.getLayers().length > 0) {
+    map.fitBounds(markers_layer.getBounds());
+  }
+
+  function show_popup_for_selected(marker) {
+    var popup = marker._popup;
+    marker.unbindPopup();
+    var url = "<%= map_popup_map_path('xxx') %>";
+    url = url.replace('xxx', marker.id);
+  
+    $.ajax({
+      url: url,
+      type: 'get',
+      dataType: 'json',
+      success: function(result) {
+        if(result) {
+          marker.bindPopup(result, {autoPanPaddingTopLeft: new L.Point(60, 60)});
+          marker.openPopup();
+        } else {
+          marker.bindPopup(popup);
+          marker.openPopup();
+        }
+      },
+      error: function (xhr, ajaxOptions, thrownError) {
+        marker.bindPopup(popup);
+        marker.openPopup();
+      }
+    });
+  };
+
+  markers_layer.on('click', function(e){
+    show_popup_for_selected(e.layer);
+  });
+
+});

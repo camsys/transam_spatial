@@ -156,8 +156,20 @@
     }
   }
 
+  // This is for demo only!
+  // TODO
   function show_asset_layers() {
-
+    $.ajax({
+      url: "#{map_map_searches_path(format: :js)}",
+      method: 'POST',
+      data: {
+        search_type: 1,
+        searcher: {
+          asset_type_id: [1],
+          asset_subtype_id: [1]
+        }
+      }
+    });
   }
 
   $(function() {

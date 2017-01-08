@@ -11,4 +11,10 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :map_searches, :only => [] do
+    collection do
+      post 'map'
+    end
+  end
+
 end
