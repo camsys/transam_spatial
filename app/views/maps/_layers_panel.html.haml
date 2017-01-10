@@ -1,3 +1,25 @@
+:ruby
+  basemap_types = {
+    esri_streets: 'Esri Streets',
+    esri_satellite: 'Esri Satellite',
+    esri_terrain: 'Esri Terrain'
+  }
+
+  overlay_types = {
+    esri_map: 'Esri Map Service',
+    esri_feature: 'Esri Feature Service'
+  }
+
+  mappable_asset_type_ids = [] 
+  AssetType.active.each do |type|
+    asset_class = type.class_name.try(:constantize)
+    if asset_class && asset_class.respond_to?(:_geolocatable_geometry_attribute_name)
+      mappable_asset_type_ids << type.id
+    end
+  end
+
+  mappable_asset_types = AssetType.where(id: mappable_asset_type_ids)
+  
 %h4
   = "Layers"
 #layerContainer.panel-group{role:"tablist", "aria-multiselectable":"true"}
@@ -8,17 +30,49 @@
           Basemap
     .panel-collapse.collapse{role:"tabpanel", id:"basemap_list"}
       .panel-body
-  .panel.panel-default
+        - basemap_types.each do |type, label|
+          .checkbox
+            %label
+              %input.basemap_layer{type:"checkbox", data: {type: type, label: label}}
+                = label
+  .panel.panel-default#overlay_layer_container
     .panel-heading{role:"tab"}
       %h5.panel-title
         %a.collapsed{href:"#overlay_list", "aria-expanded": "false", "aria-controls":"overlay_list", data: { toggle:"collapse", parent:"#layerContainer" }}
           Overlay
     .panel-collapse.collapse{role:"tabpanel", id:"overlay_list"}
       .panel-body
-  .panel.panel-default
+        - overlay_types.each do |type, label|
+          .panel.panel-default
+            .panel-heading{role:"tab"}
+              %h5.panel-title
+                %a.collapsed{href:"#overlay_#{type}", "aria-expanded": "false", "aria-controls":"overlay_list", data: { toggle:"collapse", parent:"#overlay_layer_container" }}
+                  = label
+            .panel-collapse.collapse{role:"tabpanel", id:"overlay_#{type}"}
+              .panel-body
+  .panel.panel-default#asset_layer_container
     .panel-heading{role:"tab"}
       %h5.panel-title
         %a.collapsed{href:"#asset_layer_list", "aria-expanded": "false", "aria-controls":"asset_layer_list", data: { toggle:"collapse", parent:"#layerContainer" }}
-          Data
+          Assets
     .panel-collapse.collapse{role:"tabpanel", id:"asset_layer_list"}
       .panel-body
+        - subtype_idss_with_assets = Asset.operational.where(:organization_id => @organization_list).group(:asset_subtype_id).count.keys
+        - mappable_asset_types.each do |type|
+          - subtypes = type.asset_subtypes.where(id: subtype_idss_with_assets)
+          - if subtypes.any?
+            .panel.panel-default
+              .panel-heading{role:"tab"}
+                %h5.panel-title
+                  .checkbox{style: 'margin: 0px;'}
+                    %label
+                      %input.asset_type_layer{type:"checkbox", data: {type: 'asset_type', key: type.id, label: type}}
+                      %a.collapsed{href:"#asset_layer_type_#{type.id}", "aria-expanded": "false", "aria-controls":"asset_layer_list", data: { toggle:"collapse", parent:"#asset_layer_container" }}
+                        = type
+              .panel-collapse.collapse{role:"tabpanel", id:"asset_layer_type_#{type.id}"}
+                .panel-body
+                  - type.asset_subtypes.where(id: subtype_idss_with_assets).each do |subtype|
+                    .checkbox
+                      %label
+                        %input.asset_subtype_layer{type:"checkbox", data: {type: 'asset_subtype', key: subtype.id, label: subtype}}
+                          = subtype

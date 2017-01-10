@@ -13,7 +13,7 @@ Rails.application.routes.draw do
 
   resources :map_searches, :only => [] do
     collection do
-      post 'map'
+      post 'geojson'
     end
   end
 

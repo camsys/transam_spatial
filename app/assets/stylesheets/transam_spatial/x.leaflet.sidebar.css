@@ -19,7 +19,7 @@
 } 
 
 .sidebar {
-  width: 305px; 
+  width: 350px; 
 } 
 
 .sidebar-tabs {
@@ -72,13 +72,13 @@
   display: none;
   right: 0;
   box-sizing: border-box;
-  padding: 10px 20px; 
+  padding: 5px 10px; 
 }
 .sidebar-pane.active {
   display: block; 
 }
 .sidebar-pane {
-  width: 265px; 
+  width: 300px; 
 }
 
 .sidebar-map {
@@ -106,7 +106,7 @@
 @media (min-width: 768px) {
   .sidebar-map .leaflet-control-container .leaflet-left {
     transition: left 500ms;
-    left: 315px;
+    left: 360px;
   }
 }
 @media (max-width: 767px) {

@@ -22,14 +22,16 @@
   #map_sidebar.sidebar.collapsed
     %ul.sidebar-tabs{role:"tablist"}
       %li
-        %a#add_layer{href:"#", title:"Add new layer"}
-          %i.fa.fa-plus
-      %li
-        %a{href:"#layers", title:"Manage layers", role:"tab"}
+        %a{href:"#layers", title:"Add/remove layers", role:"tab"}
           %i.fa.fa-list
+      %li
+        %a{href:"#filters", title:"Filter asset layers", role:"tab"}
+          %i.fa.fa-filter
     .sidebar-content.active
       #layers.sidebar-pane
         = render 'layers_panel'
+      #filters.sidebar-pane
+        = render 'filters_panel'
 
   = LeafletMap({:mapid => 'lmap',
     :tile_provider => Rails.application.config.map_tile_provider,

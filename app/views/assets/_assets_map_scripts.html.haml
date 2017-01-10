@@ -1,16 +1,26 @@
 :ruby 
   markers = []
-  if @assets.count <= Rails.application.config.max_num_map_objects.to_i
-    @assets.each do |a|
-      asset = Asset.get_typed_asset(a)
-      if asset.mappable?
+  geom_attr_name = nil
+  AssetType.where(id: @assets.pluck(:asset_type_id).uniq).each do |type|
+    break if geom_attr_name.present?
+    asset_class = type.class_name.try(:constantize)
+    if asset_class && asset_class.respond_to?(:_geolocatable_geometry_attribute_name)
+      geom_attr_name = asset_class._geolocatable_geometry_attribute_name
+    end
+  end
+
+  if geom_attr_name.present?
+    mappable_assets = @assets.where("#{geom_attr_name} is NOT NULL")
+    if mappable_assets.count <= Rails.application.config.max_num_map_objects.to_i
+      mappable_assets.find_each do |a|
+        asset = Asset.get_typed_asset(a)
         markers << asset.map_marker_without_popup
       end
-    end
 
-    markers = markers.to_json
-  else
-    @max_assets_on_map_reached = true
+      markers = markers.to_json
+    else
+      @max_assets_on_map_reached = true
+    end
   end
 
 :javascript

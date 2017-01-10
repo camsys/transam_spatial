@@ -72,13 +72,19 @@ module TransamGeoJSONFeature
   def to_geoJSON
     geom_column = self.send(_geojson_geometry_attribute_name)
     unless geom_column.nil?
-      if geom_column.dimension == 0
-        geo = {type: 'Point', coordinates: [geom_column.x, geom_column.y]}
+      if Rails.application.config.transam_spatial_geometry_adapter == 'rgeo'
+        if geom_column.dimension == 0
+          geo = {type: 'Point', coordinates: [geom_column.x, geom_column.y]}
+        else
+          coords = []
+          geom_column.points.each {|pt| coords << [pt.x, pt.y]}
+          geo = {type: 'LineString', coordinates: coords}
+        end
       else
-        coords = []
-        geom_column.points.each {|pt| coords << [pt.x, pt.y]}
-        geo = {type: 'LineString', coordinates: coords}
+        # GeoRuby
+        geo = {type: 'Point', coordinates: [geom_column.x, geom_column.y]}
       end
+
       props = {}
       props[:id] = self.object_key
       props[:feature_class] = self.class.name

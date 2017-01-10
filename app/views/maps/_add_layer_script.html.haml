@@ -1,8 +1,7 @@
-:ruby
-  esri_enabled = Rails.application.config.transam_spatial_map_options.include? "esri"
 :javascript
-  var esri_enabled = #{esri_enabled || false};
-  var added_basemaps = [];
+  var added_basemaps = {};
+  var added_overlays = {};
+  var added_asset_layers = {};
 
   function show_bootbox_modal(title, message, callback) {
     bootbox.dialog({
@@ -38,48 +37,6 @@
 
     show_bootbox_modal(title, message, callback);
   }
-  function show_add_layer_dialog() {
-    var types = {
-      basemap: 'Basemap',
-      overlay: 'Overlay',
-      asset: 'Asset'
-    }
-
-    var callback = function () {
-      process_new_layer_type($('#new_layer_type').val());
-    };
-    show_dropdown_dialog("Select Layer Type", "Layer Type", 'new_layer_type', types, callback);
-  }
-
-  function process_new_layer_type(type) {
-    if(type == 'basemap') {
-      show_basemaps();
-    } else if(type == 'overlay') {
-      show_overlays();
-    } else if(type == 'asset') {
-      show_asset_layers();
-    }
-  }
-
-  function show_basemaps() {
-    var types = {
-      esri_streets: 'Esri Streets',
-      esri_satellite: 'Esri Satellite',
-      esri_terrain: 'Esri Terrain'
-    };
-
-    var eligible_types = {};
-    for(var type in types) {
-      if(added_basemaps.indexOf(type) < 0) {
-        eligible_types[type] = types[type];
-      }
-    }
-
-    var callback = function () {
-      process_new_basemap($('#new_basemap_type').val(), $("#new_basemap_type option:selected").text());
-    };
-    show_dropdown_dialog("Select Basemap", "Basemap List", 'new_basemap_type', eligible_types, callback);
-  }
 
   function process_new_basemap(type, label) {
     var map = leaflet_tools.map();
@@ -98,21 +55,9 @@
 
     if(new_basemap && leaflet_tools.layerControl) {
       leaflet_tools.layerControl.addBaseLayer(new_basemap, label);
+      
+      added_basemaps[type] = new_basemap;
     }
-
-    added_basemaps.push(type);
-  }
-
-  function show_overlays() {
-    var types = {
-      esri_map: 'Esri Map Service',
-      esri_feature: 'Esri Feature Service'
-    };
-
-    var callback = function () {
-      show_new_overlay_form($('#new_overlay_type').val());
-    };
-    show_dropdown_dialog("Select Overlay", "Type", 'new_overlay_type', types, callback);
   }
 
   function show_new_overlay_form(type) {
@@ -153,28 +98,132 @@
 
     if(overlay && leaflet_tools.layerControl) {
       leaflet_tools.layerControl.addOverlay(overlay, name);
+      added_overlays[type] = overlay._leaflet_id;
     }
   }
 
-  // This is for demo only!
-  // TODO
-  function show_asset_layers() {
+  function process_new_asset_layer(layer_name, type, type_id) {
+    var search_data = {}
+
+    var layer_id;
+    if(type == 'asset_type') {
+      search_data.asset_type_id = [type_id]
+      layer_id = "asset_type_" + type_id;
+    } else if(type == 'asset_subtype') {
+      search_data.asset_subtype_id = [type_id]
+      layer_id = "asset_subtype_" + type_id;
+    }
+
     $.ajax({
-      url: "#{map_map_searches_path(format: :js)}",
+      url: "#{geojson_map_searches_path(format: :json)}",
       method: 'POST',
       data: {
-        search_type: 1,
-        searcher: {
-          asset_type_id: [1],
-          asset_subtype_id: [1]
-        }
+        search_type: "#{SearchesController::ASSET_SEARCH_TYPE}",
+        searcher: search_data
+      },
+      success: function(geojson_data) {
+        load_asset_layer(geojson_data, layer_name, layer_id);
       }
     });
   }
 
-  $(function() {
-     // Add layer
-    $('#add_layer').on('click', function() {
-      show_add_layer_dialog();
+  function show_popup_for_selected(marker) {
+    var popup = marker._popup;
+    marker.unbindPopup();
+    var url = "#{map_popup_map_path('xxx')}";
+    url = url.replace('xxx', marker.id);
+  
+    $.ajax({
+      url: url,
+      type: 'get',
+      dataType: 'json',
+      success: function(result) {
+        if(result) {
+          marker.bindPopup(result, {autoPanPaddingTopLeft: new L.Point(60, 60)});
+          marker.openPopup();
+        } else {
+          marker.bindPopup(popup);
+          marker.openPopup();
+        }
+      },
+      error: function (xhr, ajaxOptions, thrownError) {
+        marker.bindPopup(popup);
+        marker.openPopup();
+      }
     });
+  };
+
+  function load_asset_layer(geojson_data, layer_name, layer_id) {
+    var map = leaflet_tools.map();
+    var markers_layer;
+
+    var marker_cluster_option = #{ Rails.application.config.transam_spatial_map_options.include?("marker_cluster") || false };
+
+    var geoJsonLayer = L.geoJson(geojson_data, {
+      pointToLayer: function (feature, latlng) {
+        return leaflet_tools.create_marker(feature.properties['id'], latlng.lat, latlng.lng);
+      }
+    });
+
+    if (marker_cluster_option) {
+      markers_layer = new L.markerClusterGroup();
+      markers_layer.addLayer(geoJsonLayer);
+    } else {
+      markers_layer = geoJsonLayer;
+    }
+    map.addLayer(markers_layer);
+
+    markers_layer.on('click', function(e){
+      show_popup_for_selected(e.layer);
+    });
+
+    if(leaflet_tools.layerControl) {
+      leaflet_tools.layerControl.addOverlay(markers_layer, layer_name);
+      added_asset_layers[layer_id] = markers_layer;
+    }
+
+    if(markers_layer.getLayers().length > 0) {
+      map.fitBounds(markers_layer.getBounds());
+    }
+  }
+
+  $(function() {
+    var map = leaflet_tools.map();
+
+    // Add/remove basemap layer
+    $('.basemap_layer').on('change', function() {
+      var type = $(this).data('type');
+      var label = $(this).data('label');
+      if($(this).is(":checked")) {
+        process_new_basemap(type, label);
+      } else {
+        var layer = added_basemaps[type];
+        if(layer) {
+          leaflet_tools.layerControl.removeLayer(layer);
+          map.removeLayer(layer);
+
+          delete added_basemaps[type];
+        }
+      }
+    });
+
+    // Add/remove asset layer
+    $('.asset_type_layer, .asset_subtype_layer').on('change', function() {
+      var type = $(this).data('type');
+      var key = $(this).data('key');
+      var label = $(this).data('label');
+      if($(this).is(":checked")) {
+        process_new_asset_layer(label, type, key);
+      } else {
+        var layer_id = type + "_" + key;
+        var layer = added_asset_layers[layer_id];
+        if(layer) {
+          leaflet_tools.layerControl.removeLayer(layer);
+          map.removeLayer(layer);
+
+          delete added_asset_layers[layer_id];
+        }
+      }
+    });
+
   });
