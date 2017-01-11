@@ -12,40 +12,42 @@
             %i.fa.fa-plus
             = " Add New Overlay"
     .col-sm-12
-      %table.table.table-hover{:id => table_dom_id, :data => {:toggle => 'table',
-        :pagination => 'true',
-        :show_pagination_switch => 'true',
-        :page_list => "[5, 10, 20, 50]",
-        :page_size => current_user.num_table_rows,
-        :search => 'false',
-        :toolbar => "#table_actions",
-        :export_types => "['csv', 'txt', 'excel']",
-        :show_export => 'true',
-        :show_columns => 'true',
-        :show_toggle => 'false'}}
-        %thead
-          %tr
-            %th.left{:data => {:visible => 'false'}} Object Key
-            %th.left{:data => {:sortable => 'true'}} Type
-            %th.left{:data => {:sortable => 'true'}} Name
-            %th.left{:data => {:sortable => 'true'}} URL
-            %th.left{:data => {:sortable => 'true'}} Inactive?
-            %th.left{:data => {:sortable => 'true'}} Organization
-            %th.left{:data => {:sortable => 'false'}} Action
+      .table-responsive
+        %table.table.table-hover{:id => table_dom_id, :data => {:toggle => 'table',
+          :pagination => 'true',
+          :show_pagination_switch => 'true',
+          :page_list => "[5, 10, 20, 50]",
+          :page_size => current_user.num_table_rows,
+          :search => 'false',
+          :toolbar => "#table_actions",
+          :export_types => "['csv', 'txt', 'excel']",
+          :show_export => 'true',
+          :show_columns => 'true',
+          :show_toggle => 'false'}}
+          %thead
+            %tr
+              %th.left{:data => {:visible => 'false'}} Object Key
+              %th.left{:data => {:sortable => 'true'}} Type
+              %th.left{:data => {:sortable => 'true'}} Name
+              %th.left{:data => {:sortable => 'true'}} Inactive?
+              %th.left{:data => {:sortable => 'true'}} Organization
+              %th.left{:data => {:sortable => 'false'}} Action
 
-        %tbody
-          - @map_overlay_services.each do |service|
-            %tr{:id => service.object_key}
-              %td.left= service.object_key
-              %td.left= service.map_overlay_service_type
-              %td.left= service.name
-              %td.left= link_to service.url, service.url
-              %td.left= 'Inactive' if !service.active
-              %td.center= service.organization.try(:short_name)
-              %td.left
-                - if can?(:update, service)
-                  = link_to edit_map_overlay_service_path(service), title: 'Edit service' do
-                    %i.fa.fa-edit.fa-1-5x.text-success
-                - if can?(:destroy, service)
-                  = link_to map_overlay_service_path(service), method: :delete, data: { confirm: 'Are you sure to delete this service?'}, title: 'Delete service' do 
-                    %i.fa.fa-times-circle-o.text-danger.fa-1-5x
+          %tbody
+            - @map_overlay_services.each do |service|
+              %tr{:id => service.object_key}
+                %td.left= service.object_key
+                %td.left= service.map_overlay_service_type
+                %td.left
+                  %span.hidden
+                    = service.name
+                  = link_to service.name, service.url
+                %td.left= 'Inactive' if !service.active
+                %td.center= service.organization.try(:short_name)
+                %td.left
+                  - if can?(:update, service)
+                    = link_to edit_map_overlay_service_path(service), title: 'Edit service' do
+                      %i.fa.fa-edit.fa-1-5x.text-success
+                  - if can?(:destroy, service)
+                    = link_to map_overlay_service_path(service), method: :delete, data: { confirm: 'Are you sure to delete this service?'}, title: 'Delete service' do 
+                      %i.fa.fa-times-circle-o.text-danger.fa-1-5x
