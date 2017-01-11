@@ -92,6 +92,7 @@
 
     var map = leaflet_tools.map();
     var overlay;
+    var group_name;
     if(type == 'esri_map') {
       overlay = L.esri.dynamicMapLayer({
         url: url,
@@ -104,7 +105,7 @@
     }
 
     if(overlay && leaflet_tools.layerControl) {
-      leaflet_tools.layerControl.addOverlay(overlay, name);
+      leaflet_tools.layerControl.addOverlay(overlay, name, 'Overlay');
       var key = overlay._leaflet_id;
       added_overlays[key.toString()] = overlay;
       append_overlay_item(type, name, key);
@@ -187,7 +188,7 @@
     });
 
     if(leaflet_tools.layerControl) {
-      leaflet_tools.layerControl.addOverlay(markers_layer, layer_name);
+      leaflet_tools.layerControl.addOverlay(markers_layer, layer_name, 'Assets');
       added_asset_layers[layer_id] = markers_layer;
     }
 

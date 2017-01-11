@@ -39,7 +39,7 @@
       var map = this.map();
       if(map) {
         //add an empty layer switcher
-        this.layerControl = L.control.layers().addTo(map);
+        this.layerControl = L.control.groupedLayers().addTo(map);
       }
     };
   }
