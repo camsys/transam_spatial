@@ -31,9 +31,9 @@
     .panel-collapse.collapse{role:"tabpanel", id:"basemap_list"}
       .panel-body
         - basemap_types.each do |type, label|
-          .checkbox
+          .radio
             %label
-              %input.basemap_layer{type:"checkbox", data: {type: type, label: label}}
+              %input.basemap_layer{type:"radio", name: "basemap", data: {type: type, label: label}}
                 = label
   .panel.panel-default#overlay_layer_container
     .panel-heading{role:"tab"}
@@ -66,12 +66,12 @@
         - mappable_asset_types.each do |type|
           - subtypes = type.asset_subtypes.where(id: subtype_idss_with_assets)
           - if subtypes.any?
-            .panel.panel-default
+            .panel.panel-default.asset_type_panel
               .panel-heading{role:"tab"}
                 %h5.panel-title
                   .checkbox{style: 'margin: 0px;'}
                     %label
-                      %input.asset_type_layer{type:"checkbox", data: {type: 'asset_type', key: type.id, label: type}}
+                      %input.asset_type_layer{type:"checkbox", data: {type: type.id, label: type}}
                       %a.collapsed{href:"#asset_layer_type_#{type.id}", "aria-expanded": "false", "aria-controls":"asset_layer_list", data: { toggle:"collapse", parent:"#asset_layer_container" }}
                         = type
               .panel-collapse.collapse{role:"tabpanel", id:"asset_layer_type_#{type.id}"}
@@ -79,5 +79,5 @@
                   - type.asset_subtypes.where(id: subtype_idss_with_assets).each do |subtype|
                     .checkbox
                       %label
-                        %input.asset_subtype_layer{type:"checkbox", data: {type: 'asset_subtype', key: subtype.id, label: subtype}}
+                        %input.asset_subtype_layer{type:"checkbox", data: {type: subtype.id, label: subtype}}
                           = subtype

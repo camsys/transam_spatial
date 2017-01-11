@@ -53,7 +53,15 @@
     }
 
     if(new_basemap && leaflet_tools.layerControl) {
-      leaflet_tools.layerControl.addBaseLayer(new_basemap, label);
+      // remove other basemaps
+      for(var t in added_basemaps) {
+        var layer = added_basemaps[t];
+        if(layer) {
+          map.removeLayer(layer);
+
+          delete added_basemaps[type];
+        }
+      }
       
       added_basemaps[type] = new_basemap;
     }
@@ -126,18 +134,13 @@
     }
   }
 
-  function process_new_asset_layer(layer_name, type, type_id) {
-    var search_data = {}
-
-    var layer_id;
-    if(type == 'asset_type') {
-      search_data.asset_type_id = [type_id]
-      layer_id = "asset_type_" + type_id;
-    } else if(type == 'asset_subtype') {
-      search_data.asset_subtype_id = [type_id]
-      layer_id = "asset_subtype_" + type_id;
+  function process_asset_layer(layer_id, asset_type, asset_subtypes, layer_name) {
+    var search_data = {
+      asset_type_id: [asset_type],
+      asset_subtype_id: asset_subtypes || []
     }
-
+    var checkboxes = $(".asset_type_layer[data-type=" + asset_type + "]").parents('.asset_type_panel').find('input[type=checkbox]');
+    checkboxes.attr('disabled', 'disabled');
     $.ajax({
       url: "#{geojson_map_searches_path(format: :json)}",
       method: 'POST',
@@ -146,7 +149,10 @@
         searcher: search_data
       },
       success: function(geojson_data) {
-        load_asset_layer(geojson_data, layer_name, layer_id);
+        load_asset_layer(layer_id, geojson_data, layer_name);
+      },
+      complete: function() {
+        checkboxes.removeAttr('disabled');
       }
     });
   }
@@ -177,33 +183,43 @@
     });
   };
 
-  function load_asset_layer(geojson_data, layer_name, layer_id) {
+  function load_asset_layer(layer_id, geojson_data, layer_name) {
     var map = leaflet_tools.map();
-    var markers_layer;
-
+    var markers_layer = added_asset_layers[layer_id];
+    var is_loaded = markers_layer || false;
     var marker_cluster_option = #{ Rails.application.config.transam_spatial_map_options.include?("marker_cluster") || false };
-
     var geoJsonLayer = L.geoJson(geojson_data, {
       pointToLayer: function (feature, latlng) {
         return leaflet_tools.create_marker(feature.properties['id'], latlng.lat, latlng.lng);
       }
     });
 
-    if (marker_cluster_option) {
-      markers_layer = new L.markerClusterGroup();
-      markers_layer.addLayer(geoJsonLayer);
+    if(is_loaded) {
+      // reload data
+      markers_layer.clearLayers();
+
+      if (marker_cluster_option) {
+        markers_layer.addLayer(geoJsonLayer);
+      } else {
+        markers_layer.addData(geojson_data);
+      }
     } else {
-      markers_layer = geoJsonLayer;
-    }
-    map.addLayer(markers_layer);
+      if (marker_cluster_option) {
+        markers_layer = new L.markerClusterGroup();
+        markers_layer.addLayer(geoJsonLayer);
+      } else {
+        markers_layer = geoJsonLayer;
+      }
+      map.addLayer(markers_layer);
 
-    markers_layer.on('click', function(e){
-      show_popup_for_selected(e.layer);
-    });
+      markers_layer.on('click', function(e){
+        show_popup_for_selected(e.layer);
+      });
 
-    if(leaflet_tools.layerControl) {
-      leaflet_tools.layerControl.addOverlay(markers_layer, layer_name, 'Assets');
-      added_asset_layers[layer_id] = markers_layer;
+      if(leaflet_tools.layerControl) {
+        leaflet_tools.layerControl.addOverlay(markers_layer, layer_name, 'Assets');
+        added_asset_layers[layer_id] = markers_layer;
+      }
     }
 
     if(markers_layer.getLayers().length > 0) {
@@ -220,14 +236,6 @@
       var label = $(this).data('label');
       if($(this).is(":checked")) {
         process_new_basemap(type, label);
-      } else {
-        var layer = added_basemaps[type];
-        if(layer) {
-          leaflet_tools.layerControl.removeLayer(layer);
-          map.removeLayer(layer);
-
-          delete added_basemaps[type];
-        }
       }
     });
 
@@ -249,14 +257,26 @@
     });
 
     // Add/remove asset layer
-    $('.asset_type_layer, .asset_subtype_layer').on('change', function() {
-      var type = $(this).data('type');
-      var key = $(this).data('key');
+    $('.asset_type_layer').on('change', function() {
+      var asset_type = $(this).data('type');
       var label = $(this).data('label');
+      var layer_id = "asset_" + asset_type;
+
       if($(this).is(":checked")) {
-        process_new_asset_layer(label, type, key);
+        $(this).parent('label').css('font-weight', 'bold');
+        $(this).parents('.asset_type_panel').find('.asset_subtype_layer').prop('checked', true);
+
+        var asset_subtypes = [];
+        $(this).find('.asset_subtype_layer').each(function() {
+          if($(this).is(':checked')) {
+            asset_subtypes.push($(this).data('type'));
+          }
+        });
+        process_asset_layer(layer_id, asset_type, asset_subtypes, label);
       } else {
-        var layer_id = type + "_" + key;
+        $(this).parent('label').css('font-weight', 'normal');
+        $(this).parents('.asset_type_panel').find('.asset_subtype_layer').prop('checked', false);
+
         var layer = added_asset_layers[layer_id];
         if(layer) {
           leaflet_tools.layerControl.removeLayer(layer);
@@ -265,6 +285,27 @@
           delete added_asset_layers[layer_id];
         }
       }
+    });
+
+    $('.asset_subtype_layer').on('change', function() {
+      var asset_type_node = $(this).parents('.asset_type_panel').find('.asset_type_layer');
+      var asset_type = asset_type_node.data('type');
+      var label = asset_type_node.data('label');
+      var layer_id = "asset_" + asset_type;
+
+      if($(this).is(":checked")) {
+        asset_type_node.prop('checked', true);
+        asset_type_node.parent('label').css('font-weight', 'bold');
+      } 
+
+      var asset_subtypes = [];
+      asset_type_node.parents('.asset_type_panel').find('.asset_subtype_layer').each(function() {
+        if($(this).is(':checked')) {
+          asset_subtypes.push($(this).data('type'));
+        }
+      });
+
+      process_asset_layer(layer_id, asset_type, asset_subtypes, label);
     });
 
   });
