@@ -67,33 +67,7 @@
     }
   }
 
-  function show_new_overlay_form(type) {
-    var title = "Add Overlay";
-    if(type == "esri_map") {
-      title = "Add Esri Map Service"
-    } else if(type == "esri_feature") {
-      title = "Add Esri Feature Service"
-    }
-
-    var message = '<div class="row">  ' +
-          '<div class="col-md-12 form-group"> ' +
-          '<label>Name:</label>' +
-          '<input class="form-control" type="text" id="new_overlay_name"/> ' +
-          '<label>URL:</label>' +
-          '<input class="form-control" type="text" id="new_overlay_url"/> ' +
-          '</div></div>';
-    var callback = function() {
-      process_new_overlay(type, $($('#new_overlay_url')).val(), $('#new_overlay_name').val());
-    };
-
-    show_modal(title, message, callback);
-  }
-
-  function append_overlay_item(type, layer_name, key) {
-    $('#overlay_' + type + " ul").append('<li class="list-group-item"><span class="pull-right"><button class="btn btn-xs btn-danger remove_overlay" data-key=' + key + '><i class="fa fa-times"></i></button></span>' + layer_name + '</li>');
-  }
-
-  function process_new_overlay(type, url, name) {
+  function process_new_overlay(layer_id, type, url, name) {
     if(!url || !name || !url.trim() || !name.trim()) {
       return;
     }
@@ -128,9 +102,7 @@
 
     if(overlay && leaflet_tools.layerControl) {
       leaflet_tools.layerControl.addOverlay(overlay, name, 'Overlay');
-      var key = overlay._leaflet_id;
-      added_overlays[key.toString()] = overlay;
-      append_overlay_item(type, name, key);
+      added_overlays[layer_id] = overlay;
     }
   }
 
@@ -239,20 +211,27 @@
       }
     });
 
-    // Add overlay
-    $('.add_overlay').on('click', function() {
-      show_new_overlay_form($(this).data('type'));
-    });
+    // Add/remove overlay
+    $('.overlay_layer').on('change', function() {
+      var type = $(this).data('type');
+      var label = $(this).data('label');
+      var url = $(this).data('url');
+      var layer_id =  $(this).data('key');
 
-    $('#overlay_list').on('click', '.remove_overlay', function() {
-      var key = $(this).data('key');
-      var layer = added_overlays[key];
-      if(layer) {
-        leaflet_tools.layerControl.removeLayer(layer);
-        map.removeLayer(layer);
-        $(this).parents('.list-group-item').remove();
+      if($(this).is(":checked")) {
+        $(this).parent('label').css('font-weight', 'bold');
 
-        delete added_overlays[key];
+        process_new_overlay(layer_id, type, url, label);
+      } else {
+        $(this).parent('label').css('font-weight', 'normal');
+
+        var layer = added_overlays[layer_id];
+        if(layer) {
+          leaflet_tools.layerControl.removeLayer(layer);
+          map.removeLayer(layer);
+
+          delete added_overlays[layer_id];
+        }
       }
     });
 

@@ -17,4 +17,6 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :map_overlay_services
+
 end

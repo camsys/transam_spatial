@@ -5,11 +5,6 @@
     esri_topo: 'Esri Topographic'
   }
 
-  overlay_types = {
-    esri_map: 'Esri Map Service',
-    esri_feature: 'Esri Feature Service'
-  }
-
   mappable_asset_type_ids = [] 
   AssetType.active.each do |type|
     asset_class = type.class_name.try(:constantize)
@@ -42,19 +37,24 @@
           Overlay
     .panel-collapse.collapse{role:"tabpanel", id:"overlay_list"}
       .panel-body
-        - overlay_types.each do |type, label|
+        - MapOverlayServiceType.all.each do |overlay_type|
+          - overlay_services = overlay_type.map_overlay_services.active.where(organization_id: @organization_list)
+          - next if overlay_services.empty?
+          - type = overlay_type.code
+          - label = overlay_type.name
           .panel.panel-default
             .panel-heading{role:"tab"}
-              .btn-group.pull-right.panel-action
-                %button.btn.btn-primary.btn-sm.add_overlay{data: {type: type}}
-                  %i.fa.fa-fw.fa-plus
-
               %h5.panel-title
                 %a.collapsed{href:"#overlay_#{type}", "aria-expanded": "false", "aria-controls":"overlay_list", data: { toggle:"collapse", parent:"#overlay_layer_container" }}
                   = label
             .panel-collapse.collapse{role:"tabpanel", id:"overlay_#{type}"}
               .panel-body
-                %ul.list-group
+                - overlay_services.order(name: :asc).each do |overlay|
+                  .checkbox
+                    %label
+                      %input.overlay_layer{type:"checkbox", data: {type: type, url: overlay.url, label: overlay, key: overlay.object_key}}
+                        = overlay
+
   .panel.panel-default#asset_layer_container
     .panel-heading{role:"tab"}
       %h5.panel-title
