@@ -2,7 +2,7 @@
   basemap_types = {
     esri_streets: 'Esri Streets',
     esri_satellite: 'Esri Satellite',
-    esri_terrain: 'Esri Terrain'
+    esri_topo: 'Esri Topographic'
   }
 
   overlay_types = {
@@ -45,11 +45,16 @@
         - overlay_types.each do |type, label|
           .panel.panel-default
             .panel-heading{role:"tab"}
+              .btn-group.pull-right.panel-action
+                %button.btn.btn-primary.btn-sm.add_overlay{data: {type: type}}
+                  %i.fa.fa-fw.fa-plus
+
               %h5.panel-title
                 %a.collapsed{href:"#overlay_#{type}", "aria-expanded": "false", "aria-controls":"overlay_list", data: { toggle:"collapse", parent:"#overlay_layer_container" }}
                   = label
             .panel-collapse.collapse{role:"tabpanel", id:"overlay_#{type}"}
               .panel-body
+                %ul.list-group
   .panel.panel-default#asset_layer_container
     .panel-heading{role:"tab"}
       %h5.panel-title

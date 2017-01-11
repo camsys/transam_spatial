@@ -3,39 +3,38 @@
   var added_overlays = {};
   var added_asset_layers = {};
 
-  function show_bootbox_modal(title, message, callback) {
-    bootbox.dialog({
+  function show_modal(title, message, callback) {
+    var map = leaflet_tools.map();
+    map.fire('modal', {
       title: title,
-      message: message,
-      buttons: {
-        cancel: {
-          label: 'Cancel',
-          className: "btn-default"
-        },
-        success: {
-          label: "Submit",
-          className: "btn-success",
-          callback: callback
-        }
+      content: message,
+      template: ['<div class="modal-header"><h4 class="modal-title">{title}</h4></div>',
+        '<div class="modal-body">{content}</div>',
+        '<div class="modal-footer">',
+        '<button class="btn btn-primary {OK_CLS}">{okText}</button>',
+        '<button class="btn btn-default {CANCEL_CLS}">{cancelText}</button>',
+        '</div>'
+      ].join(''),
+
+      okText: 'Add',
+      cancelText: 'Cancel',
+      OK_CLS: 'modal-ok',
+      CANCEL_CLS: 'modal-cancel',
+
+      width: 600,
+
+      onShow: function(evt) {
+        var modal = evt.modal;
+        L.DomEvent
+          .on(modal._container.querySelector('.modal-ok'), 'click', function() {
+            callback();
+            modal.hide();
+          })
+          .on(modal._container.querySelector('.modal-cancel'), 'click', function() {
+            modal.hide();
+          });
       }
     });
-  }
-
-  function show_dropdown_dialog(title, label, select_el_id, options, callback) {
-    var option_str = '';
-    for(var val in options) {
-      option_str += '<option value=' + val + '>' + options[val] + '</option>';
-    }
-
-    var message = '<div class="row">  ' +
-          '<div class="col-md-12 form-group"> ' +
-          '<label>' + label + ':</label>' +
-          '<select class="form-control" id="' + select_el_id + '"> ' +
-          option_str +
-          ' </select>' +
-          '</div></div>';
-
-    show_bootbox_modal(title, message, callback);
   }
 
   function process_new_basemap(type, label) {
@@ -49,8 +48,8 @@
       new_basemap = L.esri.basemapLayer('Streets').addTo(map);
     } else if(type == 'esri_satellite') {
       new_basemap = L.esri.basemapLayer('Imagery').addTo(map);
-    } else if(type == 'esri_terrain') {
-      new_basemap = L.esri.basemapLayer('Terrain').addTo(map);
+    } else if(type == 'esri_topo') {
+      new_basemap = L.esri.basemapLayer('Topographic').addTo(map);
     }
 
     if(new_basemap && leaflet_tools.layerControl) {
@@ -79,10 +78,18 @@
       process_new_overlay(type, $($('#new_overlay_url')).val(), $('#new_overlay_name').val());
     };
 
-    show_bootbox_modal(title, message, callback);
+    show_modal(title, message, callback);
+  }
+
+  function append_overlay_item(type, layer_name, key) {
+    $('#overlay_' + type + " ul").append('<li class="list-group-item"><span class="pull-right"><button class="btn btn-xs btn-danger remove_overlay" data-key=' + key + '><i class="fa fa-times"></i></button></span>' + layer_name + '</li>');
   }
 
   function process_new_overlay(type, url, name) {
+    if(!url || !name || !url.trim() || !name.trim()) {
+      return;
+    }
+
     var map = leaflet_tools.map();
     var overlay;
     if(type == 'esri_map') {
@@ -98,7 +105,9 @@
 
     if(overlay && leaflet_tools.layerControl) {
       leaflet_tools.layerControl.addOverlay(overlay, name);
-      added_overlays[type] = overlay._leaflet_id;
+      var key = overlay._leaflet_id;
+      added_overlays[key.toString()] = overlay;
+      append_overlay_item(type, name, key);
     }
   }
 
@@ -204,6 +213,23 @@
 
           delete added_basemaps[type];
         }
+      }
+    });
+
+    // Add overlay
+    $('.add_overlay').on('click', function() {
+      show_new_overlay_form($(this).data('type'));
+    });
+
+    $('#overlay_list').on('click', '.remove_overlay', function() {
+      var key = $(this).data('key');
+      var layer = added_overlays[key];
+      if(layer) {
+        leaflet_tools.layerControl.removeLayer(layer);
+        map.removeLayer(layer);
+        $(this).parents('.list-group-item').remove();
+
+        delete added_overlays[key];
       }
     });
 
