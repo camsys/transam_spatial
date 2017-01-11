@@ -102,6 +102,20 @@
       overlay = L.esri.featureLayer({
         url: url
       }).addTo(map);
+
+      overlay.on('click', function (e) {
+        var ly = e.layer;
+        if(!ly._popup) {
+          var template = '<div style="max-height: 200px; overflow: auto;"><table><tbody>';
+          for(var k in ly.feature.properties) {
+            var val = ly.feature.properties[k];
+            template += "<tr><td style='text-align: right; font-weight: bold;'>" + k + ":</td><td style='text-align:left; padding-left: 10px;'>" + val.toString() +"</td></tr>"
+          }
+          template += "</table></div>"
+          ly.bindPopup(template);
+        }
+        ly.openPopup();
+      });
     }
 
     if(overlay && leaflet_tools.layerControl) {
