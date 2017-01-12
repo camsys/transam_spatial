@@ -5,7 +5,7 @@ class MapOverlayServicesController < OrganizationAwareController
   add_breadcrumb 'Home', :root_path
   add_breadcrumb 'Overlay Services', :map_overlay_services_path
 
-  authorize_resource except: [:activate]
+  authorize_resource
 
   def index
     @map_overlay_services = MapOverlayService.where(organization_id: @organization_list)

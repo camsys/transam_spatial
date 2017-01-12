@@ -72,6 +72,8 @@
       return;
     }
 
+    $('input[data-key=' + layer_id + ']').attr('disabled', 'disabled');
+
     var map = leaflet_tools.map();
     var overlay;
     var group_name;
@@ -101,6 +103,10 @@
     }
 
     if(overlay && leaflet_tools.layerControl) {
+      overlay.on('load', function() {
+        $('input[data-key=' + layer_id + ']').removeAttr('disabled');
+      });
+      
       leaflet_tools.layerControl.addOverlay(overlay, name, 'Overlay');
       added_overlays[layer_id] = overlay;
     }

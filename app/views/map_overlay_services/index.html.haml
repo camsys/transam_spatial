@@ -27,24 +27,24 @@
           %thead
             %tr
               %th.left{:data => {:visible => 'false'}} Object Key
-              %th.left{:data => {:sortable => 'true'}} Type
-              %th.left{:data => {:sortable => 'true'}} Name
-              %th.left{:data => {:sortable => 'true'}} Inactive?
-              %th.left{:data => {:sortable => 'true'}} Organization
-              %th.left{:data => {:sortable => 'false'}} Action
+              %th.center{:data => {:sortable => 'true'}} Type
+              %th.center{:data => {:sortable => 'true'}} Name
+              %th.center{:data => {:sortable => 'true'}} Inactive?
+              %th.center{:data => {:sortable => 'true'}} Organization
+              %th.center{:data => {:sortable => 'false'}} Action
 
           %tbody
             - @map_overlay_services.each do |service|
               %tr{:id => service.object_key}
-                %td.left= service.object_key
-                %td.left= service.map_overlay_service_type
-                %td.left
+                %td.center= service.object_key
+                %td.center= service.map_overlay_service_type
+                %td.center
                   %span.hidden
                     = service.name
                   = link_to service.name, service.url
-                %td.left= 'Inactive' if !service.active
+                %td.center= 'Inactive' if !service.active
                 %td.center= service.organization.try(:short_name)
-                %td.left
+                %td.center
                   - if can?(:update, service)
                     = link_to edit_map_overlay_service_path(service), title: 'Edit service' do
                       %i.fa.fa-edit.fa-1-5x.text-success

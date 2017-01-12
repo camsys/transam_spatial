@@ -41,19 +41,11 @@
           - overlay_services = overlay_type.map_overlay_services.active.where(organization_id: @organization_list)
           - next if overlay_services.empty?
           - type = overlay_type.code
-          - label = overlay_type.name
-          .panel.panel-default
-            .panel-heading{role:"tab"}
-              %h5.panel-title
-                %a.collapsed{href:"#overlay_#{type}", "aria-expanded": "false", "aria-controls":"overlay_list", data: { toggle:"collapse", parent:"#overlay_layer_container" }}
-                  = label
-            .panel-collapse.collapse{role:"tabpanel", id:"overlay_#{type}"}
-              .panel-body
-                - overlay_services.order(name: :asc).each do |overlay|
-                  .checkbox
-                    %label
-                      %input.overlay_layer{type:"checkbox", data: {type: type, url: overlay.url, label: overlay, key: overlay.object_key}}
-                        = overlay
+          - overlay_services.order(name: :asc).each do |overlay|
+            .checkbox
+              %label
+                %input.overlay_layer{type:"checkbox", data: {type: type, url: overlay.url, label: overlay, key: overlay.object_key}}
+                  = overlay
 
   .panel.panel-default#asset_layer_container
     .panel-heading{role:"tab"}
