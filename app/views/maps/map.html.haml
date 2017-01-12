@@ -18,6 +18,10 @@
     max-width: 100%;
   }
 
+  .sidebar-tab-pressed {
+    background-color: lightgrey;
+  }
+
 #mapContainer.map-container.col-md-12{style: 'padding: 0px;'}
   #map_sidebar.sidebar.collapsed
     %ul.sidebar-tabs{role:"tablist"}
@@ -58,9 +62,12 @@
         $('.sidebar-pane').removeClass('active');
         $($(this).attr('href')).addClass('active');
         $('#map_sidebar').removeClass('collapsed');
+        $(this).addClass('sidebar-tab-pressed');
       } else {
+        $('.sidebar-tab-pressed').removeClass('sidebar-tab-pressed');
         var active_panel_id = $('.sidebar-pane.active').attr('id');
         if( ("#" + active_panel_id) != $(this).attr('href')) {
+          $(this).addClass('sidebar-tab-pressed');
           $('.sidebar-pane').removeClass('active');
           $($(this).attr('href')).addClass('active');
         } else {
