@@ -1,5 +1,6 @@
 :ruby
   basemap_types = {
+    default: 'Default',
     esri_streets: 'Esri Streets',
     esri_satellite: 'Esri Satellite',
     esri_topo: 'Esri Topographic'
@@ -28,24 +29,26 @@
         - basemap_types.each do |type, label|
           .radio
             %label
-              %input.basemap_layer{type:"radio", name: "basemap", data: {type: type, label: label}}
+              %input.basemap_layer{type:"radio", name: "basemap", data: {type: type, label: label}, checked: (type.to_s == 'default' ? "checked": nil) }
                 = label
-  .panel.panel-default#overlay_layer_container
-    .panel-heading{role:"tab"}
-      %h5.panel-title
-        %a.collapsed{href:"#overlay_list", "aria-expanded": "false", "aria-controls":"overlay_list", data: { toggle:"collapse", parent:"#layerContainer" }}
-          Overlay
-    .panel-collapse.collapse{role:"tabpanel", id:"overlay_list"}
-      .panel-body
-        - MapOverlayServiceType.all.each do |overlay_type|
-          - overlay_services = overlay_type.map_overlay_services.active.where(organization_id: @organization_list)
-          - next if overlay_services.empty?
-          - type = overlay_type.code
-          - overlay_services.order(name: :asc).each do |overlay|
-            .checkbox
-              %label
-                %input.overlay_layer{type:"checkbox", data: {type: type, url: overlay.url, label: overlay, key: overlay.object_key}}
-                  = overlay
+  - all_overlays = MapOverlayService.active.where("organization_id is NULL or organization_id in (?)", @organization_list)
+  - if all_overlays.any?
+    .panel.panel-default#overlay_layer_container
+      .panel-heading{role:"tab"}
+        %h5.panel-title
+          %a.collapsed{href:"#overlay_list", "aria-expanded": "false", "aria-controls":"overlay_list", data: { toggle:"collapse", parent:"#layerContainer" }}
+            Overlay
+      .panel-collapse.collapse{role:"tabpanel", id:"overlay_list"}
+        .panel-body
+          - MapOverlayServiceType.all.each do |overlay_type|
+            - overlay_services = all_overlays.where(map_overlay_service_type: overlay_type)
+            - next if overlay_services.empty?
+            - type = overlay_type.code
+            - overlay_services.order(name: :asc).each do |overlay|
+              .checkbox
+                %label
+                  %input.overlay_layer{type:"checkbox", data: {type: type, url: overlay.url, label: overlay, key: overlay.object_key}}
+                    = overlay
 
   .panel.panel-default#asset_layer_container
     .panel-heading{role:"tab"}

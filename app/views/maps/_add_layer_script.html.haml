@@ -44,25 +44,27 @@
     }
 
     var new_basemap;
-    if(type == 'esri_streets') {
-      new_basemap = L.esri.basemapLayer('Streets').addTo(map);
-    } else if(type == 'esri_satellite') {
-      new_basemap = L.esri.basemapLayer('Imagery').addTo(map);
-    } else if(type == 'esri_topo') {
-      new_basemap = L.esri.basemapLayer('Topographic').addTo(map);
+    if(type != 'default') {
+      if(type == 'esri_streets') {
+        new_basemap = L.esri.basemapLayer('Streets').addTo(map);
+      } else if(type == 'esri_satellite') {
+        new_basemap = L.esri.basemapLayer('Imagery').addTo(map);
+      } else if(type == 'esri_topo') {
+        new_basemap = L.esri.basemapLayer('Topographic').addTo(map);
+      }
     }
 
-    if(new_basemap && leaflet_tools.layerControl) {
-      // remove other basemaps
-      for(var t in added_basemaps) {
-        var layer = added_basemaps[t];
-        if(layer) {
-          map.removeLayer(layer);
+    // remove other basemaps
+    for(var t in added_basemaps) {
+      var layer = added_basemaps[t];
+      if(layer) {
+        map.removeLayer(layer);
 
-          delete added_basemaps[type];
-        }
+        delete added_basemaps[type];
       }
-      
+    }
+
+    if(new_basemap) {
       added_basemaps[type] = new_basemap;
     }
   }
@@ -93,7 +95,11 @@
           var template = '<div style="max-height: 200px; overflow: auto;"><table><tbody>';
           for(var k in ly.feature.properties) {
             var val = ly.feature.properties[k];
-            template += "<tr><td style='text-align: right; font-weight: bold;'>" + k + ":</td><td style='text-align:left; padding-left: 10px;'>" + val.toString() +"</td></tr>"
+            var val_str = "";
+            if(val || val === 0) {
+              val_str = val.toString();
+            }
+            template += "<tr><td style='text-align: right; font-weight: bold;'>" + k + ":</td><td style='text-align:left; padding-left: 10px;'>" + val_str +"</td></tr>"
           }
           template += "</table></div>"
           ly.bindPopup(template);
@@ -210,13 +216,12 @@
 
     var filter_form = $('#new_searcher');
 
-    var conditions = [];
-    filter_form.find('.searcher_reported_condition_type_id input[type=checkbox]:checked').each(function() {
-      conditions.push($(this).val());
-    })   
-    if(conditions.length > 0) {
-      filters['reported_condition_type_id'] = conditions;
-    } 
+    // condition rating
+    if($('#condition_rating_slider_enabled').is(':checked')) {
+      var rating_range = $('#condition_rating_slider').slider('getValue');
+      filters['reported_condition_rating_from'] = rating_range[0];
+      filters['reported_condition_rating_to'] = rating_range[1];
+    }
 
     // purchase year
     if($('#purchase_year_slider_enabled').is(':checked')) {
@@ -249,7 +254,7 @@
       var label = $(this).data('label');
       var layer_id = "asset_" + asset_type;
       var asset_subtypes = [];
-      $(this).find('.asset_subtype_layer').each(function() {
+      $(this).parents('.asset_type_panel').find('.asset_subtype_layer').each(function() {
         if($(this).is(':checked')) {
           asset_subtypes.push($(this).data('type'));
         }
@@ -305,7 +310,7 @@
         $(this).parents('.asset_type_panel').find('.asset_subtype_layer').prop('checked', true);
 
         var asset_subtypes = [];
-        $(this).find('.asset_subtype_layer').each(function() {
+        $(this).parents('.asset_type_panel').find('.asset_subtype_layer').each(function() {
           if($(this).is(':checked')) {
             asset_subtypes.push($(this).data('type'));
           }

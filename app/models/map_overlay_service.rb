@@ -8,7 +8,6 @@ class MapOverlayService < ActiveRecord::Base
   belongs_to :map_overlay_service_type
 
   validates :map_overlay_service_type,  presence: true
-  validates :organization,              presence: true
   validates :name,                      presence: true
   validates :url,                       presence: true, uniqueness: {scope: :organization,
     message: "should add one unique service per organization"}

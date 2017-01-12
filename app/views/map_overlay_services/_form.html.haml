@@ -3,11 +3,15 @@
   :wrapper => :vertical_form) do |f|
 
   .row
-    - if @organization_list.size > 1
+    - if can?(:share, MapOverlayService)
       .col-sm-6.col-md-4
-        = f.input :organization_id, :required => true, :collection => Organization.where(id: @organization_list), :label => "Organization", :label_method => :name, :value_method => :id,  :selected => @map_overlay_service.organization_id, :include_blank => 'Choose an organization...'
+        = f.input :organization_id, :required => false, :collection => Organization.where(id: @organization_list), :label => "Organization", :label_method => :name, :value_method => :id,  :selected => @map_overlay_service.organization_id, :include_blank => 'All'
     - else
-      = f.hidden :organization_id, @organization_list.first
+      - if @organization_list.size > 1
+        .col-sm-6.col-md-4
+          = f.input :organization_id, :required => true, :collection => Organization.where(id: @organization_list), :label => "Organization", :label_method => :name, :value_method => :id,  :selected => @map_overlay_service.organization_id, :include_blank => 'Choose an organization...'
+      - else
+        = f.hidden :organization_id, @organization_list.first
 
   .row
     .col-sm-6.col-md-4

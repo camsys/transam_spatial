@@ -36,8 +36,7 @@ class MapOverlayServicesController < OrganizationAwareController
   end
 
   def edit
-    add_breadcrumb @map_overlay_service, map_overlay_service_path(@map_overlay_service)
-    add_breadcrumb "Update"
+    add_breadcrumb "Update #{@map_overlay_service}"
   end
 
   def update
