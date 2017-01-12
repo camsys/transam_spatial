@@ -9,8 +9,6 @@ class MapSearchesController < SearchesController
     #---------------------------------------------------------------------------
     headers['Last-Modified'] = Time.now.httpdate
 
-    @searcher_klass = "AssetSearcher"
-
     @asset_subtype = AssetSubtype.where(id: params[:searcher][:asset_subtype_id]).first
     @asset_type = @asset_subtype.present? ? @asset_subtype.asset_type : AssetType.where(id: params[:searcher][:asset_type_id]).first
 
@@ -41,9 +39,13 @@ class MapSearchesController < SearchesController
       # use organization list if query is for any organization
       params[:searcher][:organization_id] = @organization_list if params[:searcher][:organization_id] == [''] || params[:searcher][:organization_id].nil?
 
-      searcher = @searcher_klass.constantize.new(params[:searcher])
+      searcher = AssetSearcher.new(params[:searcher])
       searcher.user = current_user
       data = searcher.data
+
+      # map specific filters
+      data = process_map_filters data
+
       mappable_assets = data.where("#{geom_attr_name} is NOT NULL")
 
       @geojson = geo_json(mappable_assets) 
@@ -73,6 +75,32 @@ class MapSearchesController < SearchesController
     end
 
     geojson
+  end
+
+  def process_map_filters(data)
+    if params[:searcher][:scheduled_replacement_year_from].present?
+      data = data.where('scheduled_replacement_year >= ?', params[:searcher][:scheduled_replacement_year_from])
+    end
+    if params[:searcher][:scheduled_replacement_year_to].present?
+      data = data.where('scheduled_replacement_year <= ?', params[:searcher][:scheduled_replacement_year_to])
+    end
+    if params[:searcher][:purchase_year_from].present?
+      data = data.where('purchase_date >= ?', params[:searcher][:purchase_year_from])
+    end
+    if params[:searcher][:purchase_year_to].present?
+      data = data.where('purchase_date <= ?', params[:searcher][:purchase_year_to])
+    end
+
+    if @asset_type && @asset_type.class_name = 'Vehicle'
+      if params[:searcher][:reported_mileage_from].present?
+        data = data.where('reported_mileage >= ?', params[:searcher][:reported_mileage_from])
+      end
+      if params[:searcher][:reported_mileage_to].present?
+        data = data.where('reported_mileage <= ?', params[:searcher][:reported_mileage_to])
+      end
+    end
+
+    data
   end
 
 end

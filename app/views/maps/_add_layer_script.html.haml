@@ -113,10 +113,10 @@
   }
 
   function process_asset_layer(layer_id, asset_type, asset_subtypes, layer_name) {
-    var search_data = {
-      asset_type_id: [asset_type],
-      asset_subtype_id: asset_subtypes || []
-    }
+    var search_data = get_filter_params() || {};
+    search_data['asset_type_id'] = [asset_type];
+    search_data['asset_subtype_id'] = asset_subtypes || [];
+    
     var checkboxes = $(".asset_type_layer[data-type=" + asset_type + "]").parents('.asset_type_panel').find('input[type=checkbox]');
     checkboxes.attr('disabled', 'disabled');
     $.ajax({
@@ -203,6 +203,59 @@
     if(markers_layer.getLayers().length > 0) {
       map.fitBounds(markers_layer.getBounds());
     }
+  }
+
+  function get_filter_params() {
+    var filters = {};
+
+    var filter_form = $('#new_searcher');
+
+    var conditions = [];
+    filter_form.find('.searcher_reported_condition_type_id input[type=checkbox]:checked').each(function() {
+      conditions.push($(this).val());
+    })   
+    if(conditions.length > 0) {
+      filters['reported_condition_type_id'] = conditions;
+    } 
+
+    // purchase year
+    if($('#purchase_year_slider_enabled').is(':checked')) {
+      var year_range = $('#purchase_year_slider').slider('getValue');
+      filters['purchase_year_from'] = year_range[0];
+      filters['purchase_year_to'] = year_range[1];
+    }
+
+    // replacement year
+    if($('#scheduled_replacement_year_slider_enabled').is(':checked')) {
+      var year_range = $('#scheduled_replacement_year_slider').slider('getValue');
+      filters['scheduled_replacement_year_from'] = year_range[0];
+      filters['scheduled_replacement_year_to'] = year_range[1];
+    }
+
+    // mileage
+    if($('#min_mileage').val() || $('#min_mileage').val() === 0) {
+      filters['reported_mileage_from'] = $('#min_mileage').val();
+    }
+    if($('#max_mileage').val() || $('#max_mileage').val() === 0) {
+      filters['reported_mileage_to'] = $('#max_mileage').val();
+    }
+
+    return filters;
+  }
+
+  function reload_asset_layers() {
+    $('.asset_type_layer:checked').each(function() {
+      var asset_type = $(this).data('type');
+      var label = $(this).data('label');
+      var layer_id = "asset_" + asset_type;
+      var asset_subtypes = [];
+      $(this).find('.asset_subtype_layer').each(function() {
+        if($(this).is(':checked')) {
+          asset_subtypes.push($(this).data('type'));
+        }
+      });
+      process_asset_layer(layer_id, asset_type, asset_subtypes, label);
+    });
   }
 
   $(function() {

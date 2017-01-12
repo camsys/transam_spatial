@@ -1,3 +1,115 @@
+:ruby
+  min_replacement_year = Date.today.year
+  max_replacement_year = min_replacement_year + 40
+  min_purchase_year = Rails.application.config.epoch.present? ? Rails.application.config.epoch.year : 1900
+  max_purchase_year = Date.today.year
 %h4
   = "Filters"
 #filterContainer.panel-group{role:"tablist", "aria-multiselectable":"true"}
+  = simple_form_for(AssetSearcher.new,
+  :as => :searcher,
+  :url => '#',
+  :method => 'post',
+  :html => {:class => 'form-vertical'},
+  :remote => true,
+  :wrapper => :vertical_form,
+  :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes, :radio_buttons => :horizontal_radio_and_checkboxes, :file => :vertical_file_input, :boolean => :vertical_boolean},
+  :defaults => {:include_blank => "Any...", :required => false} ) do |f|
+    = hidden_field_tag :search_type, SearchesController::ASSET_SEARCH_TYPE
+    .row
+      .col-md-12
+        = f.input :reported_condition_type_id, :label => "Condition", :collection => ConditionType.active, as: :check_boxes
+    .row
+      .col-md-12
+        %label
+          = "Purchase Year (#{min_purchase_year}-#{max_purchase_year})"
+        .col-md-12{style: 'padding-left: 20px'}
+          %input{id: 'purchase_year_slider', type: 'text', data: {slider_min: min_purchase_year, slider_max: max_purchase_year, slider_value: [min_purchase_year, max_purchase_year], slider_enabled: 'false'}}
+        .col-md-12
+          %span.pull-right
+            %input{type: 'checkbox', id: 'purchase_year_slider_enabled'}
+              Enabled
+    .row
+      .col-md-12
+        %label
+          = "Scheduled Replacement Year (#{min_replacement_year}-#{max_replacement_year})"      
+        .col-md-12{style: 'padding-left: 20px'}
+          %input{id: 'scheduled_replacement_year_slider', type: 'text', data: {slider_min: min_replacement_year, slider_max: max_replacement_year, slider_value: [min_replacement_year, max_replacement_year], slider_enabled: 'false'}}
+        .col-md-12
+          %span.pull-right
+            %input{type: 'checkbox', id: 'scheduled_replacement_year_slider_enabled'}
+              Enabled 
+    .row
+      .col-md-12
+        %label
+          = "Mileage (For Revenue Vehicle Only)"      
+        .col-md-12{style: 'padding-left: 20px'}
+          .col-md-5{style: 'padding: 0px'}
+            %input.form-control#min_mileage{type: 'number', min: 0, step: 1, name: 'min_mileage'}
+          .col-md-2.center
+            = "-"
+          .col-md-5{style: 'padding: 0px'}
+            %input.form-control#max_mileage{type: 'number', min: 0, step: 1, name: 'max_mileage'}
+    .row{style: "margin-top: 20px;"}
+      .col-md-12
+        = f.button :submit, 'Query', :class=>"btn btn-primary", :id => 'submit_filters_btn'
+        = button_tag 'Reset', :type => 'reset', :class=> 'btn btn-warning reset-button', :id => 'reset_filters_btn'
+
+:javascript
+  $(function() {
+    // initialize slider filters
+    $("#purchase_year_slider").slider({ focus: true });
+    $('#purchase_year_slider_enabled').on('change', function() {
+      if($(this).is(':checked')) {
+        $("#purchase_year_slider").slider('enable');
+      } else {
+        $("#purchase_year_slider").slider('disable');
+      }
+    });
+
+    $("#scheduled_replacement_year_slider").slider({ focus: true });
+    $('#scheduled_replacement_year_slider_enabled').on('change', function() {
+      if($(this).is(':checked')) {
+        $("#scheduled_replacement_year_slider").slider('enable');
+      } else {
+        $("#scheduled_replacement_year_slider").slider('disable');
+      }
+    });
+
+    $('#new_searcher').validate({
+      submitHandler: function(form) {
+        form.submit();
+      }
+    });
+
+    $('#min_mileage, #max_mileage').rules("add", {
+      has_valid_mileage_range: true
+    });
+
+    $.validator.addMethod('has_valid_mileage_range', function (value, element, param) {
+      if ($('#min_mileage').val() && $('#max_mileage').val() && ($('#min_mileage').val() > $('#max_mileage').val())) {
+        return false;
+      }
+      return true;
+    }, 'Please make sure the mileage range is valid.');
+
+    $('#submit_filters_btn').click(function() {
+      if($('#new_searcher').valid()) {
+        reload_asset_layers();
+      }
+
+      return false;
+    });
+
+    $('#reset_filters_btn').click(function() {
+      $("#purchase_year_slider").slider('setValue', [#{min_purchase_year}, #{max_purchase_year}]);
+      $("#purchase_year_slider").slider('disable');
+      $("#scheduled_replacement_year_slider").slider('setValue', [#{min_replacement_year}, #{max_replacement_year}]);
+      $("#scheduled_replacement_year_slider").slider('disable');
+
+      $('#new_searcher label.error').remove();
+      $('#new_searcher .error').removeClass('error');
+    });
+  });
+
+  
