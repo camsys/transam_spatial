@@ -87,7 +87,7 @@
     });
 
     $.validator.addMethod('has_valid_mileage_range', function (value, element, param) {
-      if ($('#min_mileage').val() && $('#max_mileage').val() && ($('#min_mileage').val() > $('#max_mileage').val())) {
+      if ($('#min_mileage').val() && $('#max_mileage').val() && (parseInt($('#min_mileage').val()) > parseInt($('#max_mileage').val()))) {
         return false;
       }
       return true;
