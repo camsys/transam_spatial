@@ -591,14 +591,6 @@ ActiveRecord::Schema.define(version: 20170111223828) do
 
   add_index "manufacturers", ["filter"], name: "manufacturers_idx1", using: :btree
 
-  create_table "message_tags", force: true do |t|
-    t.integer "message_id"
-    t.integer "user_id"
-  end
-
-  add_index "message_tags", ["message_id"], name: "message_tags_idx1", using: :btree
-  add_index "message_tags", ["user_id"], name: "message_tags_idx2", using: :btree
-
   create_table "map_overlay_service_types", force: true do |t|
     t.string   "code"
     t.string   "name"
@@ -617,6 +609,14 @@ ActiveRecord::Schema.define(version: 20170111223828) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "message_tags", force: true do |t|
+    t.integer "message_id"
+    t.integer "user_id"
+  end
+
+  add_index "message_tags", ["message_id"], name: "message_tags_idx1", using: :btree
+  add_index "message_tags", ["user_id"], name: "message_tags_idx2", using: :btree
 
   create_table "messages", force: true do |t|
     t.string   "object_key",        limit: 12, null: false
@@ -797,14 +797,6 @@ ActiveRecord::Schema.define(version: 20170111223828) do
     t.string  "description", limit: 254, null: false
     t.boolean "is_default",              null: false
     t.boolean "active",                  null: false
-  end
-
-  create_table "query_params", force: true do |t|
-    t.string  "name"
-    t.string  "description"
-    t.text    "query_string"
-    t.string  "class_name"
-    t.boolean "active"
   end
 
   create_table "query_params", force: true do |t|
@@ -1075,9 +1067,6 @@ ActiveRecord::Schema.define(version: 20170111223828) do
     t.string  "description", limit: 254, null: false
     t.boolean "active",                  null: false
   end
-
-  add_index "users_user_organization_filters", ["user_id"], name: "users_user_organization_filters_idx1", using: :btree
-  add_index "users_user_organization_filters", ["user_organization_filter_id"], name: "users_user_organization_filters_idx2", using: :btree
 
   create_table "vendors", force: true do |t|
     t.string   "object_key",      limit: 12,                           null: false
