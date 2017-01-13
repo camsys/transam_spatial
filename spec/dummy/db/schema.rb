@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170103225100) do
+ActiveRecord::Schema.define(version: 20170111223828) do
 
   create_table "activities", force: true do |t|
     t.string   "object_key",           limit: 12
@@ -428,6 +428,76 @@ ActiveRecord::Schema.define(version: 20170103225100) do
     t.boolean "active",      null: false
   end
 
+  create_table "funding_source_types", force: true do |t|
+    t.string  "name",        limit: 64,  null: false
+    t.string  "description", limit: 254, null: false
+    t.boolean "active",                  null: false
+  end
+
+  create_table "funding_sources", force: true do |t|
+    t.string   "object_key",                      limit: 12, null: false
+    t.string   "name",                            limit: 64, null: false
+    t.text     "description",                                null: false
+    t.integer  "funding_source_type_id",                     null: false
+    t.string   "external_id",                     limit: 32
+    t.boolean  "state_administered_federal_fund"
+    t.boolean  "bond_fund"
+    t.boolean  "formula_fund"
+    t.boolean  "non_committed_fund"
+    t.boolean  "contracted_fund"
+    t.boolean  "discretionary_fund"
+    t.float    "state_match_required",            limit: 24
+    t.float    "federal_match_required",          limit: 24
+    t.float    "local_match_required",            limit: 24
+    t.boolean  "rural_providers"
+    t.boolean  "urban_providers"
+    t.boolean  "shared_ride_providers"
+    t.boolean  "inter_city_bus_providers"
+    t.boolean  "inter_city_rail_providers"
+    t.integer  "created_by_id"
+    t.integer  "updated_by_id"
+    t.boolean  "active"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "funding_sources", ["object_key"], name: "funding_sources_idx1", using: :btree
+
+  create_table "general_ledger_account_types", force: true do |t|
+    t.string  "name",        limit: 64,  null: false
+    t.string  "description", limit: 254, null: false
+    t.boolean "active",                  null: false
+  end
+
+  create_table "general_ledger_accounts", force: true do |t|
+    t.string   "object_key",                     limit: 12, null: false
+    t.integer  "chart_of_account_id",                       null: false
+    t.integer  "general_ledger_account_type_id",            null: false
+    t.string   "account_number",                 limit: 32, null: false
+    t.string   "name",                           limit: 64, null: false
+    t.boolean  "active",                                    null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "general_ledger_accounts", ["active"], name: "general_ledger_accounts_idx3", using: :btree
+  add_index "general_ledger_accounts", ["chart_of_account_id"], name: "general_ledger_accounts_idx2", using: :btree
+  add_index "general_ledger_accounts", ["object_key"], name: "general_ledger_accounts_idx1", using: :btree
+
+  create_table "governing_body_types", force: true do |t|
+    t.string  "name",        limit: 64,  null: false
+    t.string  "code",        limit: 2,   null: false
+    t.string  "description", limit: 254, null: false
+    t.boolean "active",                  null: false
+  end
+
+  create_table "grant_budgets", force: true do |t|
+    t.integer "general_ledger_account_id", null: false
+    t.integer "grant_id",                  null: false
+    t.integer "amount",                    null: false
+>>>>>>> Add spec for map_overlay_service model
+  end
+
   create_table "images", force: true do |t|
     t.string   "object_key",        limit: 12,  null: false
     t.integer  "imagable_id",                   null: false
@@ -529,6 +599,25 @@ ActiveRecord::Schema.define(version: 20170103225100) do
 
   add_index "message_tags", ["message_id"], name: "message_tags_idx1", using: :btree
   add_index "message_tags", ["user_id"], name: "message_tags_idx2", using: :btree
+
+  create_table "map_overlay_service_types", force: true do |t|
+    t.string   "code"
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "map_overlay_services", force: true do |t|
+    t.string   "object_key",                  null: false
+    t.integer  "organization_id"
+    t.integer  "created_by_user_id"
+    t.integer  "map_overlay_service_type_id"
+    t.string   "name"
+    t.string   "url"
+    t.boolean  "active"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "messages", force: true do |t|
     t.string   "object_key",        limit: 12, null: false
@@ -709,6 +798,14 @@ ActiveRecord::Schema.define(version: 20170103225100) do
     t.string  "description", limit: 254, null: false
     t.boolean "is_default",              null: false
     t.boolean "active",                  null: false
+  end
+
+  create_table "query_params", force: true do |t|
+    t.string  "name"
+    t.string  "description"
+    t.text    "query_string"
+    t.string  "class_name"
+    t.boolean "active"
   end
 
   create_table "query_params", force: true do |t|
@@ -955,6 +1052,30 @@ ActiveRecord::Schema.define(version: 20170103225100) do
   create_table "users_user_organization_filters", force: true do |t|
     t.integer "user_id",                     null: false
     t.integer "user_organization_filter_id", null: false
+  end
+
+  add_index "users_user_organization_filters", ["user_id"], name: "users_user_organization_filters_idx1", using: :btree
+  add_index "users_user_organization_filters", ["user_organization_filter_id"], name: "users_user_organization_filters_idx2", using: :btree
+
+  create_table "vehicle_features", force: true do |t|
+    t.string  "name",        limit: 64,  null: false
+    t.string  "code",        limit: 3,   null: false
+    t.string  "description", limit: 254, null: false
+    t.boolean "active",                  null: false
+  end
+
+  create_table "vehicle_rebuild_types", force: true do |t|
+    t.string  "name",        limit: 64,  null: false
+    t.text    "description", limit: 255, null: false
+    t.boolean "active",                  null: false
+  end
+
+  create_table "vehicle_storage_method_types", force: true do |t|
+    t.string  "name",        limit: 64,  null: false
+    t.string  "code",        limit: 1,   null: false
+    t.string  "description", limit: 254, null: false
+    t.boolean "active",                  null: false
+>>>>>>> Add spec for map_overlay_service model
   end
 
   add_index "users_user_organization_filters", ["user_id"], name: "users_user_organization_filters_idx1", using: :btree
