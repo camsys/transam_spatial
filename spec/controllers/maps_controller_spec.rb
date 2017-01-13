@@ -4,7 +4,7 @@ RSpec.describe MapsController, :type => :controller do
 
   let(:test_asset) { create(:buslike_asset) }
 
-  it 'GET index' do
+  it 'GET map' do
 
   end
 

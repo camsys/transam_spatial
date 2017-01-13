@@ -1,7 +1,5 @@
 class MapSearchesController < SearchesController
 
-  skip_before_filter  :verify_authenticity_token, only: [:geojson]
-
   # Called via AJAX to get markers for the search results
   def geojson
     #---------------------------------------------------------------------------
