@@ -495,7 +495,6 @@ ActiveRecord::Schema.define(version: 20170111223828) do
     t.integer "general_ledger_account_id", null: false
     t.integer "grant_id",                  null: false
     t.integer "amount",                    null: false
->>>>>>> Add spec for map_overlay_service model
   end
 
   create_table "images", force: true do |t|
@@ -1075,7 +1074,6 @@ ActiveRecord::Schema.define(version: 20170111223828) do
     t.string  "code",        limit: 1,   null: false
     t.string  "description", limit: 254, null: false
     t.boolean "active",                  null: false
->>>>>>> Add spec for map_overlay_service model
   end
 
   add_index "users_user_organization_filters", ["user_id"], name: "users_user_organization_filters_idx1", using: :btree
