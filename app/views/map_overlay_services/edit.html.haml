@@ -1,0 +1,7 @@
+.col-sm-12.col-md-10.col-md-offset-1.col-lg-8.col-lg-offset-2
+  .page-header
+    %h2= "Update #{@map_overlay_service}"
+
+  = render(:partial => 'shared/form_errors', :locals => {:obj => @map_overlay_service}) unless @map_overlay_service.errors.empty?
+
+  = render 'form'

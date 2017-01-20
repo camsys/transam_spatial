@@ -1,0 +1,45 @@
+= simple_form_for(@map_overlay_service,
+  :html => {:class => 'form-vertical'},
+  :wrapper => :vertical_form) do |f|
+
+  .row
+    - if can?(:share, MapOverlayService)
+      .col-sm-6.col-md-4
+        = f.input :organization_id, :required => false, :collection => Organization.where(id: @organization_list), :label => "Organization", :label_method => :name, :value_method => :id,  :selected => @map_overlay_service.organization_id, :include_blank => 'All'
+    - else
+      - if @organization_list.size > 1
+        .col-sm-6.col-md-4
+          = f.input :organization_id, :required => true, :collection => Organization.where(id: @organization_list), :label => "Organization", :label_method => :name, :value_method => :id,  :selected => @map_overlay_service.organization_id, :include_blank => 'Choose an organization...'
+      - else
+        = f.hidden :organization_id, @organization_list.first
+
+  .row
+    .col-sm-6.col-md-4
+      = f.input :map_overlay_service_type_id, :required => true, :collection => MapOverlayServiceType.all, :label => "Type", :label_method => :name, :value_method => :id,  :selected => @map_overlay_service.map_overlay_service_type_id, :include_blank => 'Choose a service type...'
+
+  .row
+    .col-sm-6.col-md-4
+      = f.input :name, required: true
+  
+  .row
+    .col-sm-12
+      = f.input :url, required: true, label: 'URL', placeholder: 'Please provide the service URL...'
+
+  - unless @map_overlay_service.new_record?
+    .row
+      .col-sm-4
+        = f.input :active, :required => true, :collection => [['Active', true], ['Inactive', false]], :label => "Status", :selected => @map_overlay_service.active, :include_blank => false
+
+  .row
+    .col-sm-12
+      = f.button :submit, 'Submit', :class => 'btn btn-primary', :id => 'submit_new_overlay'
+      = link_to "Cancel", :back, :class => "btn btn-warning cancel-action", :role => 'button'
+
+:javascript
+  $(function() {
+    $('#new_map_overlay_service_form').validate({
+      submitHandler: function(form) {
+        form.submit();
+      }
+    });
+  });

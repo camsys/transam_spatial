@@ -1,0 +1,40 @@
+:javascript
+  $(function() {
+    // store the map object for convienience
+    var map = leaflet_tools.map();
+
+    // add TransAM map customizations
+    leaflet_tools.addZoomSliderControl();
+    leaflet_tools.addFullscreenControl(document.getElementById('mapContainer'));
+    leaflet_tools.addLayerControl();
+    leaflet_tools.addSidebar('map_sidebar');
+
+    // More customization in the map providing more tools
+    var locate_option = #{(Rails.application.config.transam_spatial_map_options.include? "locate").to_s};
+    var draw_option = #{(Rails.application.config.transam_spatial_map_options.include? "draw").to_s};
+    var esri_option = #{(Rails.application.config.transam_spatial_map_options.include? "esri").to_s};
+    
+    if (locate_option) {
+      // Allow the user to locate themselves on the map using the HTML 5 fuctions
+      var location_control = new L.control.locate().addTo(map);
+    }
+
+    if (draw_option) {
+      // Add a feature groups for selecting
+      var featureGroup = L.featureGroup().addTo(map);
+
+      var drawControl = new L.Control.Draw({
+        edit: {
+          featureGroup: featureGroup
+        }
+      }).addTo(map);
+
+      map.on('draw:created', function(e) {
+          featureGroup.addLayer(e.layer);
+      });
+    }
+
+    // Add the mouse position plugin
+    L.control.mousePosition().addTo(map);
+
+  });

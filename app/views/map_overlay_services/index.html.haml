@@ -1,0 +1,53 @@
+:ruby
+  table_dom_id = SecureRandom.hex
+
+.col-sm-12.col-md-10.col-md-offset-1.col-lg-10.col-lg-offset-1
+  .page-header
+    %h2 Map Overlay Services
+  .row
+    .col-sm-12
+      - if can? :create, MapOverlayService
+        .pull-right
+          = link_to new_map_overlay_service_path do
+            %i.fa.fa-plus
+            = " Add New Overlay"
+    .col-sm-12
+      .table-responsive
+        %table.table.table-hover{:id => table_dom_id, :data => {:toggle => 'table',
+          :pagination => 'true',
+          :show_pagination_switch => 'true',
+          :page_list => "[5, 10, 20, 50]",
+          :page_size => current_user.num_table_rows,
+          :search => 'false',
+          :toolbar => "#table_actions",
+          :export_types => "['csv', 'txt', 'excel']",
+          :show_export => 'true',
+          :show_columns => 'true',
+          :show_toggle => 'false'}}
+          %thead
+            %tr
+              %th.left{:data => {:visible => 'false'}} Object Key
+              %th.center{:data => {:sortable => 'true'}} Type
+              %th.center{:data => {:sortable => 'true'}} Name
+              %th.center{:data => {:sortable => 'true'}} Inactive?
+              %th.center{:data => {:sortable => 'true'}} Organization
+              %th.center{:data => {:sortable => 'false'}} Action
+
+          %tbody
+            - @map_overlay_services.each do |service|
+              %tr{:id => service.object_key}
+                %td.center= service.object_key
+                %td.center= service.map_overlay_service_type
+                %td.center
+                  %span.hidden
+                    = service.name
+                  = link_to service.name, service.url
+                %td.center= 'Inactive' if !service.active
+                %td.center= service.organization.try(:short_name)
+                %td.center
+                  - if can?(:update, service)
+                    = link_to edit_map_overlay_service_path(service), title: 'Edit service' do
+                      %i.fa.fa-edit.fa-1-5x.text-success
+                  - if can?(:destroy, service)
+                    = link_to map_overlay_service_path(service), method: :delete, data: { confirm: 'Are you sure to delete this service?'}, title: 'Delete service' do 
+                      %i.fa.fa-times-circle-o.text-danger.fa-1-5x
