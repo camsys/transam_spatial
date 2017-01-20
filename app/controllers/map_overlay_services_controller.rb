@@ -8,7 +8,7 @@ class MapOverlayServicesController < OrganizationAwareController
   authorize_resource
 
   def index
-    @map_overlay_services = MapOverlayService.where(organization_id: @organization_list)
+    @map_overlay_services = MapOverlayService.where("organization_id is NULL or organization_id in (?)", @organization_list)
   end
 
   def new

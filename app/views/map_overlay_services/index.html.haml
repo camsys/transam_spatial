@@ -43,7 +43,7 @@
                     = service.name
                   = link_to service.name, service.url
                 %td.center= 'Inactive' if !service.active
-                %td.center= service.organization.try(:short_name)
+                %td.center= service.organization.present? ? service.organization.try(:short_name) : 'All'
                 %td.center
                   - if can?(:update, service)
                     = link_to edit_map_overlay_service_path(service), title: 'Edit service' do
