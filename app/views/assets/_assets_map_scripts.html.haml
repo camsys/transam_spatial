@@ -1,7 +1,7 @@
 :ruby 
   markers = []
   geom_attr_name = nil
-  AssetType.where(id: @assets.pluck(:asset_type_id).uniq).each do |type|
+  AssetType.where(id: @assets.uniq(:asset_type_id).pluck(:asset_type_id)).each do |type|
     break if geom_attr_name.present?
     asset_class = type.class_name.try(:constantize)
     if asset_class && asset_class.respond_to?(:_geolocatable_geometry_attribute_name)
