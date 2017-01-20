@@ -34,9 +34,9 @@ class MapSearchesController < SearchesController
     end
     
     if geom_attr_name.present?
-      data = process_filters
+      process_filters
 
-      mappable_assets = data.where("#{geom_attr_name} is NOT NULL")
+      mappable_assets = @data.where("#{geom_attr_name} is NOT NULL")
 
       @geojson = geo_json(mappable_assets) 
     end
@@ -71,42 +71,38 @@ class MapSearchesController < SearchesController
     search_params = params[:searcher]
 
      # TODO: depends on future changes in the generic query and map query, might need to re-use AssetSearcher for map search as well
-    data = Asset.operational.where(
+    @data = Asset.operational.where(
       organization_id: @organization_list, 
       asset_type_id: search_params[:asset_type_id], 
       asset_subtype_id: search_params[:asset_subtype_id])
 
-    if search_params[:reported_condition_rating_from].present?
-      data = data.where('reported_condition_rating >= ?', search_params[:reported_condition_rating_from])
-    end
-    if search_params[:reported_condition_rating_to].present?
-      data = data.where('reported_condition_rating <= ?', search_params[:reported_condition_rating_to])
-    end
-
-    if search_params[:scheduled_replacement_year_from].present?
-      data = data.where('scheduled_replacement_year >= ?', search_params[:scheduled_replacement_year_from])
-    end
-    if search_params[:scheduled_replacement_year_to].present?
-      data = data.where('scheduled_replacement_year <= ?', search_params[:scheduled_replacement_year_to])
-    end
-
-    if search_params[:purchase_year_from].present?
-      data = data.where('purchase_date >= ?', search_params[:purchase_year_from])
-    end
-    if search_params[:purchase_year_to].present?
-      data = data.where('purchase_date <= ?', search_params[:purchase_year_to])
+    [:reported_condition_rating, :scheduled_replacement_year, :purchase_year].each do |attr_key|
+      check_attribute_range(attr_key)
     end
 
     if @asset_type && @asset_type.class_name = 'Vehicle'
-      if search_params[:reported_mileage_from].present?
-        data = data.where('reported_mileage >= ?', search_params[:reported_mileage_from])
-      end
-      if search_params[:reported_mileage_to].present?
-        data = data.where('reported_mileage <= ?', search_params[:reported_mileage_to])
-      end
+      check_attribute_range(:reported_mileage)
+    end
+  end
+
+  def check_attribute_range(attr_key)
+    search_params = params[:searcher]
+
+    attr_from_key = "#{attr_key}_from".to_sym
+    attr_to_key = "#{attr_key}_to".to_sym
+
+    if attr_key.to_s == 'purchase_year'
+      column = 'purchase_date'
+    else
+      column = attr_key
     end
 
-    data
+    if search_params[attr_from_key].present?
+      @data = @data.where("#{column} >= ?", search_params[attr_from_key])
+    end
+    if search_params[attr_to_key].present?
+      @data = @data.where("#{column} <= ?", search_params[attr_to_key])
+    end
   end
 
 end
