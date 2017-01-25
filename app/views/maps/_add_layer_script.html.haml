@@ -190,7 +190,9 @@
       }
     } else {
       if (marker_cluster_option) {
-        markers_layer = new L.markerClusterGroup();
+        markers_layer = new L.markerClusterGroup({
+          maxClusterRadius: 10
+        });
         markers_layer.addLayer(geoJsonLayer);
       } else {
         markers_layer = geoJsonLayer;
