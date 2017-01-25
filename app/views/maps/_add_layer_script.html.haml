@@ -2,10 +2,10 @@
   var added_basemaps = {};
   var added_overlays = {};
   var added_asset_layers = {};
-  var assets_feature_group = new L.featureGroup([]);
+  var assets_feature_group;
   var marker_cluster_layer;
 
-  init_marker_cluster();
+  init_asset_layer();
 
   function show_modal(title, message, callback) {
     var map = leaflet_tools.map();
@@ -112,12 +112,15 @@
       });
     }
 
-    if(overlay && leaflet_tools.layerControl) {
+    if(overlay) {
       overlay.on('load', function() {
         $('input[data-key=' + layer_id + ']').removeAttr('disabled');
       });
       
-      leaflet_tools.layerControl.addOverlay(overlay, name, 'Overlay');
+      if(leaflet_tools.layerControl) {
+        leaflet_tools.layerControl.addOverlay(overlay, name, 'Overlay');
+      }
+      
       added_overlays[layer_id] = overlay;
     }
   }
@@ -171,7 +174,7 @@
     });
   };
 
-  function init_marker_cluster() {
+  function init_asset_layer() {
     var marker_cluster_option = #{ Rails.application.config.transam_spatial_map_options.include?("marker_cluster") || false };
     if (marker_cluster_option) {
       var map = leaflet_tools.map();
@@ -181,6 +184,8 @@
       }).addTo(map);
 
       //TODO: cluster specific events
+    } else {
+      assets_feature_group = new L.featureGroup([])
     }
   }
 
@@ -214,10 +219,13 @@
         e.layer.closePopup();
       });
 
+      added_asset_layers[layer_id] = markers_layer;
+      if (assets_feature_group) {
+        assets_feature_group.addLayer(markers_layer);
+      }
+
       if(leaflet_tools.layerControl) {
         leaflet_tools.layerControl.addOverlay(markers_layer, layer_name, 'Assets');
-        added_asset_layers[layer_id] = markers_layer;
-        assets_feature_group.addLayer(markers_layer);
       }
     }
 
@@ -225,9 +233,10 @@
   }
 
   function zoom_to_assets() {
-    if(assets_feature_group.getLayers().length > 0) {
-      var map = leaflet_tools.map();
-      map.fitBounds(assets_feature_group.getBounds(), {padding: [50, 50]});
+    var map = leaflet_tools.map();
+    var asset_layer = marker_cluster_layer ? marker_cluster_layer : assets_feature_group;
+    if(asset_layer && asset_layer.getLayers().length > 0) {
+      map.fitBounds(asset_layer.getBounds(), {padding: [50, 50]});
     }
   }
 
@@ -311,7 +320,10 @@
 
         var layer = added_overlays[layer_id];
         if(layer) {
-          leaflet_tools.layerControl.removeLayer(layer);
+          if(leaflet_tools.layerControl) {
+            leaflet_tools.layerControl.removeLayer(layer);
+          }
+
           map.removeLayer(layer);
 
           delete added_overlays[layer_id];
@@ -342,10 +354,16 @@
 
         var layer = added_asset_layers[layer_id];
         if(layer) {
-          leaflet_tools.layerControl.removeLayer(layer);
+          if(leaflet_tools.layerControl) {
+            leaflet_tools.layerControl.removeLayer(layer);
+          }
+
           map.removeLayer(layer);
-          assets_feature_group.removeLayer(layer);
-          marker_cluster_layer.removeLayer(layer);
+          if(marker_cluster_layer) {
+            marker_cluster_layer.removeLayer(layer);
+          } else if (assets_feature_group) {
+            assets_feature_group.removeLayer(layer);
+          }
 
           delete added_asset_layers[layer_id];
 
