@@ -2,6 +2,7 @@
   var added_basemaps = {};
   var added_overlays = {};
   var added_asset_layers = {};
+  var assets_feature_group = new L.featureGroup([]);
 
   function show_modal(title, message, callback) {
     var map = leaflet_tools.map();
@@ -203,11 +204,17 @@
       if(leaflet_tools.layerControl) {
         leaflet_tools.layerControl.addOverlay(markers_layer, layer_name, 'Assets');
         added_asset_layers[layer_id] = markers_layer;
+        assets_feature_group.addLayer(markers_layer);
       }
     }
 
-    if(markers_layer.getLayers().length > 0) {
-      map.fitBounds(markers_layer.getBounds());
+    zoom_to_assets();
+  }
+
+  function zoom_to_assets() {
+    if(assets_feature_group.getLayers().length > 0) {
+      var map = leaflet_tools.map();
+      map.fitBounds(assets_feature_group.getBounds(), {padding: [50, 50]});
     }
   }
 
@@ -324,8 +331,11 @@
         if(layer) {
           leaflet_tools.layerControl.removeLayer(layer);
           map.removeLayer(layer);
+          assets_feature_group.removeLayer(layer);
 
           delete added_asset_layers[layer_id];
+
+          zoom_to_assets();
         }
       }
     });
