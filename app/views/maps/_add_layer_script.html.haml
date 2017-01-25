@@ -3,6 +3,9 @@
   var added_overlays = {};
   var added_asset_layers = {};
   var assets_feature_group = new L.featureGroup([]);
+  var marker_cluster_layer;
+
+  init_marker_cluster();
 
   function show_modal(title, message, callback) {
     var map = leaflet_tools.map();
@@ -168,36 +171,40 @@
     });
   };
 
+  function init_marker_cluster() {
+    var marker_cluster_option = #{ Rails.application.config.transam_spatial_map_options.include?("marker_cluster") || false };
+    if (marker_cluster_option) {
+      var map = leaflet_tools.map();
+      marker_cluster_layer = new L.markerClusterGroup({
+        maxClusterRadius: 10,
+        spiderfyOnMaxZoom: false
+      }).addTo(map);
+
+      //TODO: cluster specific events
+    }
+  }
+
   function load_asset_layer(layer_id, geojson_data, layer_name) {
     var map = leaflet_tools.map();
     var markers_layer = added_asset_layers[layer_id];
-    var is_loaded = markers_layer || false;
-    var marker_cluster_option = #{ Rails.application.config.transam_spatial_map_options.include?("marker_cluster") || false };
-    var geoJsonLayer = L.geoJson(geojson_data, {
-      pointToLayer: function (feature, latlng) {
-        return leaflet_tools.create_marker(feature.properties['id'], latlng.lat, latlng.lng);
-      }
-    });
+    var is_loaded = markers_layer || false;    
 
     if(is_loaded) {
       // reload data
       markers_layer.clearLayers();
-
-      if (marker_cluster_option) {
-        markers_layer.addLayer(geoJsonLayer);
-      } else {
-        markers_layer.addData(geojson_data);
-      }
+      markers_layer.addData(geojson_data);
     } else {
-      if (marker_cluster_option) {
-        markers_layer = new L.markerClusterGroup({
-          maxClusterRadius: 10
-        });
-        markers_layer.addLayer(geoJsonLayer);
+      var markers_layer = L.geoJson(geojson_data, {
+        pointToLayer: function (feature, latlng) {
+          return leaflet_tools.create_marker(feature.properties['id'], latlng.lat, latlng.lng);
+        }
+      });
+
+      if (marker_cluster_layer) {
+        marker_cluster_layer.addLayer(markers_layer);
       } else {
-        markers_layer = geoJsonLayer;
+        map.addLayer(markers_layer);
       }
-      map.addLayer(markers_layer);
 
       markers_layer.on('mouseover', function(e){
         show_popup_for_selected(e.layer);
@@ -338,6 +345,7 @@
           leaflet_tools.layerControl.removeLayer(layer);
           map.removeLayer(layer);
           assets_feature_group.removeLayer(layer);
+          marker_cluster_layer.removeLayer(layer);
 
           delete added_asset_layers[layer_id];
 
