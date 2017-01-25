@@ -4,6 +4,7 @@ Rails.application.routes.draw do
     collection do
       get 'map'
       get 'markers'
+      get 'map_cluster_popup'
     end
 
     member do 

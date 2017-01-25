@@ -120,7 +120,7 @@
       if(leaflet_tools.layerControl) {
         leaflet_tools.layerControl.addOverlay(overlay, name, 'Overlay');
       }
-      
+
       added_overlays[layer_id] = overlay;
     }
   }
@@ -183,7 +183,46 @@
         spiderfyOnMaxZoom: false
       }).addTo(map);
 
-      //TODO: cluster specific events
+      //cluster specific events
+      marker_cluster_layer.on('clusterclick', function(e) {
+        var cluster_marker = e.layer;
+        var asset_object_keys = [];
+        cluster_marker.getAllChildMarkers().forEach(function(m) {
+          var asset_key = m.id;
+          if(asset_key) {
+            asset_object_keys.push(asset_key);
+          }
+        });
+
+        $.ajax({
+          url: "#{map_cluster_popup_maps_path}",
+          type: 'get',
+          dataType: 'json',
+          data: {
+            object_keys: asset_object_keys
+          },
+          success: function(result) {
+            if(result) {
+              cluster_marker.bindPopup(result, {
+                minWidth: 450,
+                maxWidth: 580,
+                maxHeight: 360
+              });
+
+              cluster_marker.openPopup();
+
+              // apply bootstrap-tables 
+              $('#assets_map_cluster_table').bootstrapTable({
+                pageSize: 5,
+                pageList: [5]
+              });
+
+              // hide the scroll bar
+              $('#assets_map_cluster_table').parents('.leaflet-popup-content').css('overflow', 'hidden');
+            }
+          }
+        });
+      });
     } else {
       assets_feature_group = new L.featureGroup([])
     }
