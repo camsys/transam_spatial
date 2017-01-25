@@ -199,8 +199,12 @@
       }
       map.addLayer(markers_layer);
 
-      markers_layer.on('click', function(e){
+      markers_layer.on('mouseover', function(e){
         show_popup_for_selected(e.layer);
+      });
+
+      markers_layer.on('mouseout', function(e){
+        e.layer.closePopup();
       });
 
       if(leaflet_tools.layerControl) {
