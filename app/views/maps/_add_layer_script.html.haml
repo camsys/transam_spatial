@@ -230,43 +230,37 @@
 
   function load_asset_layer(layer_id, geojson_data, layer_name) {
     var map = leaflet_tools.map();
-    var markers_layer = added_asset_layers[layer_id];
-    var is_loaded = markers_layer || false;    
+    remove_asset_layer(layer_id);
+   
+    var markers_layer = L.geoJson(geojson_data, {
+      pointToLayer: function (feature, latlng) {
+        return leaflet_tools.create_marker(feature.properties['id'], latlng.lat, latlng.lng);
+      }
+    });
 
-    if(is_loaded) {
-      // reload data
-      markers_layer.clearLayers();
-      markers_layer.addData(geojson_data);
+    markers_layer.on('mouseover', function(e){
+      show_popup_for_selected(e.layer);
+    });
+
+    markers_layer.on('mouseout', function(e){
+      e.layer.closePopup();
+    });
+
+    if (marker_cluster_layer) {
+      marker_cluster_layer.addLayer(markers_layer);
     } else {
-      var markers_layer = L.geoJson(geojson_data, {
-        pointToLayer: function (feature, latlng) {
-          return leaflet_tools.create_marker(feature.properties['id'], latlng.lat, latlng.lng);
-        }
-      });
-
-      if (marker_cluster_layer) {
-        marker_cluster_layer.addLayer(markers_layer);
-      } else {
-        map.addLayer(markers_layer);
-      }
-
-      markers_layer.on('mouseover', function(e){
-        show_popup_for_selected(e.layer);
-      });
-
-      markers_layer.on('mouseout', function(e){
-        e.layer.closePopup();
-      });
-
-      added_asset_layers[layer_id] = markers_layer;
-      if (assets_feature_group) {
-        assets_feature_group.addLayer(markers_layer);
-      }
-
-      if(leaflet_tools.layerControl) {
-        leaflet_tools.layerControl.addOverlay(markers_layer, layer_name, 'Assets');
-      }
+      map.addLayer(markers_layer);
     }
+
+    if (assets_feature_group) {
+      assets_feature_group.addLayer(markers_layer);
+    }
+
+    if(leaflet_tools.layerControl) {
+      leaflet_tools.layerControl.addOverlay(markers_layer, layer_name, 'Assets');
+    }
+
+    added_asset_layers[layer_id] = markers_layer;
 
     zoom_to_assets();
   }
@@ -331,6 +325,27 @@
     });
   }
 
+  function remove_asset_layer(layer_id) {
+    var map = leaflet_tools.map();
+    var layer = added_asset_layers[layer_id];
+    if(layer) {
+      if(leaflet_tools.layerControl) {
+        leaflet_tools.layerControl.removeLayer(layer);
+      }
+
+      if(marker_cluster_layer) {
+        marker_cluster_layer.removeLayer(layer);
+      } else {
+        map.removeLayer(layer);
+        if (assets_feature_group) {
+          assets_feature_group.removeLayer(layer);
+        }
+      }
+
+      delete added_asset_layers[layer_id];
+    }
+  }
+
   $(function() {
     var map = leaflet_tools.map();
 
@@ -391,23 +406,8 @@
         $(this).parent('label').css('font-weight', 'normal');
         $(this).parents('.asset_type_panel').find('.asset_subtype_layer').prop('checked', false);
 
-        var layer = added_asset_layers[layer_id];
-        if(layer) {
-          if(leaflet_tools.layerControl) {
-            leaflet_tools.layerControl.removeLayer(layer);
-          }
-
-          map.removeLayer(layer);
-          if(marker_cluster_layer) {
-            marker_cluster_layer.removeLayer(layer);
-          } else if (assets_feature_group) {
-            assets_feature_group.removeLayer(layer);
-          }
-
-          delete added_asset_layers[layer_id];
-
-          zoom_to_assets();
-        }
+        remove_asset_layer(layer_id);
+        zoom_to_assets();
       }
     });
 
