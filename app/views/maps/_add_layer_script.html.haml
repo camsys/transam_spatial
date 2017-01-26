@@ -261,8 +261,6 @@
     }
 
     added_asset_layers[layer_id] = markers_layer;
-
-    zoom_to_assets();
   }
 
   function zoom_to_assets() {
@@ -407,7 +405,6 @@
         $(this).parents('.asset_type_panel').find('.asset_subtype_layer').prop('checked', false);
 
         remove_asset_layer(layer_id);
-        zoom_to_assets();
       }
     });
 

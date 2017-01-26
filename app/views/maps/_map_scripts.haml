@@ -53,12 +53,22 @@
 
   // restorep revious map state based on latest map snapshot cache
   function restoreMap() {  
+    var map = leaflet_tools.map();
     var snapshot = localStorage.getItem(MAP_SNAPSHOT_CACHE_KEY);
     if(!snapshot) {
       return;
     }
 
     snapshot = JSON.parse(snapshot);
+
+    // restore map bounds
+    var bounds = snapshot["bounds"];
+    if(bounds) {
+      map.fitBounds([
+        [bounds.xmin, bounds.ymin],
+        [bounds.xmax, bounds.ymax]
+      ]);
+    }
 
     var layers = snapshot["layers"];
     // restore basemap
