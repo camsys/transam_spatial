@@ -1,0 +1,19 @@
+- if Rails.application.config.transam_spatial_map_options.include? 'map_page'
+  %li.divider
+    - if can?(:manage, MapOverlayService)
+      %li.text-left.dropdown-submenu
+        = link_to '#' do
+          %i.fa.fa-map.fa-fw
+          Map
+        %ul.dropdown-menu
+          %li.text-left
+            = link_to map_maps_path do
+              Show Map
+          %li.text-left
+            = link_to map_overlay_services_path do
+              Manage Overlay Services
+    - else
+      %li.text-left
+        = link_to map_maps_path do
+          %i.fa.fa-map.fa-fw
+          Map

@@ -1,4 +1,129 @@
 :javascript
+  var MAP_SNAPSHOT_CACHE_KEY = "transam-map-snapshot";
+
+  // Get the snapshot params that can be used to recover the map state
+  function getMapSnapshot() {
+    var map = leaflet_tools.map();
+    var params = {};
+
+    // bounds
+    var bounds = map.getBounds();
+    params["bounds"] = {
+      ymin: bounds.getWest(),
+      ymax: bounds.getEast(),
+      xmin: bounds.getSouth(),
+      xmax: bounds.getNorth()
+    };
+
+    // layers
+    var basemap = $('input.basemap_layer:checked').data('type') || "default";
+    var overlay_keys = [];
+    $('input.overlay_layer:checked').each(function() {
+      overlay_keys.push($(this).data('key'));
+    });
+    var asset_types = {};
+    $('input.asset_type_layer:checked').each(function() {
+      var subtypes = [];
+      $(this).parents('.asset_type_panel').find('input.asset_subtype_layer:checked').each(function() {
+        subtypes.push($(this).data('type'));
+      });
+      asset_types[$(this).data('type')] = subtypes;
+    });
+   
+    params["layers"] = {
+      basemap_type: basemap,
+      overlay_keys: overlay_keys,
+      asset_types: asset_types
+    };
+
+    // filters
+    var filters = {};
+    ['condition_rating', 'purchase_year', 'scheduled_replacement_year'].forEach(function(field) {
+      if($('#' + field + '_slider_enabled').is(':checked')) {
+        filters[field] = $("#" + field+ "_slider").slider('getValue');
+      }
+    });
+
+    filters['reported_mileage_from'] = $('#min_mileage').val();
+    filters['reported_mileage_to'] = $('#max_mileage').val();
+    params["filters"] = filters;
+
+    return params;
+  }
+
+  // restorep revious map state based on latest map snapshot cache
+  function restoreMap() {  
+    var map = leaflet_tools.map();
+    var snapshot = localStorage.getItem(MAP_SNAPSHOT_CACHE_KEY);
+    if(!snapshot) {
+      return;
+    }
+
+    snapshot = JSON.parse(snapshot);
+
+    // restore map bounds
+    var bounds = snapshot["bounds"];
+    if(bounds) {
+      map.fitBounds([
+        [bounds.xmin, bounds.ymin],
+        [bounds.xmax, bounds.ymax]
+      ]);
+    } 
+
+    // configure navbar
+    if(!leaflet_tools.navbarControl) {
+      leaflet_tools.addNavbar({
+        home_center: map.getCenter(),
+        home_zoom: map.getZoom()
+      });
+    }
+
+    var layers = snapshot["layers"];
+    // restore basemap
+    var basemap_type = layers['basemap_type'];
+    if(basemap_type) {
+      $('input.basemap_layer[data-type=' + basemap_type + ']').prop('checked', true).trigger('change');
+    }
+
+    // restore overlays
+    var overlay_keys = layers['overlay_keys'];
+    if(overlay_keys && overlay_keys.length > 0) {
+      overlay_keys.forEach(function(key) {
+        $('input.overlay_layer[data-key=' + key + ']').prop('checked', true).trigger('change');
+      });
+    }
+
+    // restore assets
+    var asset_types = layers['asset_types'];
+    if(asset_types) {
+      for(var type in asset_types) {
+        $('input.asset_type_layer[data-type=' + type + ']').prop('checked', true);
+        var subtypes = asset_types[type];
+        subtypes.forEach(function(subtype) {
+          $('input.asset_subtype_layer[data-type=' + subtype + ']').prop('checked', true);
+        });
+      }
+    }
+
+    // restore filters
+    var filters = snapshot['filters'];
+    ['condition_rating', 'purchase_year', 'scheduled_replacement_year'].forEach(function(field) {
+      var filter_val = filters[field];
+      if(filter_val && filter_val.length == 2) {
+        $('#' + field + '_slider_enabled').prop('checked', true).trigger('change');
+        $("#" + field + "_slider").slider('setValue', filter_val, true, true);
+      }
+    });
+    if(filters['reported_mileage_from'] || filters['reported_mileage_from'] === 0) {
+      $('#min_mileage').val(filters['reported_mileage_from']);
+    }
+    if(filters['reported_mileage_to'] || filters['reported_mileage_to'] === 0) {
+      $('#max_mileage').val(filters['reported_mileage_to']);
+    }
+
+    $('#submit_filters_btn').click();
+  }
+
   $(function() {
     // store the map object for convienience
     var map = leaflet_tools.map();
@@ -6,7 +131,6 @@
     // add TransAM map customizations
     leaflet_tools.addZoomSliderControl();
     leaflet_tools.addFullscreenControl(document.getElementById('mapContainer'));
-    leaflet_tools.addLayerControl();
     leaflet_tools.addSidebar('map_sidebar');
 
     // More customization in the map providing more tools
@@ -37,4 +161,11 @@
     // Add the mouse position plugin
     L.control.mousePosition().addTo(map);
 
+    // Cache map snapshot when leaving map page
+    window.onbeforeunload = function(){
+      localStorage.setItem(MAP_SNAPSHOT_CACHE_KEY, JSON.stringify(getMapSnapshot()));
+    }
+
+    // after page load, apply previous map snapshot
+    restoreMap();
   });

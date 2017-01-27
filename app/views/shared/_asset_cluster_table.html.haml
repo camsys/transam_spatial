@@ -1,0 +1,42 @@
+.col-sm-12
+  .table-responsive
+    %table.table.table-hover{:id => "assets_map_cluster_table", :data => {:toggle => 'table',
+      :pagination => 'true',
+      :show_pagination_switch => 'false',
+      :show_export => 'false',
+      :show_columns => 'false',
+      :show_toggle => 'false'}}
+      %thead
+        %tr
+          %th.center{:data => {:sortable => 'true'}} 
+            Asset 
+            %br
+            Tag
+          %th.center{:data => {:sortable => 'true'}} 
+            Asset 
+            %br
+            Type
+          %th.center{:data => {:sortable => 'true'}} 
+            Asset 
+            %br
+            Subtype
+          %th.center{:data => {:sortable => 'true'}} 
+            Purchase 
+            %br
+            Date
+
+      %tbody
+        - assets.each do |asset|
+          %tr{:id => asset.object_key}
+            %td
+              %span.hidden
+                = asset.asset_tag
+              = link_to asset.asset_tag, asset_path(asset), target: '_blank'
+            %td
+              = asset.asset_type
+            %td
+              = asset.asset_subtype
+            %td
+              %span.hidden
+                = asset.purchase_date
+              = format_as_date(asset.purchase_date)

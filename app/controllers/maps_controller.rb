@@ -32,4 +32,13 @@ class MapsController < AssetsController
     render json: str.to_json
   end
 
+  # Called via AJAX to get dynamic content via AJAX
+  def map_cluster_popup
+    assets = Asset.where(:object_key => params[:object_keys]).order(:asset_type_id, :asset_subtype_id, purchase_date: :desc)
+
+    str = render_to_string(:partial => "/shared/map_cluster_popup", :locals => { :assets => assets })
+
+    render json: str.to_json
+  end
+
 end
