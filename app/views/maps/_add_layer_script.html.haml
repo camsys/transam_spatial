@@ -238,12 +238,8 @@
       }
     });
 
-    markers_layer.on('mouseover', function(e){
+    markers_layer.on('click', function(e){
       show_popup_for_selected(e.layer);
-    });
-
-    markers_layer.on('mouseout', function(e){
-      e.layer.closePopup();
     });
 
     if (marker_cluster_layer) {
