@@ -1,0 +1,45 @@
+/* Icons from Font-Awesome  | Font Awesome by Dave Gandy - http://fontawesome.io*/
+/* Thanks to http://fa2png.io/ for icon png generation */
+
+.leaflet-control-navbar-fwd:before {
+    font-family: FontAwesome;
+    top:0;
+    left:-5px;
+    content: "\f061"; 
+}
+
+.leaflet-control-navbar-back:before {
+    font-family: FontAwesome;
+    top:0;
+    left:-5px;
+    content: "\f060"; 
+}
+
+.leaflet-control-navbar-home:before {
+    font-family: FontAwesome;
+    top:0;
+    left:-5px;
+    content: "\f015"; 
+}
+
+
+.leaflet-control-navbar-fwd-disabled:before {
+    font-family: FontAwesome;
+    top:0;
+    left:-5px;
+    content: "\f061"; 
+}
+
+.leaflet-control-navbar-back-disabled:before {
+    font-family: FontAwesome;
+    top:0;
+    left:-5px;
+    content: "\f060"; 
+}
+
+.leaflet-control-navbar-home-disabled:before {
+    font-family: FontAwesome;
+    top:0;
+    left:-5px;
+    content: "\f015"; 
+}

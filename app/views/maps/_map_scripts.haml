@@ -68,6 +68,14 @@
         [bounds.xmin, bounds.ymin],
         [bounds.xmax, bounds.ymax]
       ]);
+    } 
+
+    // configure navbar
+    if(!leaflet_tools.navbarControl) {
+      leaflet_tools.addNavbar({
+        home_center: map.getCenter(),
+        home_zoom: map.getZoom()
+      });
     }
 
     var layers = snapshot["layers"];

@@ -53,6 +53,17 @@
       }
     };
   }
+
+  // Add navbar onto the map container
+  if(! LeafletTransAM.addNavbar) {
+    LeafletTransAM.addNavbar= function(options) {
+      var map = this.map();
+      if(map && L.control.navbar) {
+        options = options || {};
+        this.navbarControl = L.control.navbar(options).addTo(map);
+      }
+    };
+  }
   
 
 })();
