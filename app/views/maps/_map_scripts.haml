@@ -68,14 +68,6 @@
         [bounds.xmin, bounds.ymin],
         [bounds.xmax, bounds.ymax]
       ]);
-    } 
-
-    // configure navbar
-    if(!leaflet_tools.navbarControl) {
-      leaflet_tools.addNavbar({
-        home_center: map.getCenter(),
-        home_zoom: map.getZoom()
-      });
     }
 
     var layers = snapshot["layers"];
@@ -132,6 +124,14 @@
     leaflet_tools.addZoomSliderControl();
     leaflet_tools.addFullscreenControl(document.getElementById('mapContainer'));
     leaflet_tools.addSidebar('map_sidebar');
+
+    // configure navbar
+    if(!leaflet_tools.navbarControl) {
+      leaflet_tools.addNavbar({
+        home_center: map.getCenter(),
+        home_zoom: map.getZoom()
+      });
+    }
 
     // More customization in the map providing more tools
     var locate_option = #{(Rails.application.config.transam_spatial_map_options.include? "locate").to_s};
