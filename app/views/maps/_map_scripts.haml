@@ -166,6 +166,12 @@
       localStorage.setItem(MAP_SNAPSHOT_CACHE_KEY, JSON.stringify(getMapSnapshot()));
     }
 
+    // Resize map along with window resizing
+    $( window ).resize(function() {
+      $( ".map-container" ).height( $( "footer" ).offset().top - $( ".map-container" ).offset().top );
+      map.invalidateSize();
+    });
+
     // after page load, apply previous map snapshot
     restoreMap();
   });
