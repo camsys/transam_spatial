@@ -116,7 +116,16 @@
     $('#submit_filters_btn').click();
   }
 
+  // resize map to fill in the whole page
+  function resize_map() {
+    $( ".map-container" ).height( $( "footer" ).offset().top - $( ".map-container" ).offset().top );
+    var map = leaflet_tools.map();
+    map.invalidateSize();
+  }
+
   $(function() {
+    resize_map();
+    
     // store the map object for convienience
     var map = leaflet_tools.map();
 
@@ -168,8 +177,7 @@
 
     // Resize map along with window resizing
     $( window ).resize(function() {
-      $( ".map-container" ).height( $( "footer" ).offset().top - $( ".map-container" ).offset().top );
-      map.invalidateSize();
+      resize_map();
     });
 
     // after page load, apply previous map snapshot
