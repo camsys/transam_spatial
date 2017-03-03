@@ -2,10 +2,16 @@
 ENV["RAILS_ENV"] ||= 'test'
 
 require 'codacy-coverage'
-Codacy::Reporter.start
-
 require 'simplecov'
-SimpleCov.start 'rails'
+
+SimpleCov.formatters = [
+  Codacy::Formatter,
+  SimpleCov::Formatter::HTMLFormatter
+]
+
+SimpleCov.start 'rails' do
+  add_group "Services", "app/services"
+end
 
 require 'spec_helper'
 require File.expand_path("../dummy/config/environment", __FILE__)
