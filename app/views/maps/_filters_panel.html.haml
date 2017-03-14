@@ -18,7 +18,7 @@
   :wrapper => :vertical_form,
   :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes, :radio_buttons => :horizontal_radio_and_checkboxes, :file => :vertical_file_input, :boolean => :vertical_boolean},
   :defaults => {:include_blank => "Any...", :required => false} ) do |f|
-    = hidden_field_tag :search_type, SearchesController::ASSET_SEARCH_TYPE
+    = hidden_field_tag :search_type, SearchType.find_by(class_name: 'AssetSearcher').id
     .row
       .col-md-12
         %label

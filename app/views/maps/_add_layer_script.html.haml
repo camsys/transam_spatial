@@ -136,7 +136,7 @@
       url: "#{geojson_map_searches_path(format: :json)}",
       method: 'POST',
       data: {
-        search_type: "#{SearchesController::ASSET_SEARCH_TYPE}",
+        search_type: "#{SearchType.find_by(class_name: 'AssetSearcher').id}",
         searcher: search_data
       },
       success: function(geojson_data) {
