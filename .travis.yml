@@ -16,5 +16,5 @@ before_script:
 - bundle update transam_core
 - cp spec/dummy/config/database.travis.yml spec/dummy/config/database.yml
 script:
-- bundle exec rake app:transam_spatial:prepare_rspec
+- bundle exec rake app:transam_spatial:prepare_rspec_from_canon_schema
 - bundle exec rspec
