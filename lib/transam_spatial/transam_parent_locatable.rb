@@ -38,21 +38,21 @@ module TransamParentLocatable
     return 'purpleIcon'
   end
 
-  # Derive an assets location from the location of the parent
+  # Derive an assets location from the location
   def derive_geometry
-    unless parent.nil?
-      self.geometry = parent.geometry
+    unless location.nil?
+      self.geometry = location.geometry
     end
   end
 
   # Populates the location reference with the address of the asset
   def set_location_reference
-    if self.parent.nil?
+    if self.location.nil?
       self.location_reference_type = LocationReferenceType.find_by_format('NULL')
       self.location_reference = nil
     else
       self.location_reference_type = LocationReferenceType.find_by_format('DERIVED')
-      self.location_reference = "Derived from parent"
+      self.location_reference = "Derived from location"
     end
   end
 
