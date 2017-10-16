@@ -24,8 +24,12 @@ location_reference_types = [
   #{:active => 1, :name => 'GeoServer',              :format => "GEOSERVER",       :description => 'Location is determined by deriving a location from Geo Server.'},
   {:active => 1, :name => 'Undefined',              :format => "NULL",            :description => 'Location is not defined.'}
 ]
+map_overlay_service_types = [
+  {:code => 'esri_map', :name => 'Esri Map Service'},
+  {:code => 'esri_feature', :name => 'Esri Feature Service'}
+]
 
-lookup_tables = %w{ location_reference_types }
+lookup_tables = %w{ location_reference_types map_overlay_service_types }
 
 lookup_tables.each do |table_name|
   puts "  Loading #{table_name}"
