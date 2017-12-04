@@ -7,9 +7,12 @@
 #-------------------------------------------------------------------------------
 class RgeoGeometryAdapter
 
-  RGEO_FACTORY  = RGeo::Geographic.projected_factory(
-    :projection_proj4 => Rails.application.config.rgeo_proj4, 
-    :projection_srid => Rails.application.config.rgeo_proj4_srid) if defined?(RGeo)
+  if defined?(RGeo)
+    RGEO_FACTORY  = Rails.application.config.try(:rgeo_factory) || RGeo::Geographic.projected_factory(
+        :projection_proj4 => Rails.application.config.rgeo_proj4,
+        :projection_srid => Rails.application.config.rgeo_proj4_srid)
+  end
+
 
   attr_reader :geometry_factory
   attr_reader :srid
