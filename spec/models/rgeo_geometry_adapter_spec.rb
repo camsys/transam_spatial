@@ -6,11 +6,11 @@ RSpec.describe RgeoGeometryAdapter, :type => :model do
 
   it '.create_unprojected_point' do
     # might fail locally, but Travis passes
-    expect(test_adapter.create_unprojected_point(45.2171892,-68.9847046).to_s).to eq("POINT (-77.51941294756287 40.112201084338245)")
+    expect(test_adapter.create_unprojected_point(45.2171892,-68.9847046).to_s).to eq("POINT (-77.51941294756288 40.11220108433824)")
   end
   it '.create_projected_point' do
     # might fail locally, but Travis passes
-    expect(test_adapter.create_projected_point(45.2171892,-68.9847046).to_s).to eq("POINT (119186698.55759005 -689179.1571515526)")
+    expect(test_adapter.create_projected_point(45.2171892,-68.9847046).to_s).to eq("POINT (119186698.55759074 -689179.1571507208)")
   end
   it '.create_point' do
     expect(test_adapter.create_point(45.2171892,-68.9847046).to_s).to eq("POINT (45.2171892 -68.9847046)")
