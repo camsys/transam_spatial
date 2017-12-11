@@ -40,7 +40,7 @@ class RgeoGeometryAdapter
   # Create an unprojected point (lat lng) from a lat lng
   def create_point(lng, lat)
     Rails.logger.debug "RgeoGeometryAdapter Creating point geometry from lng = #{lng}, lat = #{lat}"
-    @geometry_factory.point(lng, lat)
+    @geometry_factory.point(lat, lng)
   end
 
   # create a line string from an array of arrays. Coords are in lng lat
