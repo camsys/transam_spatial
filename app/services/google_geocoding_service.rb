@@ -87,7 +87,7 @@ class GoogleGeocodingService < AbstractGeocodingService
     # Cache the best result if it is there
     addr = @results.first
     if addr
-      @coords << [addr[:lat], addr[:lon]]
+      @coords << [addr[:lon], addr[:lat]]
       @formatted_location_reference = addr[:formatted_address]
     end
   end

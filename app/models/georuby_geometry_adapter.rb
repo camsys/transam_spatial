@@ -13,7 +13,7 @@ class GeorubyGeometryAdapter
   attr_reader :srid
   attr_reader :geometry_factory
 
-  def create_point(lat, lon)
+  def create_point(lon, lat)
     Rails.logger.debug "Creating point geometry from lat = #{lat}, lon = #{lon}"
     @geometry_factory.reset
     @geometry_factory.begin_geometry(Point, @srid)
