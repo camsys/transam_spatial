@@ -12,7 +12,7 @@ RSpec.describe GeorubyGeometryAdapter, :type => :model do
     test_point = test_adapter.create_point(-68.9847046, 45.2171892)
 
     expect(test_point.text_geometry_type).to eq("POINT")
-    expect(test_point.text_representation).to eq("45.2171892 -68.9847046")
+    expect(test_point.text_representation).to eq("-68.9847046 45.2171892")
   end
   it '.create_linestring' do
     test_line = test_adapter.create_linestring([[45.217,-68.984], [42.394,-71.144]])
