@@ -3,8 +3,10 @@
 
 module RGeo
   module ActiveRecord
-    RGeo::ActiveRecord.send(:remove_const, :SpatialIndexDefinition)
-    class SpatialIndexDefinition < Struct.new(:table, :name, :unique, :columns, :lengths, :orders, :where, :spatial, :using, :type)
+    if defined?(RGeo::ActiveRecord::SpatialIndexDefinition)
+      RGeo::ActiveRecord.send(:remove_const, :SpatialIndexDefinition)
+      class SpatialIndexDefinition < Struct.new(:table, :name, :unique, :columns, :lengths, :orders, :where, :spatial, :using, :type)
+      end
     end
   end
 end
