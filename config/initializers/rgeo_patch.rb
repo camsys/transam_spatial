@@ -3,7 +3,7 @@
 
 module RGeo
   module ActiveRecord
-    if defined?(RGeo::ActiveRecord::SpatialIndexDefinition) && ActiveRecord::Base.configurations[Rails.env]['adapter'] == "mysql2spatial"
+    if defined?(RGeo::ActiveRecord::SpatialIndexDefinition) && ::ActiveRecord::Base.configurations[Rails.env]['adapter'] == "mysql2spatial"
       RGeo::ActiveRecord.send(:remove_const, :SpatialIndexDefinition)
       class SpatialIndexDefinition < Struct.new(:table, :name, :unique, :columns, :lengths, :orders, :where, :spatial, :using, :type)
       end
