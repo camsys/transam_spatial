@@ -28,7 +28,7 @@
   - unless @map_overlay_service.new_record?
     .row
       .col-sm-4
-        = f.input :active, :required => true, :collection => [['Active', true], ['Inactive', false]], :label => "Status", :selected => @map_overlay_service.active, :include_blank => false
+        = f.input :active, :collection => [['Active', true], ['Inactive', false]], :label => "Status", :selected => @map_overlay_service.active, :include_blank => false
 
   .row
     .col-sm-12
