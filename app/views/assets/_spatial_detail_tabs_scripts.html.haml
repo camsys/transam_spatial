@@ -1,5 +1,5 @@
-:javascript
-
+- if @asset.type_of? TransamGeoLocatable and @asset.mappable?
+  :javascript
     // Capture the show event and re-render the map
     $("a[href='#maps']").on('shown.bs.tab', function(e) {
       leaflet_tools.invalidate_map();
