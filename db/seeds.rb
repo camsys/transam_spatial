@@ -29,6 +29,16 @@ map_overlay_service_types = [
   {:code => 'esri_feature', :name => 'Esri Feature Service'}
 ]
 
+system_config_extensions = [
+    {class_name: 'Organization', extension_name: 'TransamGeocodable', active: true},
+    {class_name: 'Vendor', extension_name: 'TransamGeocodable', active: true},
+    {class_name: 'Facility', extension_name: 'TransamAddressLocatable', active: true},
+    {class_name: 'RevenueVehicle', extension_name: 'TransamParentLocatable', active: true},
+    {class_name: 'ServiceVehicle', extension_name: 'TransamParentLocatable', active: true},
+    {class_name: 'CapitalEquipment', extension_name: 'TransamParentLocatable', active: true},
+    {class_name: 'FacilityComponent', extension_name: 'TransamParentLocatable', active: true}
+]
+
 lookup_tables = %w{ location_reference_types map_overlay_service_types }
 
 lookup_tables.each do |table_name|
@@ -40,6 +50,18 @@ lookup_tables.each do |table_name|
   else
     ActiveRecord::Base.connection.execute("TRUNCATE #{table_name} RESTART IDENTITY;")
   end
+  data = eval(table_name)
+  klass = table_name.classify.constantize
+  data.each do |row|
+    x = klass.new(row)
+    x.save!
+  end
+end
+
+merge_tables = %w{ system_config_extensions }
+
+merge_tables.each do |table_name|
+  puts "  Merging #{table_name}"
   data = eval(table_name)
   klass = table_name.classify.constantize
   data.each do |row|
