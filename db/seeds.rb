@@ -36,7 +36,20 @@ system_config_extensions = [
     {class_name: 'RevenueVehicle', extension_name: 'TransamParentLocatable', active: true},
     {class_name: 'ServiceVehicle', extension_name: 'TransamParentLocatable', active: true},
     {class_name: 'CapitalEquipment', extension_name: 'TransamParentLocatable', active: true},
-    {class_name: 'FacilityComponent', extension_name: 'TransamParentLocatable', active: true}
+    {class_name: 'FacilityComponent', extension_name: 'TransamParentLocatable', active: true},
+
+    {class_name: 'Facility', extension_name: 'TransamGeoLocatable', active: true},
+    {class_name: 'RevenueVehicle', extension_name: 'TransamGeoLocatable', active: true},
+    {class_name: 'ServiceVehicle', extension_name: 'TransamGeoLocatable', active: true},
+    {class_name: 'CapitalEquipment', extension_name: 'TransamGeoLocatable', active: true},
+    {class_name: 'FacilityComponent', extension_name: 'TransamGeoLocatable', active: true},
+
+    {class_name: 'Facility', extension_name: 'TransamGeoJSONFeature', active: true},
+    {class_name: 'RevenueVehicle', extension_name: 'TransamGeoJSONFeature', active: true},
+    {class_name: 'ServiceVehicle', extension_name: 'TransamGeoJSONFeature', active: true},
+    {class_name: 'CapitalEquipment', extension_name: 'TTransamGeoJSONFeature', active: true},
+    {class_name: 'FacilityComponent', extension_name: 'TransamGeoJSONFeature', active: true}
+
 ]
 
 lookup_tables = %w{ location_reference_types map_overlay_service_types }

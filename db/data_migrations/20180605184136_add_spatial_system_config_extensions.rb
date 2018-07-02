@@ -7,7 +7,19 @@ class AddSpatialSystemConfigExtensions < ActiveRecord::DataMigration
         {class_name: 'RevenueVehicle', extension_name: 'TransamParentLocatable', active: true},
         {class_name: 'ServiceVehicle', extension_name: 'TransamParentLocatable', active: true},
         {class_name: 'CapitalEquipment', extension_name: 'TransamParentLocatable', active: true},
-        {class_name: 'FacilityComponent', extension_name: 'TransamParentLocatable', active: true}
+        {class_name: 'FacilityComponent', extension_name: 'TransamParentLocatable', active: true},
+
+        {class_name: 'Facility', extension_name: 'TransamGeoLocatable', active: true},
+        {class_name: 'RevenueVehicle', extension_name: 'TransamGeoLocatable', active: true},
+        {class_name: 'ServiceVehicle', extension_name: 'TransamGeoLocatable', active: true},
+        {class_name: 'CapitalEquipment', extension_name: 'TransamGeoLocatable', active: true},
+        {class_name: 'FacilityComponent', extension_name: 'TransamGeoLocatable', active: true},
+
+        {class_name: 'Facility', extension_name: 'TransamGeoJSONFeature', active: true},
+        {class_name: 'RevenueVehicle', extension_name: 'TransamGeoJSONFeature', active: true},
+        {class_name: 'ServiceVehicle', extension_name: 'TransamGeoJSONFeature', active: true},
+        {class_name: 'CapitalEquipment', extension_name: 'TTransamGeoJSONFeature', active: true},
+        {class_name: 'FacilityComponent', extension_name: 'TransamGeoJSONFeature', active: true}
     ]
 
     system_config_extensions.each do |extension|
