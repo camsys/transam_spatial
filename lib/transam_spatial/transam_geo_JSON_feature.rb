@@ -58,7 +58,7 @@ module TransamGeoJSONFeature
 
     def configure_geojson(options = {})
       self._geojson_geometry_attribute_name = (options[:geometry_attribute_name] || :geometry).to_s
-      self._geojson_properties = (options[:geojson_properties] || [:object_key])
+      self._geojson_properties = (options[:geojson_properties] || Rails.application.config.try(:geojson_properties) || [:object_key])
     end
 
   end
