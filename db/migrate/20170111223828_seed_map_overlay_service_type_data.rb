@@ -1,4 +1,4 @@
-class SeedMapOverlayServiceTypeData < ActiveRecord::Migration
+class SeedMapOverlayServiceTypeData < ActiveRecord::Migration[4.2]
   def change
     if table_exists? :map_overlay_service_types
         data = {

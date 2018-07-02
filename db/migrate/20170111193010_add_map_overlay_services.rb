@@ -1,4 +1,4 @@
-class AddMapOverlayServices < ActiveRecord::Migration
+class AddMapOverlayServices < ActiveRecord::Migration[4.2]
   def change
     unless table_exists? :map_overlay_services
       create_table :map_overlay_services do |t|
