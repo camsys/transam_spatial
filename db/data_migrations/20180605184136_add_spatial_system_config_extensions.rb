@@ -18,7 +18,7 @@ class AddSpatialSystemConfigExtensions < ActiveRecord::DataMigration
         {class_name: 'Facility', extension_name: 'TransamGeoJSONFeature', active: true},
         {class_name: 'RevenueVehicle', extension_name: 'TransamGeoJSONFeature', active: true},
         {class_name: 'ServiceVehicle', extension_name: 'TransamGeoJSONFeature', active: true},
-        {class_name: 'CapitalEquipment', extension_name: 'TTransamGeoJSONFeature', active: true},
+        {class_name: 'CapitalEquipment', extension_name: 'TransamGeoJSONFeature', active: true},
         {class_name: 'FacilityComponent', extension_name: 'TransamGeoJSONFeature', active: true}
     ]
 
