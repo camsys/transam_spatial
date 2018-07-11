@@ -38,9 +38,9 @@ module TransamGeoJSONFeature
     # ----------------------------------------------------
     # The name of the attribute to use for encoding the geoJSON feature. This
     # atribute must erespond to :x and :y
-    class_attribute :_geojson_geometry_attribute_name
+    class_attribute :_geojson_geometry_attribute_name, default: 'geometry'
     # A collection of attributes to encode into the geoJSON properties list
-    class_attribute :_geojson_properties
+    class_attribute :_geojson_properties, default: [:object_key]
 
     # ----------------------------------------------------
     # Validations
