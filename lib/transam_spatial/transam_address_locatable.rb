@@ -16,6 +16,8 @@ module TransamAddressLocatable
 
   included do
 
+    include TransamGeoLocatable
+
   end
 
   #------------------------------------------------------------------------------

@@ -27,6 +27,8 @@ module TransamAssociationLocatable
 
   included do
 
+    include TransamGeoLocatable
+
     #---------------------------------------------------------------------------
     # Attributes
     #---------------------------------------------------------------------------
