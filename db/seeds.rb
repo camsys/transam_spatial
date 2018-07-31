@@ -65,9 +65,12 @@ merge_tables = %w{ system_config_extensions }
 merge_tables.each do |table_name|
   puts "  Merging #{table_name}"
   data = eval(table_name)
-  klass = table_name.classify.constantize
-  data.each do |row|
-    x = klass.new(row)
-    x.save!
+  begin
+    klass = table_name.classify.constantize
+    data.each do |row|
+      x = klass.new(row)
+      x.save!
+    end
+  rescue NameError
   end
 end
