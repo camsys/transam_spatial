@@ -1,5 +1,7 @@
 class AddGeometryTransamAssets < ActiveRecord::Migration[5.2]
   def change
-    add_column :transam_assets, :geometry, :geometry, after: :in_backlog
+    if ActiveRecord::Base.connection.table_exists? :transam_assets
+      add_column :transam_assets, :geometry, :geometry, after: :in_backlog
+    end
   end
 end
