@@ -64,8 +64,8 @@ module TransamGeoLocatable
     class_attribute :_geolocatable_geometry_attribute_name, default: "geometry"
     class_attribute :_icon_class, default: "blueIcon"
     class_attribute :_update_on_save, default: true
-    class_attribute :_use_nodes, default: true
-    class_attribute :_tolerate_update_geometry_error, default: true
+    class_attribute :_use_nodes, default: false
+    class_attribute :_tolerate_update_geometry_error, default: false
     
     # ----------------------------------------------------
     # Validations
