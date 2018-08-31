@@ -38,7 +38,9 @@ system_config_extensions = [
     {class_name: 'ServiceVehicle', extension_name: 'TransamParentLocatable', active: true},
     {class_name: 'CapitalEquipment', extension_name: 'TransamParentLocatable', active: true},
 
-    {class_name: 'TransamAsset', extension_name: 'TransamGeoJSONFeature', active: true},
+    {class_name: 'Infrastructure', extension_name: 'TransamCoordinateLocatable', active: true},
+
+    {class_name: 'TransamAsset', extension_name: 'TransamGeoJSONFeature', active: true}
 ]
 
 lookup_tables = %w{ location_reference_types map_overlay_service_types }
