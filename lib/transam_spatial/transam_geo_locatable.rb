@@ -250,10 +250,10 @@ module TransamGeoLocatable
         "lat" =>lat,
         "lng" => lng,
         "zindex" => zindex,
-        "name" => name,
+        "name" => try(:name) || to_s,
         "iconClass" => icon,
         "draggable" => draggable,
-        "title" => name
+        "title" => try(:name) || to_s
       }
 
       marker['description'] = description unless no_popup
