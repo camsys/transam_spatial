@@ -44,8 +44,13 @@ module TransamCoordinateLocatable
 
   # Populates the location reference with the address of the asset
   def set_location_reference
-    self.location_reference_type = LocationReferenceType.find_by_format('COORDINATE')
-    self.location_reference = "(#{longitude},#{latitude})"
+    if longitude.blank? && latitude.blank?
+      self.location_reference_type = LocationReferenceType.find_by_format('NULL')
+      self.location_reference = nil
+    else
+      self.location_reference_type = LocationReferenceType.find_by_format('COORDINATE')
+      self.location_reference = "(#{longitude},#{latitude})"
+    end
   end
 
 end
