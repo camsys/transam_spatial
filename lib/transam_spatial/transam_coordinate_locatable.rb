@@ -38,13 +38,22 @@ module TransamCoordinateLocatable
   #
   #------------------------------------------------------------------------------
 
+
+  def latitude
+    geometry.try(:y)
+  end
+
+  def longitude
+    geometry.try(:x)
+  end
+
   def icon_class
     return 'greenDotIcon'
   end
 
   # Populates the location reference with the address of the asset
   def set_location_reference
-    if longitude.blank? && latitude.blank?
+    if longitude.blank? || latitude.blank?
       self.location_reference_type = LocationReferenceType.find_by_format('NULL')
       self.location_reference = nil
     else
