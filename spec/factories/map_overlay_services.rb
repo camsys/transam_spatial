@@ -1,6 +1,6 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :map_overlay_service do
-    name "Test Name"
+    name { "Test Name" }
     organization
     map_overlay_service_type
     sequence :url do |n|
