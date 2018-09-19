@@ -45,7 +45,6 @@ module TransamCoordinateLocatable
   # Populates the location reference with the address of the asset
   def set_location_reference
     if (longitude.blank? || latitude.blank?) && self.send(_geolocatable_geometry_attribute_name).nil?
-      puts "apple pie"
       self.location_reference_type = LocationReferenceType.find_by_format('NULL')
       self.location_reference = nil
     else
