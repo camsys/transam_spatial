@@ -1,4 +1,5 @@
 TransamCore::Engine.load_seed
+TransamTransit::Engine.load_seed
 TransamSpatial::Engine.load_seed
 
 puts "  Processing system_config"
