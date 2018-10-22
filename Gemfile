@@ -8,6 +8,10 @@ source "https://rubygems.org"
 # To use debugger
 # gem 'debugger'
 gem 'transam_core', git: 'https://github.com/camsys/transam_core', branch: :quarter4
+
+# needed for testing spatial mixins on transit models
+gem 'transam_transit', git: 'https://github.com/camsys/transam_transit', branch: :quarter4
+
 gem 'mysql2', "~> 0.5.1" # lock gem for dummy app
 gem "capybara", '2.6.2' # lock gem for old capybara behavior on hidden element xpath
 gem "rgeo"
