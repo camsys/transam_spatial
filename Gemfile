@@ -17,6 +17,7 @@ gem "capybara", '2.6.2' # lock gem for old capybara behavior on hidden element x
 gem "rgeo"
 gem 'rgeo-geojson'
 gem 'rgeo-proj4'
+gem 'figaro' # need to add an application.yml because need API keys to test geocode libraries
 
 group :development, :test do
   gem 'byebug'

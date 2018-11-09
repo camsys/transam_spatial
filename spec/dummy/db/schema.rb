@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_10_03_163749) do
+ActiveRecord::Schema.define(version: 2018_11_01_163402) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "object_key", limit: 12
@@ -70,6 +70,7 @@ ActiveRecord::Schema.define(version: 2018_10_03_163749) do
   create_table "asset_events", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "object_key", limit: 12, null: false
     t.integer "asset_id"
+    t.string "transam_asset_type"
     t.bigint "transam_asset_id"
     t.integer "asset_event_type_id", null: false
     t.integer "upload_id"
@@ -399,6 +400,7 @@ ActiveRecord::Schema.define(version: 2018_10_03_163749) do
 
   create_table "assets_fta_mode_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "asset_id"
+    t.string "transam_asset_type"
     t.bigint "transam_asset_id"
     t.integer "fta_mode_type_id"
     t.boolean "is_primary"
@@ -408,6 +410,7 @@ ActiveRecord::Schema.define(version: 2018_10_03_163749) do
 
   create_table "assets_fta_service_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "asset_id"
+    t.string "transam_asset_type"
     t.bigint "transam_asset_id"
     t.integer "fta_service_type_id"
     t.boolean "is_primary"
@@ -788,7 +791,7 @@ ActiveRecord::Schema.define(version: 2018_10_03_163749) do
   create_table "fta_equipment_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "fta_asset_class_id"
     t.string "name"
-    t.string "active"
+    t.boolean "active"
     t.index ["fta_asset_class_id"], name: "index_fta_equipment_types_on_fta_asset_class_id"
   end
 
@@ -1425,6 +1428,18 @@ ActiveRecord::Schema.define(version: 2018_10_03_163749) do
     t.boolean "active"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "ntd_performance_measures", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "ntd_report_id"
+    t.bigint "fta_asset_category_id"
+    t.string "asset_level"
+    t.string "pcnt_goal"
+    t.string "pcnt_performance"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["fta_asset_category_id"], name: "index_ntd_performance_measures_on_fta_asset_category_id"
+    t.index ["ntd_report_id"], name: "index_ntd_performance_measures_on_ntd_report_id"
   end
 
   create_table "ntd_reports", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|

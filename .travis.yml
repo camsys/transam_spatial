@@ -9,6 +9,7 @@ before_install:
 - gem update bundler
 - sudo apt-get install libgeos-dev libproj-dev
 - mysql -e "create database IF NOT EXISTS transam_spatial_testing;" -uroot
+- openssl aes-256-cbc -K $encrypted_684e5c653cef_key -iv $encrypted_684e5c653cef_iv -in spec/dummy/config/application.yml.enc -out spec/dummy/config/application.yml -d
 addons:
   code_climate:
     repo_token: ce7c157104b0cf1f2babf66d9cc10bbe598607781e8eeb1ba1593fec1d1fc5c1
