@@ -11,9 +11,7 @@ FactoryBot.define do
     asset_tag
     purchase_date { 1.year.ago }
     in_service_date { 1.year.ago }
-    manufacture_year { "2000" }
-    fta_funding_type_id { 1 }
-    created_by_id { 1 }
+    manufacture_year "2000"
   end
 
   factory :buslike_asset, :class => :asset do # An untyped asset which looks like a bus
@@ -25,6 +23,21 @@ FactoryBot.define do
     reported_condition_rating { 2.0 }
     #replacement_value 100
     estimated_replacement_cost { 100 }
+    fta_funding_type_id { 1 }
+    created_by_id { 1 }
+  end
+
+  factory :buslike_transit_asset, :class => :transit_asset do # An untyped asset which looks like a bus
+    basic_asset_attributes
+    association :asset_subtype
+    purchase_cost { 2000.0 }
+    purchased_new { false }
+    policy_replacement_year { 2018 }
+    association :manufacturer
+    association :manufacturer_model
+    association :fta_asset_category, :factory => :fta_revenue_vehicles_category
+    association :fta_asset_class, :factory => :fta_buses_class
+    association :fta_type, :factory => :fta_bus_type
   end
 
 end
