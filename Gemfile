@@ -14,6 +14,7 @@ gem 'transam_transit', git: 'https://github.com/camsys/transam_transit', branch:
 
 gem 'mysql2', "~> 0.5.1" # lock gem for dummy app
 gem "capybara", '2.6.2' # lock gem for old capybara behavior on hidden element xpath
+gem 'activerecord-mysql2rgeo-adapter', git: 'https://github.com/camsys/activerecord-mysql2rgeo-adapter', branch: 'master'
 gem "rgeo"
 gem 'rgeo-geojson'
 gem 'rgeo-proj4'

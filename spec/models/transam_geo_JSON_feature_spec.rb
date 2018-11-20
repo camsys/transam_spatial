@@ -18,11 +18,12 @@ RSpec.describe TransamGeoJSONFeature do
 
     fta_type = create(:fta_bus_type)
 
-    test_asset = create(:buslike_transit_asset, :organization => organization, :asset_subtype => asset_subtype, :fta_type => fta_type)
+    test_asset = build(:buslike_transit_asset, :organization => organization, :asset_subtype => asset_subtype, :fta_type => fta_type)
 
     expect(TransamAsset._geojson_geometry_attribute_name).to eq('geometry')
     expect(TransamAsset._geojson_properties).to eq([:object_key])
-    expect(test_asset.to_geoJSON).to eq( {type: 'Feature', geometry: {type: 'Point', coordinates: [0, 0]}, properties: {id: :object_key, feature_class: 'TransamAsset'}} )
+    #test_asset.asset_type.class_name.constantize = Vehicle, but doesn't respond_to?(:_geolocatable_geometry_attribute_name) How to geoJSON???
+    expect(test_asset.to_geoJSON).to eq( {type: 'Feature', geometry: {type: 'Point', coordinates: [0, 0]}, properties: {id: :object_key, feature_class: 'TransitAsset'}} )
   end
 
   it 'changes GeoJSON configuration' do

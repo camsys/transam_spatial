@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_11_01_163402) do
+ActiveRecord::Schema.define(version: 2018_11_16_174415) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "object_key", limit: 12
@@ -96,6 +96,7 @@ ActiveRecord::Schema.define(version: 2018_11_01_163402) do
     t.integer "avg_daily_use_miles"
     t.integer "avg_daily_passenger_trips"
     t.integer "maintenance_provider_type_id"
+    t.integer "vehicle_storage_method_type_id"
     t.decimal "avg_cost_per_mile", precision: 9, scale: 2
     t.decimal "avg_miles_per_gallon", precision: 9, scale: 2
     t.integer "annual_maintenance_cost"
@@ -120,9 +121,9 @@ ActiveRecord::Schema.define(version: 2018_11_01_163402) do
     t.string "relative_location_unit"
     t.string "relative_location_direction"
     t.bigint "performance_restriction_type_id"
-    t.integer "book_value"
-    t.text "comments"
+    t.integer "num_infrastructure"
     t.integer "organization_id"
+    t.text "comments"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "state", limit: 32
@@ -130,7 +131,6 @@ ActiveRecord::Schema.define(version: 2018_11_01_163402) do
     t.string "original_filename", limit: 128
     t.integer "created_by_id"
     t.integer "total_cost"
-    t.integer "general_ledger_account_id"
     t.index ["asset_event_type_id"], name: "asset_events_idx3"
     t.index ["asset_id"], name: "asset_events_idx2"
     t.index ["created_by_id"], name: "asset_events_creator_idx"
@@ -140,6 +140,12 @@ ActiveRecord::Schema.define(version: 2018_11_01_163402) do
     t.index ["performance_restriction_type_id"], name: "index_asset_events_on_performance_restriction_type_id"
     t.index ["transam_asset_id"], name: "index_asset_events_on_transam_asset_id"
     t.index ["upload_id"], name: "asset_events_idx5"
+  end
+
+  create_table "asset_events_vehicle_usage_codes", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "asset_event_id"
+    t.integer "vehicle_usage_code_id"
+    t.index ["asset_event_id", "vehicle_usage_code_id"], name: "asset_events_vehicle_usage_codes_idx1"
   end
 
   create_table "asset_fleet_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -257,6 +263,7 @@ ActiveRecord::Schema.define(version: 2018_11_01_163402) do
     t.boolean "scheduled_replace_with_new"
     t.integer "scheduled_rehabilitation_cost"
     t.integer "replacement_reason_type_id"
+    t.string "replacement_status_type_id"
     t.boolean "in_backlog"
     t.integer "reported_condition_type_id"
     t.decimal "reported_condition_rating", precision: 10, scale: 1
@@ -269,10 +276,6 @@ ActiveRecord::Schema.define(version: 2018_11_01_163402) do
     t.date "service_status_date"
     t.date "last_maintenance_date"
     t.boolean "depreciable"
-    t.date "depreciation_start_date"
-    t.integer "depreciation_useful_life"
-    t.integer "depreciation_purchase_cost"
-    t.date "current_depreciation_date"
     t.integer "book_value"
     t.integer "salvage_value"
     t.date "disposition_date"
@@ -379,14 +382,6 @@ ActiveRecord::Schema.define(version: 2018_11_01_163402) do
     t.integer "district_id"
     t.index ["asset_id", "district_id"], name: "assets_districts_idx1"
     t.index ["transam_asset_id"], name: "index_assets_districts_on_transam_asset_id"
-  end
-
-  create_table "assets_expenditures", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "asset_id", null: false
-    t.bigint "transam_asset_id"
-    t.integer "expenditure_id", null: false
-    t.index ["asset_id", "expenditure_id"], name: "assets_expenditures_idx1"
-    t.index ["transam_asset_id"], name: "index_assets_expenditures_on_transam_asset_id"
   end
 
   create_table "assets_facility_features", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -582,26 +577,6 @@ ActiveRecord::Schema.define(version: 2018_11_01_163402) do
     t.index ["priority", "run_at"], name: "delayed_jobs_priority"
   end
 
-  create_table "depreciation_entries", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "object_key", limit: 12, null: false
-    t.integer "asset_id"
-    t.bigint "transam_asset_id"
-    t.date "event_date"
-    t.string "description"
-    t.integer "book_value"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.index ["asset_id"], name: "index_depreciation_entries_on_asset_id"
-    t.index ["transam_asset_id"], name: "index_depreciation_entries_on_transam_asset_id"
-  end
-
-  create_table "depreciation_entries_general_ledger_account_entries", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "depreciation_entry_id"
-    t.integer "general_ledger_account_entry_id"
-    t.index ["depreciation_entry_id"], name: "depr_entry_idx"
-    t.index ["general_ledger_account_entry_id"], name: "gl_entry_idx"
-  end
-
   create_table "disposition_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", limit: 64, null: false
     t.string "code", limit: 2, null: false
@@ -613,6 +588,16 @@ ActiveRecord::Schema.define(version: 2018_11_01_163402) do
     t.string "name", limit: 64, null: false
     t.string "description", limit: 254, null: false
     t.boolean "active", null: false
+  end
+
+  create_table "districts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "district_type_id", null: false
+    t.string "name", limit: 64, null: false
+    t.string "code", limit: 6, null: false
+    t.string "description", limit: 254, null: false
+    t.boolean "active", null: false
+    t.index ["district_type_id"], name: "districts_idx1"
+    t.index ["name"], name: "districts_idx2"
   end
 
   create_table "documents", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -643,32 +628,6 @@ ActiveRecord::Schema.define(version: 2018_11_01_163402) do
     t.string "name"
     t.string "class_name"
     t.boolean "active"
-  end
-
-  create_table "expenditures", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "object_key", limit: 12, null: false
-    t.integer "general_ledger_account_id"
-    t.integer "grant_id"
-    t.integer "expense_type_id", null: false
-    t.string "external_id", limit: 32
-    t.date "expense_date", null: false
-    t.string "description", limit: 254
-    t.integer "amount", null: false
-    t.integer "extended_useful_life_months"
-    t.string "vendor"
-    t.integer "pcnt_from_grant"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.index ["expense_type_id"], name: "expenditures_idx4"
-    t.index ["general_ledger_account_id"], name: "expenditures_idx3"
-    t.index ["object_key"], name: "expenditures_idx1"
-  end
-
-  create_table "expense_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "name", limit: 64, null: false
-    t.string "description", limit: 254, null: false
-    t.boolean "active", null: false
-    t.index ["name"], name: "expense_types_idx2"
   end
 
   create_table "facilities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -890,104 +849,10 @@ ActiveRecord::Schema.define(version: 2018_11_01_163402) do
     t.boolean "active", null: false
   end
 
-  create_table "general_ledger_account_entries", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "object_key", limit: 12
-    t.integer "general_ledger_account_id"
-    t.date "event_date"
-    t.string "description"
-    t.decimal "amount", precision: 10
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer "asset_id"
-    t.bigint "transam_asset_id"
-    t.index ["asset_id"], name: "index_general_ledger_account_entries_on_asset_id"
-    t.index ["general_ledger_account_id"], name: "general_ledger_account_entry_general_ledger_account_idx"
-    t.index ["transam_asset_id"], name: "index_general_ledger_account_entries_on_transam_asset_id"
-  end
-
-  create_table "general_ledger_account_subtypes", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "general_ledger_account_type_id"
-    t.string "name"
-    t.string "description"
-    t.boolean "active"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "general_ledger_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "object_key", limit: 12, null: false
-    t.integer "chart_of_account_id", null: false
-    t.integer "general_ledger_account_type_id", null: false
-    t.integer "general_ledger_account_subtype_id"
-    t.string "account_number", null: false
-    t.string "name", null: false
-    t.boolean "active", null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer "grant_id"
-    t.index ["active"], name: "general_ledger_accounts_idx3"
-    t.index ["chart_of_account_id"], name: "general_ledger_accounts_idx2"
-    t.index ["object_key"], name: "general_ledger_accounts_idx1"
-  end
-
-  create_table "general_ledger_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "object_key", limit: 12, null: false
-    t.integer "chart_of_account_id"
-    t.integer "asset_subtype_id"
-    t.integer "asset_account_id"
-    t.integer "depr_expense_account_id"
-    t.integer "accumulated_depr_account_id"
-    t.integer "gain_loss_account_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.index ["accumulated_depr_account_id"], name: "index_general_ledger_mappings_on_accumulated_depr_account_id"
-    t.index ["asset_account_id"], name: "index_general_ledger_mappings_on_asset_account_id"
-    t.index ["asset_subtype_id"], name: "index_general_ledger_mappings_on_asset_subtype_id"
-    t.index ["chart_of_account_id"], name: "index_general_ledger_mappings_on_chart_of_account_id"
-    t.index ["depr_expense_account_id"], name: "index_general_ledger_mappings_on_depr_expense_account_id"
-    t.index ["gain_loss_account_id"], name: "index_general_ledger_mappings_on_gain_loss_account_id"
-  end
-
   create_table "governing_body_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", limit: 64, null: false
     t.string "description", limit: 254, null: false
     t.boolean "active", null: false
-  end
-
-  create_table "grant_budgets", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "general_ledger_account_id", null: false
-    t.integer "grant_id", null: false
-    t.integer "amount", null: false
-    t.boolean "active"
-    t.index ["general_ledger_account_id", "grant_id"], name: "grant_budgets_idx1"
-  end
-
-  create_table "grant_purchases", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "asset_id"
-    t.bigint "transam_asset_id"
-    t.integer "pcnt_purchase_cost", null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string "sourceable_type"
-    t.integer "sourceable_id"
-    t.index ["asset_id"], name: "grant_purchases_idx1"
-    t.index ["transam_asset_id"], name: "index_grant_purchases_on_transam_asset_id"
-  end
-
-  create_table "grants", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "object_key", limit: 12, null: false
-    t.integer "organization_id", null: false
-    t.integer "fy_year", null: false
-    t.integer "amount", null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string "sourceable_type"
-    t.integer "sourceable_id"
-    t.boolean "active"
-    t.string "name"
-    t.index ["fy_year"], name: "grants_idx3"
-    t.index ["object_key"], name: "grants_idx1"
-    t.index ["organization_id"], name: "grants_idx2"
   end
 
   create_table "images", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -1387,8 +1252,6 @@ ActiveRecord::Schema.define(version: 2018_11_01_163402) do
     t.integer "updated_by_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.date "start_date"
-    t.date "end_date"
     t.text "processing_log"
     t.index ["object_key"], name: "ntd_forms_idx1", unique: true
     t.index ["organization_id", "fy_year"], name: "ntd_forms_idx2"
@@ -1489,7 +1352,6 @@ ActiveRecord::Schema.define(version: 2018_11_01_163402) do
     t.integer "manufacture_year", null: false
     t.string "additional_fta_mode"
     t.string "additional_fta_service_type"
-    t.integer "avg_expected_service_years", null: false
     t.string "other_ownership_type"
     t.string "other_fuel_type"
     t.index ["ntd_report_id"], name: "ntd_revenue_vehicle_fleets_idx1"
@@ -1577,11 +1439,24 @@ ActiveRecord::Schema.define(version: 2018_11_01_163402) do
     t.index ["short_name"], name: "short_name"
   end
 
+  create_table "organizations_districts", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "organization_id"
+    t.integer "district_id"
+    t.index ["organization_id", "district_id"], name: "organizations_districts_idx2"
+  end
+
   create_table "organizations_saved_searches", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "organization_id"
     t.bigint "saved_search_id"
     t.index ["organization_id"], name: "index_organizations_saved_searches_on_organization_id"
     t.index ["saved_search_id"], name: "index_organizations_saved_searches_on_saved_search_id"
+  end
+
+  create_table "organizations_service_provider_types", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "organization_id", null: false
+    t.integer "service_provider_type_id", null: false
+    t.index ["organization_id"], name: "organization_spt_idx1"
+    t.index ["service_provider_type_id"], name: "organization_spt_idx2"
   end
 
   create_table "performance_restriction_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -1590,7 +1465,7 @@ ActiveRecord::Schema.define(version: 2018_11_01_163402) do
     t.boolean "active"
   end
 
-  create_table "planning_partners_organizations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "planning_partners_organizations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "planning_partner_id"
     t.integer "organization_id"
     t.index ["organization_id"], name: "index_planning_partners_organizations_on_organization_id"
@@ -1604,11 +1479,9 @@ ActiveRecord::Schema.define(version: 2018_11_01_163402) do
     t.integer "year", null: false
     t.string "name", limit: 64, null: false
     t.string "description", limit: 254, null: false
-    t.integer "depreciation_calculation_type_id", null: false
     t.integer "service_life_calculation_type_id", null: false
     t.integer "cost_calculation_type_id", null: false
     t.integer "condition_estimation_type_id", null: false
-    t.integer "depreciation_interval_type_id", null: false
     t.decimal "condition_threshold", precision: 9, scale: 2, null: false
     t.decimal "interest_rate", precision: 9, scale: 2, null: false
     t.boolean "current", null: false
@@ -1703,7 +1576,7 @@ ActiveRecord::Schema.define(version: 2018_11_01_163402) do
     t.boolean "active", null: false
   end
 
-  create_table "reports", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+  create_table "reports", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "report_type_id", null: false
     t.string "name", limit: 64, null: false
     t.string "description", limit: 254, null: false
@@ -1770,8 +1643,8 @@ ActiveRecord::Schema.define(version: 2018_11_01_163402) do
     t.text "json"
     t.text "query_string"
     t.integer "ordinal"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "search_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -1959,7 +1832,6 @@ ActiveRecord::Schema.define(version: 2018_11_01_163402) do
     t.bigint "transam_assetible_id"
     t.string "object_key", limit: 12, null: false
     t.bigint "organization_id", null: false
-    t.integer "penn_comm_type_id"
     t.bigint "asset_subtype_id"
     t.bigint "upload_id"
     t.string "asset_tag", null: false
@@ -1993,16 +1865,9 @@ ActiveRecord::Schema.define(version: 2018_11_01_163402) do
     t.integer "scheduled_replacement_cost"
     t.text "early_replacement_reason"
     t.boolean "in_backlog"
-    t.boolean "depreciable"
-    t.date "depreciation_start_date"
-    t.date "current_depreciation_date"
-    t.integer "depreciation_useful_life"
-    t.integer "depreciation_purchase_cost"
-    t.integer "book_value"
-    t.integer "salvage_value"
+    t.geometry "geometry"
     t.integer "location_reference_type_id"
     t.string "location_reference"
-    t.integer "replacement_status_type_id"
     t.integer "scheduled_rehabilitation_year"
     t.integer "scheduled_disposition_year"
     t.datetime "created_at", null: false
@@ -2135,6 +2000,8 @@ ActiveRecord::Schema.define(version: 2018_11_01_163402) do
     t.boolean "active", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "authentication_token", limit: 30
+    t.index ["authentication_token"], name: "index_users_on_authentication_token", unique: true
     t.index ["email"], name: "users_idx3"
     t.index ["object_key"], name: "users_idx1"
     t.index ["organization_id"], name: "users_idx2"
