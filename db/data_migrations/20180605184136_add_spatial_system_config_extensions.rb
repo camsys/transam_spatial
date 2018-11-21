@@ -4,11 +4,6 @@ class AddSpatialSystemConfigExtensions < ActiveRecord::DataMigration
         {class_name: 'Organization', extension_name: 'TransamGeocodable', active: true},
         {class_name: 'Vendor', extension_name: 'TransamGeocodable', active: true},
 
-        {class_name: 'Facility', extension_name: 'TransamAddressLocatable', active: true},
-
-        {class_name: 'ServiceVehicle', extension_name: 'TransamParentLocatable', active: true},
-        {class_name: 'CapitalEquipment', extension_name: 'TransamParentLocatable', active: true},
-
         {class_name: 'TransamAsset', extension_name: 'TransamGeoJSONFeature', active: true},
     ]
 
