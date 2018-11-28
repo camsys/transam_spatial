@@ -6,7 +6,7 @@ RSpec.describe TransamGeocodable do
     let(:test_org) { create(:organization, address1: "123 Fake Street", city: "Bloston", state: "MA", zip: "00000") }
 
     it 'is located in Massachusetts' do
-      expect(test_org.latitude).to be_within(0.000001).of(42.360083)
+      expect(test_org.latitude).to be_within(0.000001).of(42.407211)
       expect(test_org.longitude).to be_within(0.000001).of(-71.382437)
     end
 
