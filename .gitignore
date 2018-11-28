@@ -41,3 +41,6 @@ coverage/.resultset.json
 coverage/index.html
 Guardfile~
 TAGS
+
+# Ignore application configuration
+/config/application.yml
