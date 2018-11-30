@@ -1,11 +1,11 @@
 FactoryBot.define do
 
   factory :asset_type do
-    name { "Vehicle" }
-    class_name { "Vehicle" } # For core, no concrete classes exist
-    description { "Vehicle" }
+    name { "Test Asset Type" }
+    class_name { "TestAssetType" } # For core, no concrete classes exist
+    display_icon_name { "display icon" }
+    map_icon_name { "map icon" }
+    description { "An generalized asset type." }
     active { true }
-    display_icon_name { "fa fa-bus" }
-    map_icon_name { "redIcon" }
   end
 end

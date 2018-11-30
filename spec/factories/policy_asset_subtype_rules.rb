@@ -1,7 +1,7 @@
 FactoryBot.define do
 
   factory :policy_asset_subtype_rule do
-    association :asset_subtype
+    asset_subtype
     min_service_life_months { 144 }
     min_service_life_miles { 500000 }
     replacement_cost { 2000 }

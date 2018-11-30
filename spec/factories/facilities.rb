@@ -1,6 +1,7 @@
 FactoryBot.define do
 
   factory :facility do
+    association :transit_asset, factory: [:basic_transit_asset, :fta_facility]
     manufacture_year { 2018 }
     facility_name { 'Test Facility' }
     address1 { '101 Station Landing' }
@@ -9,8 +10,8 @@ FactoryBot.define do
     state { 'MA' }
     zip { '02155' }
     country { 'USA' }
+    esl_category_id { 10 }
     facility_size { 10000 }
     facility_size_unit { 'square foot' }
-    association :transit_asset, factory: :buslike_transit_asset
   end
 end

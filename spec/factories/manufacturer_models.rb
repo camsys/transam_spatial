@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :manufacturer_model do
-    name { "MyString" }
-    description { "MyString" }
+    name { 'Transam Model' }
+    description { "A generalized manufacturer model." }
     active { false }
   end
 end

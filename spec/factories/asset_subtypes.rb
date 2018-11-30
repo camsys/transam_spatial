@@ -1,9 +1,9 @@
 FactoryBot.define do
 
   factory :asset_subtype do
-    association :asset_type
+    asset_type
     name { "Test Asset Subtype" }
-    description { "Test Asset Subtype" }
+    description { "A generalized asset subtype." }
     active { true }
   end
 

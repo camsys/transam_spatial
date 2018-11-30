@@ -1,7 +1,7 @@
 FactoryBot.define do
 
   trait :basic_policy_attributes do
-    association :organization, :factory => :organization
+    organization
     interest_rate { "0.05" }
     service_life_calculation_type_id { 1 }
     cost_calculation_type_id { 1 }

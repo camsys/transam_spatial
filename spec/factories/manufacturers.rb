@@ -1,9 +1,9 @@
 FactoryBot.define do
 
   factory :manufacturer do
-    filter { 'vehicle' }
-    name { 'Ford' }
-    code { 'FRD' }
+    filter { 'asset' }
+    name { 'transam asset' }
+    code { 'TAA' }
     active { true }
   end
 

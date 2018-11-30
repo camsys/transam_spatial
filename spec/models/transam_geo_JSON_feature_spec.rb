@@ -3,22 +3,22 @@ require 'rails_helper'
 RSpec.describe TransamGeoJSONFeature do
 
   it 'has default configuration' do
-    asset_type = create(:asset_type)
-    asset_subtype = create(:asset_subtype, :asset_type => asset_type)
-    parent_organization = create(:organization)
-    organization = create(:organization)
-
-    parent_policy = create(:policy, :organization => parent_organization, :parent => nil)
-    policy_asset_type_rule = create(:policy_asset_type_rule, :asset_type => asset_type, :policy => parent_policy)
-    policy_asset_subtype_rule = create(:policy_asset_subtype_rule, :asset_subtype => asset_subtype, :policy => parent_policy)
-
-    policy = create(:policy, :organization => organization, :parent => parent_policy)
-    policy.policy_asset_subtype_rules << policy_asset_subtype_rule
-    policy.policy_asset_type_rules << policy_asset_type_rule
-
-    fta_type = create(:fta_bus_type)
-
-    test_asset = build(:buslike_transit_asset, :organization => organization, :asset_subtype => asset_subtype, :fta_type => fta_type)
+    # asset_type = create(:asset_type)
+    # asset_subtype = create(:asset_subtype, :asset_type => asset_type)
+    # parent_organization = create(:organization)
+    # organization = create(:organization)
+    #
+    # parent_policy = create(:policy, :organization => parent_organization, :parent => nil)
+    # policy_asset_type_rule = create(:policy_asset_type_rule, :asset_type => asset_type, :policy => parent_policy)
+    # policy_asset_subtype_rule = create(:policy_asset_subtype_rule, :asset_subtype => asset_subtype, :policy => parent_policy)
+    #
+    # policy = create(:policy, :organization => organization, :parent => parent_policy)
+    # policy.policy_asset_subtype_rules << policy_asset_subtype_rule
+    # policy.policy_asset_type_rules << policy_asset_type_rule
+    #
+    # fta_type = create(:fta_transit_type)
+    #
+    # test_asset = build(:basic_transam_asset)
 
     expect(TransamAsset._geojson_geometry_attribute_name).to eq('geometry')
     expect(TransamAsset._geojson_properties).to eq([:object_key])
