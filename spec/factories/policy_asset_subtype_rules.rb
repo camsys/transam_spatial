@@ -10,5 +10,6 @@ FactoryBot.define do
     replace_with_leased { false }
     purchase_replacement_code { 'XX.XX.XX' }
     rehabilitation_code { 'XX.XX.XX' }
+    default_rule { true }
   end
 end

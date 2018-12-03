@@ -13,8 +13,8 @@ RSpec.describe TransamAddressLocatable do
   end
   
   it 'set_location_reference' do
-    expect(test_asset.location_reference_type.name).to eq("Street Address")
-    expect(test_asset.location_reference).to eq("101 Station Landing, Suite 410, Medford, MA, 02155")
+    expect(test_facility.location_reference_type.name).to eq("Street Address")
+    expect(test_facility.location_reference).to eq("101 Station Landing, Suite 410, Medford, MA, 02155")
   end
 
 end
