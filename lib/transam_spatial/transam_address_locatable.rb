@@ -52,6 +52,7 @@ module TransamAddressLocatable
     elems << address1 unless address1.blank?
     elems << address2 unless address2.blank?
     elems << city unless city.blank?
+    elems << county if self.respond_to?(:county) && !county.blank?
     elems << state unless state.blank?
     elems << zip unless zip.blank?
     elems.compact.join(', ')
