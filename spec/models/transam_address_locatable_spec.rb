@@ -2,7 +2,9 @@ require 'rails_helper'
 
 RSpec.describe TransamAddressLocatable do
 
-  let(:test_facility) { create(:facility) }
+  let(:test_parent_policy) { create(:parent_policy) }
+  let(:test_policy) { create(:policy, organization: test_parent_policy.organization, parent: test_parent_policy) }
+  let(:test_facility) { create(:facility, organization: test_policy.organization) }
 
   it 'green dot icon_class' do
     expect(test_facility.icon_class).to eq('greenDotIcon')
