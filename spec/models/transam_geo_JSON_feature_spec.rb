@@ -5,17 +5,13 @@ RSpec.describe TransamGeoJSONFeature do
   let(:test_parent_policy) { create(:parent_policy) }
   let(:test_policy) { create(:policy, organization: test_parent_policy.organization, parent: test_parent_policy) }
   let(:test_asset) { create(:facility, organization: test_policy.organization) }
+  let(:geometry_adapter) { RgeoGeometryAdapter.new }
 
   it 'has default configuration' do
     expect(test_asset._geojson_geometry_attribute_name).to eq('geometry')
     expect(test_asset._geojson_properties).to eq([:object_key])
-    # TODO: figure out how the use to_geoJSON with test_asset
-    # puts test_asset.send(:_geojson_geometry_attribute_name)
-    # puts Rails.application.config.transam_spatial_geometry_adapter
-    # puts test_asset.geometry.dimension.to_s
-    # puts test_asset.send(:_geojson_geometry_attribute_name).points
-
-    # expect(test_asset.to_geoJSON).to eq( {type: 'Feature', geometry: {type: 'Point', coordinates: [0, 0]}, properties: {id: :object_key, feature_class: 'TransitAsset'}} )
+    test_asset.geometry = geometry_adapter.create_point(-98,40)
+    expect(test_asset.to_geoJSON).to eq( {type: 'Feature', geometry: {type: 'Point', coordinates: [-98.0, 40.0]}, properties: {id: test_asset.object_key, feature_class: 'TransamAsset', object_key: test_asset.object_key}} )
   end
 
   it 'changes GeoJSON configuration' do
