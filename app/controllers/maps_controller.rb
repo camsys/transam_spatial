@@ -9,9 +9,9 @@ class MapsController < AssetsController
   def marker
 
     @marker = {}
-    a = Asset.find_by(:object_key => params[:object_key])
+    a = Rails.application.config.asset_base_class_name.constantize.find_by(:object_key => params[:object_key])
     if asset
-      asset = Asset.get_typed_asset(a)
+      asset = Rails.application.config.asset_base_class_name.constantize.get_typed_asset(a)
       if asset.mappable?
         @marker = asset.get_map_marker
       end
@@ -21,9 +21,9 @@ class MapsController < AssetsController
   # Called via AJAX to get dynamic content via AJAX
   def map_popup
     str = ""
-    a = Asset.find_by(:object_key => params[:id])
+    a = Rails.application.config.asset_base_class_name.constantize.find_by(:object_key => params[:id])
     if a
-      asset = Asset.get_typed_asset(a)
+      asset = Rails.application.config.asset_base_class_name.constantize.get_typed_asset(a)
       if asset.mappable?
         str = render_to_string(:partial => "/shared/map_popup", :locals => { :asset => asset })
       end
@@ -34,7 +34,7 @@ class MapsController < AssetsController
 
   # Called via AJAX to get dynamic content via AJAX
   def map_cluster_popup
-    assets = Asset.where(:object_key => params[:object_keys]).order(:asset_type_id, :asset_subtype_id, purchase_date: :desc)
+    assets = Rails.application.config.asset_base_class_name.constantize.where(:object_key => params[:object_keys]).order(:asset_type_id, :asset_subtype_id, purchase_date: :desc)
 
     str = render_to_string(:partial => "/shared/map_cluster_popup", :locals => { :assets => assets })
 

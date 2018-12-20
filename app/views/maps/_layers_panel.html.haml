@@ -14,7 +14,10 @@
     end
   end
 
-  mappable_asset_types = AssetType.where(id: mappable_asset_type_ids)
+  # mappable_asset_types = AssetType.where(id: mappable_asset_type_ids)
+  # override this be all asset types since moving away AssetType and Asset to TransamAsset
+  # assume all assets are always mappable for right now
+  mappable_asset_types = AssetType.all
   
 %h4
   = "Layers"
@@ -58,7 +61,7 @@
           Assets
     .panel-collapse.collapse{role:"tabpanel", id:"asset_layer_list"}
       .panel-body
-        - subtype_idss_with_assets = Asset.operational.where(:organization_id => @organization_list).group(:asset_subtype_id).count.keys
+        - subtype_idss_with_assets = Rails.application.config.asset_base_class_name.constantize.operational.where(:organization_id => @organization_list).group(:asset_subtype_id).count.keys
         - mappable_asset_types.each do |type|
           - subtypes = type.asset_subtypes.where(id: subtype_idss_with_assets)
           - if subtypes.any?
