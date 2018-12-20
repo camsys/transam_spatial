@@ -1,7 +1,6 @@
 FactoryBot.define do
 
   factory :policy_asset_subtype_rule do
-    association :asset_subtype
     min_service_life_months { 144 }
     min_service_life_miles { 500000 }
     replacement_cost { 2000 }
@@ -10,5 +9,6 @@ FactoryBot.define do
     replace_with_leased { false }
     purchase_replacement_code { 'XX.XX.XX' }
     rehabilitation_code { 'XX.XX.XX' }
+    default_rule { true }
   end
 end

@@ -8,7 +8,7 @@ FactoryBot.define do
     zip { '17120' }
     url { 'http://www.example.com' }
     phone { '9999999999' }
-    association :organization_type, :factory => :organization_type
+    organization_type_id { 2 }
     sequence(:name) { |n| "Org #{n}" }
     short_name {name}
     license_holder { true }
