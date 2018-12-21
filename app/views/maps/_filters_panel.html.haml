@@ -5,7 +5,7 @@
   max_replacement_year = min_replacement_year + 40
   min_purchase_year = Rails.application.config.epoch.present? ? Rails.application.config.epoch.year : 1900
   max_purchase_year = Date.today.year
-  asset = Asset.new
+  asset = Rails.application.config.asset_base_class_name.constantize.new
 %h4
   = "Filters"
 #filterContainer.panel-group{role:"tablist", "aria-multiselectable":"true"}
@@ -49,17 +49,11 @@
           %label.slider-label.col-xs-12
             = "#{asset.fiscal_year min_replacement_year} - #{asset.fiscal_year max_replacement_year}"
           %input{id: 'scheduled_replacement_year_slider', type: 'text', data: {slider_min: min_replacement_year, slider_max: max_replacement_year, slider_value: [min_replacement_year, max_replacement_year], slider_enabled: 'false', slider_tooltip: 'hide'}}
-    .row{style: "margin-top: 10px;"}
-      .col-md-12
-        %label
-          = "Mileage (For Revenue Vehicle Only)"      
-        .col-md-12{style: 'padding-left: 20px'}
-          .col-md-5{style: 'padding: 0px'}
-            %input.form-control#min_mileage{type: 'number', min: 0, step: 1, name: 'min_mileage'}
-          .col-md-2.center
-            = "-"
-          .col-md-5{style: 'padding: 0px'}
-            %input.form-control#max_mileage{type: 'number', min: 0, step: 1, name: 'max_mileage'}
+
+    - SystemConfig.transam_module_names.each do |mod|
+      - if lookup_context.template_exists?("#{mod}_filters_panel", 'maps', true)
+        = render :partial => "maps/#{mod}_filters_panel"
+
     .row{style: "margin-top: 20px;"}
       .col-md-12
         = f.button :submit, 'Apply', :class=>"btn btn-primary", :id => 'submit_filters_btn'
@@ -133,17 +127,6 @@
         form.submit();
       }
     });
-
-    $('#min_mileage, #max_mileage').rules("add", {
-      has_valid_mileage_range: true
-    });
-
-    $.validator.addMethod('has_valid_mileage_range', function (value, element, param) {
-      if ($('#min_mileage').val() && $('#max_mileage').val() && (parseInt($('#min_mileage').val()) > parseInt($('#max_mileage').val()))) {
-        return false;
-      }
-      return true;
-    }, 'Please make sure the mileage range is valid.');
 
     $('#submit_filters_btn').click(function() {
       if($('#new_searcher').valid()) {

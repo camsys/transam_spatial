@@ -28,8 +28,23 @@ class MapSearchesController < SearchesController
     # get the geometry column name associated with the assets
     if @asset_type
       asset_class = @asset_type.class_name.try(:constantize)
-      if asset_class && asset_class.respond_to?(:_geolocatable_geometry_attribute_name)
-        geom_attr_name = asset_class._geolocatable_geometry_attribute_name
+
+
+
+      if asset_class
+        if asset_class.respond_to?(:_geolocatable_geometry_attribute_name)
+          geom_attr_name = asset_class._geolocatable_geometry_attribute_name
+        else
+          asset_class = asset_class.acting_as_model
+          while asset_class
+            if asset_class.respond_to?(:_geolocatable_geometry_attribute_name)
+              geom_attr_name = asset_class._geolocatable_geometry_attribute_name
+              asset_class = nil
+            else
+              asset_class = asset_class.acting_as_model
+            end
+          end
+        end
       end
     end
     
@@ -59,7 +74,7 @@ class MapSearchesController < SearchesController
       features: features
     }
     assets.find_each do |a|
-      asset = Asset.get_typed_asset a
+      asset = Rails.application.config.asset_base_class_name.constantize.get_typed_asset a
       str = asset.to_geoJSON
       features << str unless str.blank?
     end
@@ -71,16 +86,16 @@ class MapSearchesController < SearchesController
     search_params = params[:searcher]
 
      # TODO: depends on future changes in the generic query and map query, might need to re-use AssetSearcher for map search as well
-    @data = Asset.operational.where(
+    @data = Rails.application.config.asset_base_class_name.constantize.operational.includes(asset_subtype: :asset_type).where(
       organization_id: @organization_list, 
-      asset_type_id: search_params[:asset_type_id], 
+      asset_types: {id: search_params[:asset_type_id]},
       asset_subtype_id: search_params[:asset_subtype_id])
 
     [:reported_condition_rating, :scheduled_replacement_year, :purchase_year].each do |attr_key|
       check_attribute_range(attr_key)
     end
 
-    if @asset_type && @asset_type.class_name = 'Vehicle'
+    if @asset_type && (@asset_type.class_name.include? 'Vehicle')
       check_attribute_range(:reported_mileage)
     end
   end
