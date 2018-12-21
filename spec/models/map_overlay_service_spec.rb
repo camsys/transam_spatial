@@ -15,6 +15,7 @@ RSpec.describe MapOverlayService, :type => :model do
     end
     it 'has a type' do
       expect(test_service).to belong_to(:map_overlay_service_type)
+      expect(test_service.map_overlay_service_type.to_s).to eq("Test Name")
     end
   end
   describe 'validations' do

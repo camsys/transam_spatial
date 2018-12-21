@@ -44,7 +44,7 @@ class TransamGeometryFactory
     elsif adapter_type == 'georuby'
       @geometry_adapter = GeorubyGeometryAdapter.new
     else
-      RaiseException "Geometry Adapter #{adapter_type} not found."
+      raise "Geometry Adapter #{adapter_type} not found."
     end
   end
 end

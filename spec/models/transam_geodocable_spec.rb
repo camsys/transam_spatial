@@ -5,6 +5,10 @@ RSpec.describe TransamGeocodable do
   context 'geocode an organization' do
     let(:test_org) { create(:organization, address1: "123 Fake Street", city: "Bloston", state: "MA", zip: "00000") }
 
+    it 'icon_class' do
+      expect(test_org.icon_class).to eq('blueIcon')
+    end
+
     it 'is located in Massachusetts' do
       expect(test_org.latitude).to be_within(0.000001).of(42.360083)
       expect(test_org.longitude).to be_within(0.000001).of(-71.05888)
@@ -34,6 +38,10 @@ RSpec.describe TransamGeocodable do
 
   context 'geocode a vendor' do
     let(:test_vendor) { create(:vendor) }
+
+    it 'icon_class' do
+      expect(test_vendor.icon_class).to eq('blueIcon')
+    end
 
     it 'has default state (PA)' do
       expect(test_vendor.latitude).to be_within(0.000001).of(41.2033216)

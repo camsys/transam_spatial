@@ -2,11 +2,12 @@ require 'rails_helper'
 
 RSpec.describe LocationReferenceService, :type => :service do
 
-  let(:test_service) { LocationReferenceService.new }
+  let(:test_service) { LocationReferenceService.new(attrs = {warnings: ["Loaded from initialization"]}) }
   let(:location) { "140 Water St, New York" }
 
   it 'initialize' do
     expect(test_service.geocoding_service.class.name).to eq('GoogleGeocodingService')
+    expect(test_service.warnings[0]).to eq("Loaded from initialization")
   end
 
   it '.has_errors?' do
@@ -25,6 +26,10 @@ RSpec.describe LocationReferenceService, :type => :service do
       expect(test_service.format).to eq('address')
       expect(test_service.coords).to eq([[-74.00673019999999, 40.705673]])
       expect(test_service.formatted_location_reference).to be nil
+    end
+    it 'invalid coordinate' do
+      expect(test_service.parse('abcdefg', 'coordinate')).to be false
+      expect(test_service.errors[0]).to eq("Coordinate is incorrectly formatted. Use '(logitude,latitude)' format.")
     end
   end
 

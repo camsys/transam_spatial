@@ -10,8 +10,12 @@ RSpec.describe TransamGeoJSONFeature do
   it 'has default configuration' do
     expect(test_asset._geojson_geometry_attribute_name).to eq('geometry')
     expect(test_asset._geojson_properties).to eq([:object_key])
+
     test_asset.geometry = geometry_adapter.create_point(-98,40)
     expect(test_asset.to_geoJSON).to eq( {type: 'Feature', geometry: {type: 'Point', coordinates: [-98.0, 40.0]}, properties: {id: test_asset.object_key, feature_class: 'TransamAsset', object_key: test_asset.object_key}} )
+
+    test_asset.geometry = geometry_adapter.create_linestring([[-71.06, 42.36], [-122.42, 37.77]])
+    expect(test_asset.to_geoJSON).to eq( {type: 'Feature', geometry: {type: 'LineString', coordinates: [[-71.06, 42.36], [-122.42, 37.77]]}, properties: {id: test_asset.object_key, feature_class: 'TransamAsset', object_key: test_asset.object_key}} )
   end
 
   it 'changes GeoJSON configuration' do
