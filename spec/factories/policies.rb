@@ -21,13 +21,23 @@ FactoryBot.define do
   factory :parent_policy, :class => :policy do
     basic_policy_attributes
 
-    after(:create) do |policy|
+    transient do
+      has_fuel_type false
+    end
+
+    transient do
+      subtype 0
+    end
+
+    trait :fuel_type do
+      has_fuel_type true
+    end
+
+    after(:create) do |policy, evaluator|
       AssetType.all.each do |type|
         create(:policy_asset_type_rule, policy: policy, asset_type: type)
       end
-      AssetSubtype.all.each do |subtype|
-        create(:policy_asset_subtype_rule, policy: policy, asset_subtype: subtype)
-      end
+      create(:policy_asset_subtype_rule, (:fuel_type if evaluator.has_fuel_type), policy: policy, asset_subtype_id: evaluator.subtype)
     end
   end
 end

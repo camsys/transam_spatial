@@ -13,7 +13,12 @@ FactoryBot.define do
     in_service_date { 1.year.ago }
     purchased_new { false }
   end
-  
+
+  trait :transam_support_vehicle do
+    basic_asset_attributes
+    asset_subtype_id { 35 }
+  end
+
   trait :transam_facility do
     basic_asset_attributes
     asset_subtype_id { 24 }
@@ -23,7 +28,15 @@ FactoryBot.define do
     basic_asset_attributes
     asset_subtype_id { 61 }
   end
-  
+
+  trait :transit_service_vehicle do
+    transam_support_vehicle
+    fta_asset_category_id { 2 }
+    fta_asset_class_id { 5 }
+    fta_type_id { 1 }
+    fta_type_type { "FtaSupportVehicleType" }
+  end
+
   trait :transit_facility do
     transam_facility
     fta_asset_category_id { 3 }
@@ -38,6 +51,19 @@ FactoryBot.define do
     fta_asset_class_id { 11 }
     fta_type_id { 1 }
     fta_type_type { "FtaGuidewayType" }
+  end
+
+  factory :service_vehicle do
+    transit_service_vehicle
+    manufacture_year { 1.year.ago }
+    serial_number { 'ABC123' }
+    manufacturer_id { 1 }
+    manufacturer_model_id { 1 }
+    fuel_type_id { 18 }
+    vehicle_length { 10 }
+    vehicle_length_unit { 'feet' }
+    seating_capacity { 5 }
+    ada_accessible { true }
   end
 
   factory :facility do

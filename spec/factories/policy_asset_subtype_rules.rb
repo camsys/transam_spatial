@@ -10,5 +10,10 @@ FactoryBot.define do
     purchase_replacement_code { 'XX.XX.XX' }
     rehabilitation_code { 'XX.XX.XX' }
     default_rule { true }
+
+    trait :fuel_type do
+      fuel_type_id { 18 }
+    end
   end
+
 end

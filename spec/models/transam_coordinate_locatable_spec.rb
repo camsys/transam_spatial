@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe TransamCoordinateLocatable do
 
-  let(:test_parent_policy) { create(:parent_policy) }
+  let(:test_parent_policy) { create(:parent_policy, subtype: 61) }
   let(:test_policy) { create(:policy, organization: test_parent_policy.organization, parent: test_parent_policy) }
   let(:test_infrastructure) { create(:infrastructure, organization: test_policy.organization) }
   let(:geometry_adapter) { RgeoGeometryAdapter.new }

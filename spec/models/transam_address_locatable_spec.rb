@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe TransamAddressLocatable do
 
-  let(:test_parent_policy) { create(:parent_policy) }
+  let(:test_parent_policy) { create(:parent_policy, subtype: 24) }
   let(:test_policy) { create(:policy, organization: test_parent_policy.organization, parent: test_parent_policy) }
   let(:test_facility) { create(:facility, organization: test_policy.organization) }
 

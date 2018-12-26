@@ -7,15 +7,61 @@ RSpec.describe GisService, :type => :service do
     attr_accessor :lon
   end
 
-  let(:test_gis_service) { GisService.new }
+  let(:test_gis_service) { GisService.new(input_unit: Uom::MILE) }
 
-  it '.euclidean_distance' do
-    pending('TODO')
-    fail
+  describe 'calculate_offset_along_line_segment' do
+    it 'negative offset' do
+      test_point1 = test_gis_service.as_point(0, 0)
+      test_point2 = test_gis_service.as_point(50, 50)
+      expect(test_gis_service.calculate_offset_along_line_segment(test_point1, test_point2, 10, -10)).to eq([0.0, 0.0])
+    end
+    it 'offset greater than distance' do
+      test_point1 = test_gis_service.as_point(0, 0)
+      test_point2 = test_gis_service.as_point(50, 50)
+      expect(test_gis_service.calculate_offset_along_line_segment(test_point1, test_point2, 10, 20)).to eq([50.0, 50.0])
+    end
+
+    it 'horizontal line' do
+      test_point1 = test_gis_service.as_point(0, 0)
+      test_point2 = test_gis_service.as_point(50, 0)
+      expect(test_gis_service.calculate_offset_along_line_segment(test_point1, test_point2, 10, 5)).to eq([5.0, 0.0])
+    end
+
+    it 'vertical line' do
+      test_point1 = test_gis_service.as_point(0, 0)
+      test_point2 = test_gis_service.as_point(0, 50)
+      expect(test_gis_service.calculate_offset_along_line_segment(test_point1, test_point2, 10, 5)).to eq([0.0, 5.0])
+    end
+
+    it 'diagonal line' do
+      test_point1 = test_gis_service.as_point(0, 0)
+      test_point2 = test_gis_service.as_point(50, 50)
+      expect(test_gis_service.calculate_offset_along_line_segment(test_point1, test_point2, 10, 5)).to eq([25.0, 25.0])
+    end
   end
-  it '.from_wkt' do
-    pending('TODO')
-    fail
+
+  it '.euclidean_distance', :skip do # euclidean_distance called on point, not defined
+    test_point1 = test_gis_service.as_point(0, 0)
+    test_point2 = test_gis_service.as_point(4, 3)
+    expect(test_gis_service.euclidean_distance(test_point1, test_point2)).to eq(5)
+  end
+
+  describe '.from_wkt' do
+    it 'point' do
+      test_point = test_gis_service.from_wkt("POINT (45.2171892 -68.9847046)")
+
+      expect(test_point.to_s).to eq("POINT (45.2171892 -68.9847046)")
+    end
+    it 'linestring' do
+      test_line = test_gis_service.from_wkt("LINESTRING (45.217 -68.984, 42.394 -71.144)")
+
+      expect(test_line.to_s).to eq("LINESTRING (45.217 -68.984, 42.394 -71.144)")
+    end
+    it 'polygon' do
+      test_polygon = test_gis_service.from_wkt("POLYGON ((45.217 -68.984, 42.394 -71.144, 44.001 -71.579, 45.217 -68.984))")
+
+      expect(test_polygon.to_s).to eq("POLYGON ((45.217 -68.984, 42.394 -71.144, 44.001 -71.579, 45.217 -68.984))")
+    end
   end
 
   it '.search_box_from_bbox' do

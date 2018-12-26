@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe TransamGeoJSONFeature do
 
-  let(:test_parent_policy) { create(:parent_policy) }
+  let(:test_parent_policy) { create(:parent_policy, subtype: 24) }
   let(:test_policy) { create(:policy, organization: test_parent_policy.organization, parent: test_parent_policy) }
   let(:test_asset) { create(:facility, organization: test_policy.organization) }
   let(:geometry_adapter) { RgeoGeometryAdapter.new }
