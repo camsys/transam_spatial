@@ -9,7 +9,7 @@ RSpec.describe GoogleGeocodingService do
   end
 
   it 'reverse_search' do
-    expect(test_service.send(:process_results, test_service.send(:reverse_search, [42.401721, -71.081997]))).to eq("Fourth Floor, 101 Station Landing, Medford, MA 02155, United States")
+    expect(test_service.send(:process_results, test_service.send(:reverse_search, [42.401721, -71.081997]))).to eq("101 Station Landing, 101 Station Landing, Medford, MA 02155")
   end
 
   it 'search', :skip do # Pulling up empty for some reason
