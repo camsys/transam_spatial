@@ -69,5 +69,27 @@ RSpec.describe TransamGeoLocatable do
       test_infrastructure.update_geometry
       expect(test_infrastructure.geometry).to eq(geometry_adapter.create_point(50, 50))
     end
+
+    it 'has linestring coords', :skip do # TODO: figure out how to pass in an array of multiple coordinates
+
+    end
+
+    it 'uses nodes', :skip do # TODO: geocoder doesn't seem to support nodes
+
+    end
+  end
+
+  describe 'validate_location_reference' do
+    it 'has no location reference type' do
+      test_facility.location_reference_type = nil
+      expect(test_facility.validate_location_reference).to be false
+    end
+
+    it 'parse with errors' do
+      test_infrastructure.longitude = "invalid"
+      test_infrastructure.latitude = "coordinate"
+      test_infrastructure.set_location_reference
+      expect(test_infrastructure.validate_location_reference).to be false
+    end
   end
 end

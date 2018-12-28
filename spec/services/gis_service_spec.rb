@@ -65,7 +65,7 @@ RSpec.describe GisService, :type => :service do
   end
 
   it '.search_box_from_bbox' do
-    expect(test_gis_service.search_box_from_bbox("0,1,50,51").to_s). to eq("POLYGON ((0.0 1.0, 0.0 51.0, 50.0 51.0, 50.0 1.0, 0.0 1.0))")
+    expect(test_gis_service.search_box_from_bbox("0,1,50,51").to_s).to eq("POLYGON ((0.0 1.0, 0.0 51.0, 50.0 51.0, 50.0 1.0, 0.0 1.0))")
   end
 
   it '.search_box_from_point', :skip do # currently calls MILE not Uom::MILE

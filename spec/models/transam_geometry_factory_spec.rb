@@ -41,7 +41,7 @@ RSpec.describe TransamGeometryFactory do
       expect(test_rgeo_factory.create_point(50,50).to_s).to eq("POINT (50.0 50.0)")
     end
     it 'invalid method' do
-      expect{test_rgeo_factory.invalid_method}.to raise_error
+      expect{test_rgeo_factory.invalid_method}.to raise_error(NoMethodError)
     end
   end
 end
