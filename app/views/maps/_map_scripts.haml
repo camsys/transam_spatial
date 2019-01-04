@@ -1,5 +1,6 @@
 :javascript
-  var MAP_SNAPSHOT_CACHE_KEY = "transam-map-snapshot";
+  var MAP_SNAPSHOT_CACHE_KEY = "simsa-map-snapshot";
+  var _isCaching = true;
 
   // Get the snapshot params that can be used to recover the map state
   function getMapSnapshot() {
@@ -29,7 +30,7 @@
       });
       asset_types[$(this).data('type')] = subtypes;
     });
-   
+
     params["layers"] = {
       basemap_type: basemap,
       overlay_keys: overlay_keys,
@@ -52,7 +53,7 @@
   }
 
   // restorep revious map state based on latest map snapshot cache
-  function restoreMap() {  
+  function restoreMap() {
     var map = leaflet_tools.map();
     var snapshot = localStorage.getItem(MAP_SNAPSHOT_CACHE_KEY);
     if(!snapshot) {
@@ -125,7 +126,7 @@
 
   $(function() {
     resize_map();
-    
+
     // store the map object for convienience
     var map = leaflet_tools.map();
 
@@ -133,6 +134,7 @@
     leaflet_tools.addZoomSliderControl();
     leaflet_tools.addFullscreenControl(document.getElementById('mapContainer'));
     leaflet_tools.addSidebar('map_sidebar');
+    //leaflet_tools.addLayerControl();
 
     // configure navbar
     if(!leaflet_tools.navbarControl) {
@@ -146,7 +148,7 @@
     var locate_option = #{(Rails.application.config.transam_spatial_map_options.include? "locate").to_s};
     var draw_option = #{(Rails.application.config.transam_spatial_map_options.include? "draw").to_s};
     var esri_option = #{(Rails.application.config.transam_spatial_map_options.include? "esri").to_s};
-    
+
     if (locate_option) {
       // Allow the user to locate themselves on the map using the HTML 5 fuctions
       var location_control = new L.control.locate().addTo(map);
@@ -172,7 +174,9 @@
 
     // Cache map snapshot when leaving map page
     window.onbeforeunload = function(){
-      localStorage.setItem(MAP_SNAPSHOT_CACHE_KEY, JSON.stringify(getMapSnapshot()));
+      if(_isCaching) {
+        localStorage.setItem(MAP_SNAPSHOT_CACHE_KEY, JSON.stringify(getMapSnapshot()));
+      }
     }
 
     // Resize map along with window resizing
@@ -182,4 +186,12 @@
 
     // after page load, apply previous map snapshot
     restoreMap();
+
+    // reset map
+    $('#resetMap').on('click', function(e){
+      leaflet_tools.sidebarControl.close();
+      localStorage.removeItem(MAP_SNAPSHOT_CACHE_KEY);
+      _isCaching = false;
+      window.location.reload();
+    });
   });

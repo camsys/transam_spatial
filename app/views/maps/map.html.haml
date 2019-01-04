@@ -22,6 +22,10 @@
     background-color: lightgrey;
   }
 
+  #map_sidebar a {
+    cursor: pointer;
+  }
+
 #mapContainer.map-container.col-md-12{style: 'padding: 0px;'}
   #map_sidebar.sidebar.collapsed
     %ul.sidebar-tabs{role:"tablist"}
@@ -31,6 +35,9 @@
       %li
         %a{href:"#filters", title:"Filter asset layers", role:"tab"}
           %i.fa.fa-filter
+      %li
+        %a#resetMap{title:"Restore the default map", role:"button"}
+          %i.fa.fa-refresh
     .sidebar-content.active
       #layers.sidebar-pane
         = render 'layers_panel'
@@ -55,7 +62,7 @@
   $(function() {
     // expand/collapse sidebar panels
     $('ul.sidebar-tabs a[role=tab]').on('click', function(e) {
-      e.preventDefault(); 
+      e.preventDefault();
       if($('#map_sidebar').hasClass('collapsed')) {
         $('.sidebar-pane').removeClass('active');
         $($(this).attr('href')).addClass('active');
