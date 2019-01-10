@@ -125,19 +125,19 @@
     }
   }
 
-  function process_asset_layer(layer_id, asset_type, asset_subtypes, layer_name) {
-    var search_data = get_filter_params() || {};
-    search_data['asset_subtype_id'] = asset_subtypes || [];
+  function process_asset_layer(layer_id, asset_type, asset_subtypes, layer_name) {   
+    var form_data = $('form').serialize();
+    form_data += "&" + encodeURIComponent("searcher[asset_subtype_id][]") + "=";
+    asset_subtypes.forEach(function(subtype_id) {
+      form_data += "&" + encodeURIComponent("searcher[asset_subtype_id][]") + "=" + subtype_id;
+    });
     
     var checkboxes = $(".asset_type_layer[data-type=" + asset_type + "]").parents('.asset_type_panel').find('input[type=checkbox]');
     checkboxes.attr('disabled', 'disabled');
     $.ajax({
       url: "#{geojson_map_searches_path(format: :json)}",
       method: 'POST',
-      data: {
-        search_type: "#{SearchType.find_by(class_name: 'AssetMapSearcher').id}",
-        searcher: search_data
-      },
+      data: form_data,
       success: function(geojson_data) {
         load_asset_layer(layer_id, geojson_data, layer_name);
       },
@@ -271,34 +271,7 @@
 
     var filter_form = $('#new_searcher');
 
-    // condition rating
-    if($('#condition_rating_slider_enabled').is(':checked')) {
-      var rating_range = $('#condition_rating_slider').slider('getValue');
-      filters['reported_condition_rating_from'] = rating_range[0];
-      filters['reported_condition_rating_to'] = rating_range[1];
-    }
-
-    // purchase year
-    if($('#purchase_year_slider_enabled').is(':checked')) {
-      var year_range = $('#purchase_year_slider').slider('getValue');
-      filters['purchase_year_from'] = year_range[0];
-      filters['purchase_year_to'] = year_range[1];
-    }
-
-    // replacement year
-    if($('#scheduled_replacement_year_slider_enabled').is(':checked')) {
-      var year_range = $('#scheduled_replacement_year_slider').slider('getValue');
-      filters['scheduled_replacement_year_from'] = year_range[0];
-      filters['scheduled_replacement_year_to'] = year_range[1];
-    }
-
-    // mileage
-    if($('#min_mileage').val() || $('#min_mileage').val() === 0) {
-      filters['reported_mileage_from'] = $('#min_mileage').val();
-    }
-    if($('#max_mileage').val() || $('#max_mileage').val() === 0) {
-      filters['reported_mileage_to'] = $('#max_mileage').val();
-    }
+    
 
     return filters;
   }

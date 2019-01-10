@@ -9,7 +9,6 @@ class MapSearchesController < SearchesController
     # Update last modified header so content is never cached
     #---------------------------------------------------------------------------
     headers['Last-Modified'] = Time.now.httpdate
-
     @asset_subtype = AssetSubtype.where(id: params[:searcher][:asset_subtype_id]).first
     @asset_type = @asset_subtype.present? ? @asset_subtype.asset_type : AssetType.where(id: params[:searcher][:asset_type_id]).first
 
