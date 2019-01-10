@@ -1,59 +1,17 @@
-:ruby
-  mappable_asset_type_ids = []
-  AssetType.active.each do |type|
-    asset_class = type.class_name.try(:constantize)
-    if asset_class && asset_class.respond_to?(:_geolocatable_geometry_attribute_name)
-      mappable_asset_type_ids << type.id
-    end
-  end
-
-  # mappable_asset_types = AssetType.where(id: mappable_asset_type_ids)
-  # override this be all asset types since moving away AssetType and Asset to TransamAsset
-  # assume all assets are always mappable for right now
-  mappable_asset_types = AssetType.all
-
 %h4
   = "Filters"
-
-#layerContainer.panel-group{role:"tablist", "aria-multiselectable":"true"}
-  .panel.panel-default#asset_layer_container
-    .panel-heading{role:"tab"}
-      %i#zoom_to_assets.pull-right.fa.fa-search-plus.fa-2x.panel-action{title: 'Zoom to all loaded assets', style: 'cursor: pointer;'}
-      %h5.panel-title
-        %a.collapsed{href:"#asset_layer_list", "aria-expanded": "false", "aria-controls":"asset_layer_list", data: { toggle:"collapse", parent:"#layerContainer" }}
-          Assets
-    .panel-collapse.collapse{role:"tabpanel", id:"asset_layer_list"}
-      .panel-body
-        - subtype_idss_with_assets = Rails.application.config.asset_base_class_name.constantize.operational.where(:organization_id => @organization_list).group(:asset_subtype_id).count.keys
-        - mappable_asset_types.each do |type|
-          - subtypes = type.asset_subtypes.where(id: subtype_idss_with_assets)
-          - if subtypes.any?
-            .panel.panel-default.asset_type_panel
-              .panel-heading{role:"tab"}
-                %h5.panel-title
-                  .checkbox{style: 'margin: 0px;'}
-                    %label
-                      %input.asset_type_layer{type:"checkbox", data: {type: type.id, label: type}}
-                      %a.collapsed{href:"#asset_layer_type_#{type.id}", "aria-expanded": "false", "aria-controls":"asset_layer_list", data: { toggle:"collapse", parent:"#asset_layer_container" }}
-                        = type
-              .panel-collapse.collapse{role:"tabpanel", id:"asset_layer_type_#{type.id}"}
-                .panel-body
-                  - type.asset_subtypes.where(id: subtype_idss_with_assets).each do |subtype|
-                    .checkbox
-                      %label
-                        %input.asset_subtype_layer{type:"checkbox", data: {type: subtype.id, label: subtype}}
-                          = subtype
 
 #filterContainer.panel-group{role:"tablist", "aria-multiselectable":"true"}
   = simple_form_for(AssetMapSearcher.new,
   :as => :searcher,
-  :url => '#',
+  :url => geojson_map_searches_path(format: :json),
   :method => 'post',
   :html => {:class => 'form-vertical'},
   :remote => true,
   :wrapper => :vertical_form,
   :wrapper_mappings => {:check_boxes => :vertical_radio_and_checkboxes, :radio_buttons => :horizontal_radio_and_checkboxes, :file => :vertical_file_input, :boolean => :vertical_boolean},
   :defaults => {:include_blank => "Any...", :required => false} ) do |f|
+    - @search_form = f
     = hidden_field_tag :search_type, SearchType.find_by(class_name: 'AssetMapSearcher').id
 
     - if lookup_context.template_exists?("app_filters_panel", 'maps', true)

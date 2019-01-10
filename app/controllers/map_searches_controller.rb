@@ -1,4 +1,7 @@
 class MapSearchesController < SearchesController
+  skip_before_action :verify_authenticity_token
+  before_action :set_view_vars,     :only => [:geojson]
+
 
   # Called via AJAX to get markers for the search results
   def geojson
@@ -10,16 +13,6 @@ class MapSearchesController < SearchesController
     @asset_subtype = AssetSubtype.where(id: params[:searcher][:asset_subtype_id]).first
     @asset_type = @asset_subtype.present? ? @asset_subtype.asset_type : AssetType.where(id: params[:searcher][:asset_type_id]).first
 
-    @layer_name = if @asset_type && @asset_subtype
-      "#{@asset_type} - #{@asset_subtype}"
-    elsif @asset_type
-      "#{@asset_type}"
-    elsif @asset_subtype
-      "#{@asset_subtype}"
-    else
-      "Assets"
-    end
-
     @geojson = {
       "type":"FeatureCollection",
       "features": []
@@ -28,8 +21,6 @@ class MapSearchesController < SearchesController
     # get the geometry column name associated with the assets
     if @asset_type
       asset_class = @asset_type.class_name.try(:constantize)
-
-
 
       if asset_class
         if asset_class.respond_to?(:_geolocatable_geometry_attribute_name)
@@ -83,41 +74,14 @@ class MapSearchesController < SearchesController
   end
 
   def process_filters
-    search_params = params[:searcher]
-
-     # TODO: depends on future changes in the generic query and map query, might need to re-use AssetSearcher for map search as well
-    @data = Rails.application.config.asset_base_class_name.constantize.operational.includes(asset_subtype: :asset_type).where(
-      organization_id: @organization_list, 
-      asset_types: {id: search_params[:asset_type_id]},
-      asset_subtype_id: search_params[:asset_subtype_id])
-
-    [:reported_condition_rating, :scheduled_replacement_year, :purchase_year].each do |attr_key|
-      check_attribute_range(attr_key)
+    @searcher = @searcher_klass.constantize.new(params[:searcher])
+    if @searcher.respond_to? :organization_id
+      @searcher.organization_id = @organization_list
     end
-
-    if @asset_type && (@asset_type.class_name.include? 'Vehicle')
-      check_attribute_range(:reported_mileage)
-    end
+    @searcher.user = current_user
+    @data = @searcher.data
   end
 
-  def check_attribute_range(attr_key)
-    search_params = params[:searcher]
-
-    attr_from_key = "#{attr_key}_from".to_sym
-    attr_to_key = "#{attr_key}_to".to_sym
-
-    if attr_key.to_s == 'purchase_year'
-      column = 'purchase_date'
-    else
-      column = attr_key
-    end
-
-    if search_params[attr_from_key].present?
-      @data = @data.where("#{column} >= ?", search_params[attr_from_key])
-    end
-    if search_params[attr_to_key].present?
-      @data = @data.where("#{column} <= ?", search_params[attr_to_key])
-    end
-  end
+  private 
 
 end
