@@ -34,7 +34,7 @@ class MapsController < AssetsController
 
   # Called via AJAX to get dynamic content via AJAX
   def map_cluster_popup
-    assets = Rails.application.config.asset_base_class_name.constantize.where(:object_key => params[:object_keys]).order(:asset_type_id, :asset_subtype_id, purchase_date: :desc)
+    assets = Rails.application.config.asset_base_class_name.constantize.where(:object_key => params[:object_keys])
 
     str = render_to_string(:partial => "/shared/map_cluster_popup", :locals => { :assets => assets })
 
