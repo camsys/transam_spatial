@@ -63,9 +63,8 @@ class MapSearchesController < SearchesController
       type: "FeatureCollection",
       features: features
     }
-    assets.find_each do |a|
-      asset = Rails.application.config.asset_base_class_name.constantize.get_typed_asset a
-      str = asset.to_geoJSON
+    assets.find_each do |asset|
+      str = asset.try(:to_geoJSON)
       features << str unless str.blank?
     end
 

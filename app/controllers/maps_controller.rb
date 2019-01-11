@@ -5,7 +5,11 @@ class MapsController < AssetsController
 
     @show_default = true if params[:show_default] == 'true'
 
-    @searcher = AssetMapSearcher.new(params[:searcher])
+    if params[:searcher].blank?
+      @searcher = AssetMapSearcher.new
+    else
+      @searcher = AssetMapSearcher.new(params[:searcher])
+    end
   end
 
   # Called via Ajax to get the map marker for a selected asset
