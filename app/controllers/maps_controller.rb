@@ -2,6 +2,10 @@ class MapsController < AssetsController
 
   def map
     add_breadcrumb "Map"
+
+    @show_default = true if params[:show_default] == 'true'
+
+    @searcher = AssetMapSearcher.new(params[:searcher])
   end
 
   # Called via Ajax to get the map marker for a selected asset

@@ -2,7 +2,7 @@
   = "Filters"
 
 #filterContainer.panel-group{role:"tablist", "aria-multiselectable":"true"}
-  = simple_form_for(AssetMapSearcher.new,
+  = simple_form_for(@searcher,
   :as => :searcher,
   :url => geojson_map_searches_path(format: :json),
   :method => 'post',

@@ -1,0 +1,23 @@
+= LeafletMap({:mapid => 'map_thumbnail',
+  :markers => @asset.map_markers.to_json,
+  :tile_provider => Rails.application.config.map_tile_provider,
+  :map_key => Rails.application.config.map_tile_key,
+  :access_token => Rails.application.config.map_access_token,
+  :min_zoom => Rails.application.config.map_min_zoom_level,
+  :max_zoom => Rails.application.config.map_max_zoom_level,
+  :is_static => true,
+  :class => "map",
+  :style => "height:100px; width: 145px;"})
+
+= yield :scripts
+
+:javascript
+  $(function() {
+    // link to large map view
+    var markers = leaflet_tools.markers();
+    markers.forEach(function(marker) {
+      marker.on('click', function(){
+        window.open("#{map_maps_path}?show_default=true&asset_type_id=#{@asset.asset_type_id}&searcher[asset_tag]=#{@asset.asset_tag}", '_blank')
+      })
+    });
+  });

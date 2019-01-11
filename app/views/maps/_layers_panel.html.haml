@@ -61,22 +61,23 @@
           Assets
     .panel-collapse.collapse{role:"tabpanel", id:"asset_layer_list"}
       .panel-body
-        - subtype_idss_with_assets = Rails.application.config.asset_base_class_name.constantize.operational.where(:organization_id => @organization_list).group(:asset_subtype_id).count.keys
+        - subtype_ids_with_assets = Rails.application.config.asset_base_class_name.constantize.operational.where(:organization_id => @organization_list).group(:asset_subtype_id).count.keys
         - mappable_asset_types.each do |type|
-          - subtypes = type.asset_subtypes.where(id: subtype_idss_with_assets)
+          - is_checked = type.id.to_s == params[:asset_type_id]
+          - subtypes = type.asset_subtypes.where(id: subtype_ids_with_assets)
           - if subtypes.any?
             .panel.panel-default.asset_type_panel
               .panel-heading{role:"tab"}
                 %h5.panel-title
                   .checkbox{style: 'margin: 0px;'}
                     %label
-                      %input.asset_type_layer{type:"checkbox", data: {type: type.id, label: type}}
+                      %input.asset_type_layer{type:"checkbox", data: {type: type.id, label: type}, checked: is_checked}
                       %a.collapsed{href:"#asset_layer_type_#{type.id}", "aria-expanded": "false", "aria-controls":"asset_layer_list", data: { toggle:"collapse", parent:"#asset_layer_container" }}
                         = type
               .panel-collapse.collapse{role:"tabpanel", id:"asset_layer_type_#{type.id}"}
                 .panel-body
-                  - type.asset_subtypes.where(id: subtype_idss_with_assets).each do |subtype|
+                  - type.asset_subtypes.where(id: subtype_ids_with_assets).each do |subtype|
                     .checkbox
                       %label
-                        %input.asset_subtype_layer{type:"checkbox", data: {type: subtype.id, label: subtype}}
+                        %input.asset_subtype_layer{type:"checkbox", data: {type: subtype.id, label: subtype}, checked: is_checked}
                           = subtype

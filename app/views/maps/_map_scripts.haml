@@ -185,7 +185,9 @@
     });
 
     // after page load, apply previous map snapshot
-    restoreMap();
+    if(!(#{@show_default || false})) {
+      restoreMap();
+    }
 
     // reset map
     $('#resetMap').on('click', function(e){
@@ -194,4 +196,9 @@
       _isCaching = false;
       window.location.reload();
     });
+
+    // load default asset_type
+    if(#{params[:asset_type_id].present? || false}) {
+      $('input.asset_type_layer[data-type=' + "#{params[:asset_type_id]}" +  ']').trigger('change');
+    }
   });
