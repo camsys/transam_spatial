@@ -1,5 +1,4 @@
 class MapsController < AssetsController
-
   def map
     add_breadcrumb "Map"
 

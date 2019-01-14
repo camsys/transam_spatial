@@ -4,10 +4,10 @@
   :map_key => Rails.application.config.map_tile_key,
   :access_token => Rails.application.config.map_access_token,
   :min_zoom => Rails.application.config.map_min_zoom_level,
-  :max_zoom => Rails.application.config.map_max_zoom_level,
+  :max_zoom => Rails.application.config.map_min_zoom_level,
   :is_static => true,
   :class => "map",
-  :style => "height:100px; width: 145px;"})
+  :style => "height:225px; width: 300px;"})
 
 = yield :scripts
 

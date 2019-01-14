@@ -126,11 +126,14 @@
   }
 
   function process_asset_layer(layer_id, asset_type, asset_subtypes, layer_name) {   
-    var form_data = $('form').serialize();
+    var form_data = $('#new_searcher').serialize();
     form_data += "&" + encodeURIComponent("searcher[asset_subtype_id][]") + "=";
     asset_subtypes.forEach(function(subtype_id) {
       form_data += "&" + encodeURIComponent("searcher[asset_subtype_id][]") + "=" + subtype_id;
     });
+
+    form_data += "&" + encodeURIComponent("searcher[asset_type_id][]") + "=";
+    form_data += "&" + encodeURIComponent("searcher[asset_type_id][]") + "=" + asset_type;
     
     var checkboxes = $(".asset_type_layer[data-type=" + asset_type + "]").parents('.asset_type_panel').find('input[type=checkbox]');
     checkboxes.attr('disabled', 'disabled');
@@ -143,6 +146,7 @@
       },
       complete: function() {
         checkboxes.removeAttr('disabled');
+        zoom_to_assets();
       }
     });
   }
@@ -181,47 +185,6 @@
         maxClusterRadius: 10,
         spiderfyOnMaxZoom: false
       }).addTo(map);
-
-      //cluster specific events
-      marker_cluster_layer.on('clusterclick', function(e) {
-        var cluster_marker = e.layer;
-        var asset_object_keys = [];
-        cluster_marker.getAllChildMarkers().forEach(function(m) {
-          var asset_key = m.id;
-          if(asset_key) {
-            asset_object_keys.push(asset_key);
-          }
-        });
-
-        $.ajax({
-          url: "#{map_cluster_popup_maps_path}",
-          type: 'get',
-          dataType: 'json',
-          data: {
-            object_keys: asset_object_keys
-          },
-          success: function(result) {
-            if(result) {
-              cluster_marker.bindPopup(result, {
-                minWidth: 450,
-                maxWidth: 580,
-                maxHeight: 360
-              });
-
-              cluster_marker.openPopup();
-
-              // apply bootstrap-tables 
-              $('#assets_map_cluster_table').bootstrapTable({
-                pageSize: 5,
-                pageList: [5]
-              });
-
-              // hide the scroll bar
-              $('#assets_map_cluster_table').parents('.leaflet-popup-content').css('overflow', 'hidden');
-            }
-          }
-        });
-      });
     } else {
       assets_feature_group = new L.featureGroup([])
     }
