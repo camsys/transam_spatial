@@ -42,9 +42,19 @@
       return false;
     });
 
+    function clear_search_form_values() {
+      $(':input','#new_searcher')
+        .not(':button, :submit, :reset, :hidden')
+        .val('')
+        .prop('checked', false)
+        .prop('selected', false);
+    }
+
     $('#reset_filters_btn').click(function() {
       $('#new_searcher label.error').remove();
       $('#new_searcher .error').removeClass('error');
+
+      clear_search_form_values();
     });
   });
 
