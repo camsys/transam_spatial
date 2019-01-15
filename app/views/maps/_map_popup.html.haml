@@ -1,0 +1,5 @@
+- asset_map_popup_view_name = "#{asset.class.name.underscore}_map_popup"
+- if lookup_context.template_exists?(asset_map_popup_view_name, 'maps', true)
+  = render "maps/#{asset_map_popup_view_name}", asset: asset
+- else
+  = render 'maps/default_map_popup', asset: asset

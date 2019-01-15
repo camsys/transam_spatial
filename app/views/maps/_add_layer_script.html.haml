@@ -152,7 +152,6 @@
   }
 
   function show_popup_for_selected(marker) {
-    var popup = marker._popup;
     marker.unbindPopup();
     var url = "#{map_popup_map_path('xxx')}";
     url = url.replace('xxx', marker.id);
@@ -163,16 +162,15 @@
       dataType: 'json',
       success: function(result) {
         if(result) {
-          marker.bindPopup(result, {autoPanPaddingTopLeft: new L.Point(60, 60)});
+          var new_popup = marker.bindPopup(result, {autoPanPaddingTopLeft: new L.Point(60, 60)});
+          new_popup.on("popupclose", function(e) {
+            e.marker.unbindPopup();
+          });
           marker.openPopup();
-        } else {
-          marker.bindPopup(popup);
-          marker.openPopup();
-        }
+        } 
       },
       error: function (xhr, ajaxOptions, thrownError) {
-        marker.bindPopup(popup);
-        marker.openPopup();
+        
       }
     });
   };
