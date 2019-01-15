@@ -152,27 +152,26 @@
   }
 
   function show_popup_for_selected(marker) {
-    marker.unbindPopup();
-    var url = "#{map_popup_map_path('xxx')}";
-    url = url.replace('xxx', marker.id);
-  
-    $.ajax({
-      url: url,
-      type: 'get',
-      dataType: 'json',
-      success: function(result) {
-        if(result) {
-          var new_popup = marker.bindPopup(result, {autoPanPaddingTopLeft: new L.Point(60, 60)});
-          new_popup.on("popupclose", function(e) {
-            e.marker.unbindPopup();
-          });
-          marker.openPopup();
-        } 
-      },
-      error: function (xhr, ajaxOptions, thrownError) {
-        
-      }
-    });
+    var popup = marker._popup;
+    if(!popup) {
+      var url = "#{map_popup_map_path('xxx')}";
+      url = url.replace('xxx', marker.id);
+    
+      $.ajax({
+        url: url,
+        type: 'get',
+        dataType: 'json',
+        success: function(result) {
+          if(result) {
+            var new_popup = marker.bindPopup(result, {autoPanPaddingTopLeft: new L.Point(60, 60)});
+            marker.openPopup();
+          } 
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          
+        }
+      });
+    }
   };
 
   function init_asset_layer() {
