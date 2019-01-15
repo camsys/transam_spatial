@@ -31,7 +31,7 @@ class MapsController < AssetsController
     a = Rails.application.config.asset_base_class_name.constantize.find_by(:object_key => params[:id])
     if a
       asset = Rails.application.config.asset_base_class_name.constantize.get_typed_asset(a)
-      if asset.mappable?
+      if asset && asset.mappable?
         str = render_to_string(:partial => "/maps/map_popup", :locals => { :asset => asset })
       end
     end
