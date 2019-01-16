@@ -1,0 +1,4 @@
+:javascript
+  function geojson_renderer(feature, latlng) {
+    return leaflet_tools.create_marker(feature.properties['id'], latlng.lat, latlng.lng);
+  }
