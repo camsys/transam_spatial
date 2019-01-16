@@ -24,7 +24,7 @@
     .row{style: "margin-top: 20px;"}
       .col-md-12
         = f.button :submit, 'Apply', :class=>"btn btn-primary", :id => 'submit_filters_btn'
-        = button_tag 'Reset', :type => 'reset', :class=> 'btn btn-warning reset-button', :id => 'reset_filters_btn'
+        = button_tag 'Reset', :type => 'button', :class=> 'btn btn-warning reset-button', :id => 'reset_filters_btn'
 
 :javascript
   $(function() {
