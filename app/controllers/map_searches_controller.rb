@@ -9,21 +9,26 @@ class MapSearchesController < SearchesController
     #---------------------------------------------------------------------------
     # Update last modified header so content is never cached
     #---------------------------------------------------------------------------
-    headers['Last-Modified'] = Time.now.httpdate
-    
-    @geojson = {
-      "type":"FeatureCollection",
-      "features": []
-    }   
+    headers['Last-Modified'] = Time.now.httpdate 
 
     # exclude assets without geometry
     mappable_assets = @data.where("geometry is NOT NULL")
 
-    @geojson = geo_json(mappable_assets) 
+    resp_json = {}
+    if params[:searcher] && !params[:searcher][:asset_type_id].blank?
+      asset_types = AssetType.where(id: params[:searcher][:asset_type_id])
+      asset_types.each do |asset_type|
+        assets = mappable_assets.where("transam_assets.asset_subtype_id": asset_type.asset_subtype_ids)
+        resp_json[asset_type.id] = {
+          name: asset_type.name,
+          geojson_assets: geo_json(assets) 
+        }
+      end
+    end
 
     respond_to do |format|
-      format.js   { render json: @geojson }  # respond with the created JSON object
-      format.json { render json: @geojson }  # respond with the created JSON object
+      format.js   { render json: resp_json }  # respond with the created JSON object
+      format.json { render json: resp_json }  # respond with the created JSON object
     end
   end
 
