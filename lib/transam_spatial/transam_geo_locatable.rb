@@ -130,6 +130,46 @@ module TransamGeoLocatable
     prepare_marker(draggable, zindex, icon, true)
   end
 
+  def longitude_from_geometry
+    "#{self.send(_geolocatable_geometry_attribute_name).x}&deg;".html_safe if self.send(_geolocatable_geometry_attribute_name).present?
+  end
+
+  def latitude_from_geometry
+    "#{self.send(_geolocatable_geometry_attribute_name).x}&deg;".html_safe if self.send(_geolocatable_geometry_attribute_name).present?
+  end
+
+  def dms_longitude_from_geometry
+    if self.send(_geolocatable_geometry_attribute_name).present?
+      decimal_abs = longitude_from_geometry.abs # absolute value of decimal version
+
+      degrees = decimal_abs.to_i
+
+      mins = ((decimal_abs - degrees)*60.0).to_i
+
+      secs = ((decimal_abs - degrees - mins/60.0)*3600.0).to_i
+
+      direction = longitude_from_geometry < 0 ? 'W' : 'E'
+
+      "#{degrees}&deg; #{mins}\' #{secs}\" #{direction}".html_safe
+    end
+  end
+
+  def dms_latitude_from_geometry
+    if self.send(_geolocatable_geometry_attribute_name).present?
+      decimal_abs = latitude_from_geometry.abs # absolute value of decimal version
+
+      degrees = decimal_abs.to_i
+
+      mins = ((decimal_abs - degrees)*60.0).to_i
+
+      secs = ((decimal_abs - degrees - mins/60.0)*3600.0).to_i
+
+      direction = latitude_from_geometry < 0 ? 'S' : 'N'
+
+      "#{degrees}&deg; #{mins}\' #{secs}\" #{direction}".html_safe
+    end
+  end
+
   # Updates the spatial reference for the model based on the location reference
   # provided
   def update_geometry
