@@ -45,7 +45,7 @@ RSpec.describe TransamGeoLocatable do
     end
     it 'formats x value' do
       test_asset.geometry = geometry_adapter.create_point(50,0)
-      expect(test_asset.longitude_from_geometry).to eq("50&deg;".html_safe)
+      expect(test_asset.longitude_from_geometry).to eq("50.0&deg;".html_safe)
     end
   end
 
@@ -56,7 +56,7 @@ RSpec.describe TransamGeoLocatable do
     end
     it 'formats y value' do
       test_asset.geometry = geometry_adapter.create_point(0,50)
-      expect(test_asset.latitude_from_geometry).to eq("50&deg;".html_safe)
+      expect(test_asset.latitude_from_geometry).to eq("50.0&deg;".html_safe)
     end
   end
 

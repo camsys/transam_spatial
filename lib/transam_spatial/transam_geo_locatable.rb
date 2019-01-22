@@ -146,7 +146,7 @@ module TransamGeoLocatable
 
       mins = ((decimal_abs - degrees)*60.0).to_i
 
-      secs = ((decimal_abs - degrees - mins/60.0)*3600.0).to_i
+      secs = ((decimal_abs - degrees - (mins/60.0).to_d)*3600.0).to_i
 
       direction = self.send(_geolocatable_geometry_attribute_name).x < 0 ? 'W' : 'E'
 
@@ -162,7 +162,7 @@ module TransamGeoLocatable
 
       mins = ((decimal_abs - degrees)*60.0).to_i
 
-      secs = ((decimal_abs - degrees - mins/60.0)*3600.0).to_i
+      secs = ((decimal_abs - degrees - (mins/60.0).to_d)*3600.0).to_i
 
       direction = self.send(_geolocatable_geometry_attribute_name).y < 0 ? 'S' : 'N'
 
