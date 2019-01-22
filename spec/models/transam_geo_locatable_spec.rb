@@ -44,7 +44,7 @@ RSpec.describe TransamGeoLocatable do
       expect(test_asset.longitude_from_geometry).to eq(nil)
     end
     it 'formats x value' do
-      test_asset.geometry = geometry_adapter.create_point(50,50)
+      test_asset.geometry = geometry_adapter.create_point(50,0)
       expect(test_asset.longitude_from_geometry).to eq("50&deg;".html_safe)
     end
   end
@@ -55,7 +55,7 @@ RSpec.describe TransamGeoLocatable do
       expect(test_asset.latitude_from_geometry).to eq(nil)
     end
     it 'formats y value' do
-      test_asset.geometry = geometry_adapter.create_point(50,50)
+      test_asset.geometry = geometry_adapter.create_point(0,50)
       expect(test_asset.latitude_from_geometry).to eq("50&deg;".html_safe)
     end
   end
@@ -67,20 +67,20 @@ RSpec.describe TransamGeoLocatable do
     end
     describe 'converts to dms format' do
       it 'just degrees' do
-        test_asset.geometry = geometry_adapter.create_point(50,50)
+        test_asset.geometry = geometry_adapter.create_point(50,0)
         expect(test_asset.dms_longitude_from_geometry).to eq("50&deg; 0\' 0\" E".html_safe)
       end
       it 'just degrees and mins' do
-        test_asset.geometry = geometry_adapter.create_point(50.25,50.25)
+        test_asset.geometry = geometry_adapter.create_point(50.25,0)
         expect(test_asset.dms_longitude_from_geometry).to eq("50&deg; 15\' 0\" E".html_safe)
       end
       it 'DMS' do
-        test_asset.geometry = geometry_adapter.create_point(50.2525,50.2525)
+        test_asset.geometry = geometry_adapter.create_point(50.2525,0)
         expect(test_asset.dms_longitude_from_geometry).to eq("50&deg; 15\' 9\" E".html_safe)
       end
     end
     it 'handles direction' do
-      test_asset.geometry = geometry_adapter.create_point(-50,-50)
+      test_asset.geometry = geometry_adapter.create_point(-50,0)
       expect(test_asset.dms_longitude_from_geometry).to eq("50&deg; 0\' 0\" W".html_safe)
     end
   end
@@ -92,20 +92,20 @@ RSpec.describe TransamGeoLocatable do
     end
     describe 'converts to dms format' do
       it 'just degrees' do
-        test_asset.geometry = geometry_adapter.create_point(50,50)
+        test_asset.geometry = geometry_adapter.create_point(0,50)
         expect(test_asset.dms_latitude_from_geometry).to eq("50&deg; 0\' 0\" N".html_safe)
       end
       it 'just degrees and mins' do
-        test_asset.geometry = geometry_adapter.create_point(50.25,50.25)
+        test_asset.geometry = geometry_adapter.create_point(0,50.25)
         expect(test_asset.dms_latitude_from_geometry).to eq("50&deg; 15\' 0\" N".html_safe)
       end
       it 'DMS' do
-        test_asset.geometry = geometry_adapter.create_point(50.2525,50.2525)
+        test_asset.geometry = geometry_adapter.create_point(0,50.2525)
         expect(test_asset.dms_latitude_from_geometry).to eq("50&deg; 15\' 9\" N".html_safe)
       end
     end
     it 'handles direction' do
-      test_asset.geometry = geometry_adapter.create_point(-50,-50)
+      test_asset.geometry = geometry_adapter.create_point(0,-50)
       expect(test_asset.dms_latitude_from_geometry).to eq("50&deg; 0\' 0\" S".html_safe)
     end
   end

@@ -135,12 +135,12 @@ module TransamGeoLocatable
   end
 
   def latitude_from_geometry
-    "#{self.send(_geolocatable_geometry_attribute_name).x}&deg;".html_safe if self.send(_geolocatable_geometry_attribute_name).present?
+    "#{self.send(_geolocatable_geometry_attribute_name).y}&deg;".html_safe if self.send(_geolocatable_geometry_attribute_name).present?
   end
 
   def dms_longitude_from_geometry
     if self.send(_geolocatable_geometry_attribute_name).present?
-      decimal_abs = longitude_from_geometry.abs # absolute value of decimal version
+      decimal_abs = self.send(_geolocatable_geometry_attribute_name).x.abs # absolute value of decimal version
 
       degrees = decimal_abs.to_i
 
@@ -148,7 +148,7 @@ module TransamGeoLocatable
 
       secs = ((decimal_abs - degrees - mins/60.0)*3600.0).to_i
 
-      direction = longitude_from_geometry < 0 ? 'W' : 'E'
+      direction = self.send(_geolocatable_geometry_attribute_name).x < 0 ? 'W' : 'E'
 
       "#{degrees}&deg; #{mins}\' #{secs}\" #{direction}".html_safe
     end
@@ -156,7 +156,7 @@ module TransamGeoLocatable
 
   def dms_latitude_from_geometry
     if self.send(_geolocatable_geometry_attribute_name).present?
-      decimal_abs = latitude_from_geometry.abs # absolute value of decimal version
+      decimal_abs = self.send(_geolocatable_geometry_attribute_name).y.abs # absolute value of decimal version
 
       degrees = decimal_abs.to_i
 
@@ -164,7 +164,7 @@ module TransamGeoLocatable
 
       secs = ((decimal_abs - degrees - mins/60.0)*3600.0).to_i
 
-      direction = latitude_from_geometry < 0 ? 'S' : 'N'
+      direction = self.send(_geolocatable_geometry_attribute_name).y < 0 ? 'S' : 'N'
 
       "#{degrees}&deg; #{mins}\' #{secs}\" #{direction}".html_safe
     end
