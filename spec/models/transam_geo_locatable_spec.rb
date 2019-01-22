@@ -38,6 +38,79 @@ RSpec.describe TransamGeoLocatable do
     expect(test_asset.map_marker_without_popup).to eq({"id" => test_asset.object_key, "lat" => 50.0, "lng" => 50.0, "zindex" => 0, "name" => test_asset.to_s, "iconClass" => "blueIcon", "draggable" => false, "title" => test_asset.to_s})
   end
 
+  describe 'longitude_from_geometry' do
+    it 'no geometry' do
+      test_asset.geometry = nil
+      expect(test_asset.longitude_from_geometry).to eq(nil)
+    end
+    it 'formats x value' do
+      test_asset.geometry = geometry_adapter.create_point(50,50)
+      expect(test_asset.longitude_from_geometry).to eq("50&deg;".html_safe)
+    end
+  end
+
+  describe 'latitude_from_geometry' do
+    it 'no geometry' do
+      test_asset.geometry = nil
+      expect(test_asset.latitude_from_geometry).to eq(nil)
+    end
+    it 'formats y value' do
+      test_asset.geometry = geometry_adapter.create_point(50,50)
+      expect(test_asset.latitude_from_geometry).to eq("50&deg;".html_safe)
+    end
+  end
+
+  describe 'dms_longtitude_from_geometry' do
+    it 'no geometry' do
+      test_asset.geometry = nil
+      expect(test_asset.dms_longitude_from_geometry).to eq(nil)
+    end
+    describe 'converts to dms format' do
+      it 'just degrees' do
+        test_asset.geometry = geometry_adapter.create_point(50,50)
+        expect(test_asset.dms_longitude_from_geometry).to eq("50&deg; 0\' 0\" E".html_safe)
+      end
+      it 'just degrees and mins' do
+        test_asset.geometry = geometry_adapter.create_point(50.25,50.25)
+        expect(test_asset.dms_longitude_from_geometry).to eq("50&deg; 15\' 0\" E".html_safe)
+      end
+      it 'DMS' do
+        test_asset.geometry = geometry_adapter.create_point(50.2525,50.2525)
+        expect(test_asset.dms_longitude_from_geometry).to eq("50&deg; 15\' 9\" E".html_safe)
+      end
+    end
+    it 'handles direction' do
+      test_asset.geometry = geometry_adapter.create_point(-50,-50)
+      expect(test_asset.dms_longitude_from_geometry).to eq("50&deg; 0\' 0\" W".html_safe)
+    end
+  end
+
+  describe 'dms_latitude_from_geometry' do
+    it 'no geometry' do
+      test_asset.geometry = nil
+      expect(test_asset.dms_latitude_from_geometry).to eq(nil)
+    end
+    describe 'converts to dms format' do
+      it 'just degrees' do
+        test_asset.geometry = geometry_adapter.create_point(50,50)
+        expect(test_asset.dms_latitude_from_geometry).to eq("50&deg; 0\' 0\" N".html_safe)
+      end
+      it 'just degrees and mins' do
+        test_asset.geometry = geometry_adapter.create_point(50.25,50.25)
+        expect(test_asset.dms_latitude_from_geometry).to eq("50&deg; 15\' 0\" N".html_safe)
+      end
+      it 'DMS' do
+        test_asset.geometry = geometry_adapter.create_point(50.2525,50.2525)
+        expect(test_asset.dms_latitude_from_geometry).to eq("50&deg; 15\' 9\" N".html_safe)
+      end
+    end
+    it 'handles direction' do
+      test_asset.geometry = geometry_adapter.create_point(-50,-50)
+      expect(test_asset.dms_latitude_from_geometry).to eq("50&deg; 0\' 0\" S".html_safe)
+    end
+  end
+
+
   describe 'update_geometry' do
     it 'no location reference type' do
       test_asset.location_reference_type = nil
