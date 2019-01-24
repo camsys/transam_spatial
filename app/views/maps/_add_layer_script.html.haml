@@ -151,8 +151,8 @@
           load_asset_layer("asset_" + asset_type_id, one_layer.name, one_layer.geojson_assets);
         }
 
-        if(typeof(display_asset_count) != 'undefined') {
-          display_asset_count(asset_count);
+        if(typeof(display_map_asset_count) != 'undefined') {
+          display_map_asset_count(asset_count);
         }
       },
       error: function (xhr, ajaxOptions, thrownError) {
