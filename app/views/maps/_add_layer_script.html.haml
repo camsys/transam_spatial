@@ -151,16 +151,9 @@
           load_asset_layer("asset_" + asset_type_id, one_layer.name, one_layer.geojson_assets);
         }
 
-        //TODO: add a count message
-        var message = "";
-        if(asset_count == 0) {
-          message = "No asset returned.";
-        } else if (asset_count == 1) {
-          message = "1 asset returned;"
-        } else {
-          message = asset_count + " assets returned."
+        if(typeof(display_asset_count) != 'undefined') {
+          display_asset_count(asset_count);
         }
-        transam.show_popup_message("Map", message, "success");
       },
       error: function (xhr, ajaxOptions, thrownError) {
         alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
