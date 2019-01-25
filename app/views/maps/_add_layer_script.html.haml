@@ -206,9 +206,7 @@
     remove_asset_layer(layer_id);
    
     var markers_layer = L.geoJson(geojson_data, {
-      pointToLayer: function (feature, latlng) {
-        return leaflet_tools.create_marker(feature.properties['id'], latlng.lat, latlng.lng);
-      }
+      pointToLayer: geojson_renderer
     });
 
     markers_layer.on('click', function(e){

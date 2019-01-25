@@ -44,9 +44,13 @@ class MapSearchesController < SearchesController
       features: features
     }
 
-    assets.find_each do |asset|
-      str = asset.try(:to_geoJSON)
-      features << str unless str.blank?
+    assets.very_specific.find_each do |asset|
+      feat = asset.try(:to_geoJSON)
+      if asset && asset.class.respond_to?(:default_map_renderer_attr)
+        attr_name = asset.class.default_map_renderer_attr
+        feat[:properties][attr_name] = asset.send(attr_name)
+      end
+      features << feat unless feat.blank?
     end
 
     geojson
