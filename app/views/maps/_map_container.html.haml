@@ -31,10 +31,14 @@
     %ul.sidebar-tabs{role:"tablist"}
       %li
         %a{href:"#layers", title:"Add/remove layers", role:"tab"}
-          %i.fa.fa-list
+          %i.fa.fa-align-justify
       %li
         %a{href:"#filters", title:"Filter asset layers", role:"tab"}
           %i.fa.fa-filter
+      - if lookup_context.template_exists?("legends_panel", 'maps', true)
+        %li
+          %a{href:"#legends", title:"Legends", role:"tab"}
+            %i.fa.fa-map-marker
       %li
         %a#resetMap{title:"Restore the default map", role:"button"}
           %i.fa.fa-refresh
@@ -43,6 +47,9 @@
         = render 'maps/layers_panel'
       #filters.sidebar-pane
         = render 'maps/filters_panel'
+      - if lookup_context.template_exists?("legends_panel", 'maps', true)
+        #legends.sidebar-pane
+          = render 'maps/legends_panel'
 
   = LeafletMap({:mapid => 'lmap',
     :tile_provider => Rails.application.config.map_tile_provider,

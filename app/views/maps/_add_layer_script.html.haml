@@ -1,3 +1,17 @@
+:css
+  .marker-cluster-gray {
+    background-color: rgba(255, 255, 255, 0.7);
+  }
+  .marker-cluster-gray div {
+    background-color: rgba(159, 166, 170, 0.7);
+  }
+
+  .marker-cluster-gray div span {
+    color: 'white',
+    font-weight: bold,
+    font-size: larger;
+  }
+
 :javascript
   var added_basemaps = {};
   var added_overlays = {};
@@ -193,6 +207,9 @@
     if (marker_cluster_option) {
       var map = leaflet_tools.map();
       marker_cluster_layer = new L.markerClusterGroup({
+        iconCreateFunction: function(cluster) {
+          return new L.DivIcon({ html: '<div><span>' + cluster.getChildCount() + '</span></div>', className: 'marker-cluster marker-cluster-gray', iconSize: new L.Point(40, 40) });
+        },
         maxClusterRadius: 10,
         spiderfyOnMaxZoom: false
       }).addTo(map);
