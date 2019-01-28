@@ -15,10 +15,18 @@ class MapSearchesController < SearchesController
     mappable_assets = @data.where("geometry is NOT NULL")
 
     resp_json = {}
-    if params[:searcher] && !params[:searcher][:asset_type_id].blank?
-      asset_types = AssetType.where(id: params[:searcher][:asset_type_id])
+
+    asset_type_layer_name = params[:searcher][:asset_type_layer_class_name] || 'AssetType'
+
+    if params[:searcher] && !params[:searcher][asset_type_layer_name.foreign_key.to_sym].blank?
+      asset_types = asset_type_layer_name.constantize.where(id: params[:searcher][asset_type_layer_name.foreign_key.to_sym])
+
       asset_types.each do |asset_type|
-        assets = mappable_assets.where("transam_assets.asset_subtype_id": asset_type.asset_subtype_ids)
+        if asset_type_layer_name == 'AssetType'
+          assets = mappable_assets.where("transam_assets.asset_subtype_id": asset_type.asset_subtype_ids)
+        else
+          assets = mappable_assets.where(asset_type_layer_name.foreign_key.to_sym => asset_type)
+        end
         resp_json[asset_type.id] = {
           name: asset_type.name,
           geojson_assets: geo_json(assets) 
