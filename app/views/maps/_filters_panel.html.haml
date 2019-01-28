@@ -43,10 +43,14 @@
     });
 
     function clear_search_form_values() {
-      $(':input','#new_searcher')
+      $(':input[type!=checkbox]','#new_searcher')
         .not(':button, :submit, :reset, :hidden')
-        .val('')
-        .prop('checked', false)
+        .val('');
+
+      $(':input[type=checkbox]','#new_searcher')
+        .prop('checked', false);
+
+      $('option','#new_searcher')
         .prop('selected', false);
     }
 
