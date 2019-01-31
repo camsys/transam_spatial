@@ -3,7 +3,7 @@ class MapOverlayService < ActiveRecord::Base
   # Include the object key mixin
   include TransamObjectKey
 
-  belongs_to :creator, :class_name => "User", :foreign_key => "created_by_user_id"
+  belongs_to :creator, -> { unscope(where: :active) }, :class_name => "User", :foreign_key => "created_by_user_id"
   belongs_to :organization
   belongs_to :map_overlay_service_type
 
