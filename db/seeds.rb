@@ -30,10 +30,10 @@ map_overlay_service_types = [
 ]
 
 system_config_extensions = [
-    {class_name: 'Organization', extension_name: 'TransamGeocodable', active: true},
-    {class_name: 'Vendor', extension_name: 'TransamGeocodable', active: true},
+    {engine_name: 'spatial', class_name: 'Organization', extension_name: 'TransamGeocodable', active: true},
+    {engine_name: 'spatial', class_name: 'Vendor', extension_name: 'TransamGeocodable', active: true},
 
-    {class_name: 'TransamAsset', extension_name: 'TransamGeoJSONFeature', active: true}
+    {engine_name: 'spatial', class_name: 'TransamAsset', extension_name: 'TransamGeoJSONFeature', active: true}
 ]
 
 lookup_tables = %w{ location_reference_types map_overlay_service_types }
