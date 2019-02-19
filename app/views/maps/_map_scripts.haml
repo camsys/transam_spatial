@@ -38,16 +38,7 @@
     };
 
     // filters
-    var filters = {};
-    ['condition_rating', 'purchase_year', 'scheduled_replacement_year'].forEach(function(field) {
-      if($('#' + field + '_slider_enabled').is(':checked')) {
-        filters[field] = $("#" + field+ "_slider").slider('getValue');
-      }
-    });
-
-    filters['reported_mileage_from'] = $('#min_mileage').val();
-    filters['reported_mileage_to'] = $('#max_mileage').val();
-    params["filters"] = filters;
+    params["filters"] = cache_filters();
 
     return params;
   }
@@ -99,20 +90,7 @@
     }
 
     // restore filters
-    var filters = snapshot['filters'];
-    ['condition_rating', 'purchase_year', 'scheduled_replacement_year'].forEach(function(field) {
-      var filter_val = filters[field];
-      if(filter_val && filter_val.length == 2) {
-        $('#' + field + '_slider_enabled').prop('checked', true).trigger('change');
-        $("#" + field + "_slider").slider('setValue', filter_val, true, true);
-      }
-    });
-    if(filters['reported_mileage_from'] || filters['reported_mileage_from'] === 0) {
-      $('#min_mileage').val(filters['reported_mileage_from']);
-    }
-    if(filters['reported_mileage_to'] || filters['reported_mileage_to'] === 0) {
-      $('#max_mileage').val(filters['reported_mileage_to']);
-    }
+    load_cached_filters(snapshot['filters'] || {});
 
     $('#submit_filters_btn').click();
   }
