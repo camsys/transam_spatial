@@ -22,15 +22,15 @@ FactoryBot.define do
     basic_policy_attributes
 
     transient do
-      has_fuel_type false
+      has_fuel_type { false }
     end
 
     transient do
-      subtype 0
+      subtype { 0 }
     end
 
     trait :fuel_type do
-      has_fuel_type true
+      has_fuel_type { true }
     end
 
     after(:create) do |policy, evaluator|
