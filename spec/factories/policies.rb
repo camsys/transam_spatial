@@ -37,7 +37,11 @@ FactoryBot.define do
       AssetType.all.each do |type|
         create(:policy_asset_type_rule, policy: policy, asset_type: type)
       end
-      create(:policy_asset_subtype_rule, (:fuel_type if evaluator.has_fuel_type), policy: policy, asset_subtype_id: evaluator.subtype)
+      if evaluator.has_fuel_type
+        create(:policy_asset_subtype_rule, :fuel_type, policy: policy, asset_subtype_id: evaluator.subtype)
+      else
+        create(:policy_asset_subtype_rule, policy: policy, asset_subtype_id: evaluator.subtype)
+      end
     end
   end
 end
