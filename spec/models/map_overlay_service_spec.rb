@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe MapOverlayService, :type => :model do
 
-  let(:test_service) { 
-    create(:map_overlay_service) 
+  let(:test_service) {
+    create(:map_overlay_service)
   }
 
   describe 'associations' do
@@ -13,9 +13,13 @@ RSpec.describe MapOverlayService, :type => :model do
     it 'has a creator' do
       expect(test_service).to belong_to(:creator)
     end
-    it 'has a type' do
-      expect(test_service).to belong_to(:map_overlay_service_type)
-      expect(test_service.map_overlay_service_type.name).to eq("Test Name")
+    describe 'has a type' do
+      it 'belongs to type' do
+        expect(test_service).to belong_to(:map_overlay_service_type)
+      end
+      it 'type has a name' do
+        expect(test_service.map_overlay_service_type.to_s).to eq("Test Name")
+      end
     end
   end
   describe 'validations' do
