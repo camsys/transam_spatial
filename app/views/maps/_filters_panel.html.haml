@@ -58,6 +58,15 @@
     });
   }
 
+  function reset_filters() {
+    filter_module_names.forEach(function(mod_name) {
+      var filter_func_name = "reset_" + mod_name + "_filters";
+      if(window[filter_func_name]) {
+        window[filter_func_name](filters);
+      }
+    });
+  }
+
   $(function() {
     $('#new_searcher').validate({
       submitHandler: function(form) {
@@ -90,6 +99,8 @@
       $('#new_searcher .error').removeClass('error');
 
       clear_search_form_values();
+
+      reset_filters();
     });
   });
 
