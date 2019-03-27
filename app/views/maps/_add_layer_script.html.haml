@@ -18,6 +18,7 @@
   var added_asset_layers = {};
   var assets_feature_group;
   var marker_cluster_layer;
+  var asset_count_by_layer_id = {};
 
   init_asset_layer();
 
@@ -139,7 +140,19 @@
     }
   }
 
-  function process_asset_layer(asset_types, asset_subtypes) {   
+  function update_asset_count_display() {
+    if(typeof(display_map_asset_count) != 'undefined') {
+      if(asset_count_by_layer_id) {
+        var asset_count = 0;
+        for(var layer_id in asset_count_by_layer_id) {
+          asset_count += parseInt(asset_count_by_layer_id[layer_id]);
+        }
+      }
+      display_map_asset_count(asset_count);
+    }
+  }
+
+  function process_asset_layer(asset_types, asset_subtypes, reset_asset_count) {   
     var form_data = $('#new_searcher').serialize();
 
     form_data += "&" + encodeURIComponent("searcher[asset_type_id][]") + "=";
@@ -158,16 +171,17 @@
       method: 'POST',
       data: form_data,
       success: function(asset_data) {
+        if(reset_asset_count) {
+          asset_count_by_layer_id = {};
+        }
         var asset_count = 0;
         for(var asset_type_id in asset_data) {
           var one_layer = asset_data[asset_type_id];
-          asset_count += one_layer.geojson_assets.features.length;
           load_asset_layer("asset_" + asset_type_id, one_layer.name, one_layer.geojson_assets);
+          asset_count_by_layer_id["asset_" + asset_type_id] = one_layer.geojson_assets.features.length;
         }
 
-        if(typeof(display_map_asset_count) != 'undefined') {
-          display_map_asset_count(asset_count);
-        }
+        update_asset_count_display();
       },
       error: function (xhr, ajaxOptions, thrownError) {
         alert("We are sorry but something went wrong. " + xhr.status + " " + thrownError);
@@ -279,10 +293,11 @@
       
     });
 
-    process_asset_layer(asset_types, asset_subtypes);
+    process_asset_layer(asset_types, asset_subtypes, true);
   }
 
   function remove_all_asset_layers() {
+    asset_count_by_layer_id = {};
     if(added_asset_layers) {
       for(var layer_id in added_asset_layers) {
         remove_asset_layer(layer_id);
@@ -293,6 +308,9 @@
   function remove_asset_layer(layer_id) {
     var map = leaflet_tools.map();
     var layer = added_asset_layers[layer_id];
+    if(asset_count_by_layer_id) {
+      asset_count_by_layer_id[layer_id] = 0;
+    }
     if(layer) {
       if(leaflet_tools.layerControl) {
         leaflet_tools.layerControl.removeLayer(layer);
@@ -309,6 +327,8 @@
 
       delete added_asset_layers[layer_id];
     }
+
+    update_asset_count_display();
   }
 
   $(function() {
