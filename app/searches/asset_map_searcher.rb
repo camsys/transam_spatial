@@ -50,11 +50,4 @@ class AssetMapSearcher < BaseSearcher
     'asset_tag'
   end
 
-  private
-
-  def remove_blanks(input)
-    output = (input.is_a?(Array) ? input : [input])
-    output.select { |e| !e.blank? }
-  end
-
 end
