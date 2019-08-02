@@ -11,7 +11,6 @@ FactoryBot.define do
     organization_type_id { 2 }
     sequence(:name) { |n| "Org #{n}" }
     short_name {name}
-    legal_name {name}
     license_holder { true }
   end
 
