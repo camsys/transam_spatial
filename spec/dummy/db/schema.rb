@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_11_16_174415) do
+ActiveRecord::Schema.define(version: 2019_07_25_162632) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "object_key", limit: 12
@@ -72,6 +72,7 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
     t.integer "asset_id"
     t.string "transam_asset_type"
     t.bigint "transam_asset_id"
+    t.bigint "base_transam_asset_id"
     t.integer "asset_event_type_id", null: false
     t.integer "upload_id"
     t.date "event_date", null: false
@@ -89,6 +90,7 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
     t.date "disposition_date"
     t.integer "disposition_type_id"
     t.integer "service_status_type_id"
+    t.bigint "out_of_service_status_type_id"
     t.boolean "fta_emergency_contingency_fleet"
     t.integer "maintenance_type_id"
     t.integer "pcnt_5311_routes"
@@ -131,12 +133,18 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
     t.string "original_filename", limit: 128
     t.integer "created_by_id"
     t.integer "total_cost"
+    t.integer "vehicle_rebuild_type_id"
+    t.string "other_vehicle_rebuild_type"
+    t.integer "reporting_year"
+    t.integer "ntd_report_mileage"
     t.index ["asset_event_type_id"], name: "asset_events_idx3"
     t.index ["asset_id"], name: "asset_events_idx2"
+    t.index ["base_transam_asset_id"], name: "index_asset_events_on_base_transam_asset_id"
     t.index ["created_by_id"], name: "asset_events_creator_idx"
     t.index ["event_date"], name: "asset_events_idx4"
     t.index ["infrastructure_chain_type_id"], name: "index_asset_events_on_infrastructure_chain_type_id"
     t.index ["object_key"], name: "asset_events_idx1"
+    t.index ["out_of_service_status_type_id"], name: "index_asset_events_on_out_of_service_status_type_id"
     t.index ["performance_restriction_type_id"], name: "index_asset_events_on_performance_restriction_type_id"
     t.index ["transam_asset_id"], name: "index_asset_events_on_transam_asset_id"
     t.index ["upload_id"], name: "asset_events_idx5"
@@ -163,8 +171,6 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
     t.string "agency_fleet_id"
     t.string "fleet_name"
     t.integer "ntd_id"
-    t.integer "estimated_cost"
-    t.integer "year_estimated_cost"
     t.text "notes"
     t.integer "created_by_user_id"
     t.datetime "created_at"
@@ -477,31 +483,6 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
     t.index ["fta_asset_class_id"], name: "index_component_types_on_fta_asset_class_id"
   end
 
-  create_table "components", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.bigint "component_type_id"
-    t.bigint "component_element_type_id"
-    t.bigint "component_subtype_id"
-    t.bigint "component_material_id"
-    t.bigint "infrastructure_rail_joining_id"
-    t.integer "infrastructure_measurement"
-    t.string "infrastructure_measurement_unit"
-    t.integer "infrastructure_weight"
-    t.string "infrastructure_weight_unit"
-    t.integer "infrastructure_diameter"
-    t.string "infrastructure_diameter_unit"
-    t.bigint "infrastructure_cap_material_id"
-    t.bigint "infrastructure_foundation_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["component_element_type_id"], name: "index_components_on_component_element_type_id"
-    t.index ["component_material_id"], name: "index_components_on_component_material_id"
-    t.index ["component_subtype_id"], name: "index_components_on_component_subtype_id"
-    t.index ["component_type_id"], name: "index_components_on_component_type_id"
-    t.index ["infrastructure_cap_material_id"], name: "index_components_on_infrastructure_cap_material_id"
-    t.index ["infrastructure_foundation_id"], name: "index_components_on_infrastructure_foundation_id"
-    t.index ["infrastructure_rail_joining_id"], name: "index_components_on_infrastructure_rail_joining_id"
-  end
-
   create_table "condition_estimation_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", limit: 64, null: false
     t.string "class_name", limit: 64, null: false
@@ -529,7 +510,7 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
 
   create_table "condition_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", limit: 64, null: false
-    t.decimal "rating", precision: 9, scale: 2, null: false
+    t.decimal "rating_ceiling", precision: 9, scale: 2, null: false
     t.string "description", limit: 254, null: false
     t.boolean "active", null: false
   end
@@ -593,7 +574,7 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
   create_table "districts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "district_type_id", null: false
     t.string "name", limit: 64, null: false
-    t.string "code", limit: 6, null: false
+    t.string "code"
     t.string "description", limit: 254, null: false
     t.boolean "active", null: false
     t.index ["district_type_id"], name: "districts_idx1"
@@ -770,8 +751,10 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
   end
 
   create_table "fta_guideway_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "fta_asset_class_id"
     t.string "name"
     t.boolean "active"
+    t.index ["fta_asset_class_id"], name: "index_fta_guideway_types_on_fta_asset_class_id"
   end
 
   create_table "fta_mode_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -795,8 +778,10 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
   end
 
   create_table "fta_power_signal_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "fta_asset_class_id"
     t.string "name"
     t.boolean "active"
+    t.index ["fta_asset_class_id"], name: "index_fta_power_signal_types_on_fta_asset_class_id"
   end
 
   create_table "fta_private_mode_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -828,8 +813,10 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
   end
 
   create_table "fta_track_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "fta_asset_class_id"
     t.string "name"
     t.boolean "active"
+    t.index ["fta_asset_class_id"], name: "index_fta_track_types_on_fta_asset_class_id"
   end
 
   create_table "fta_vehicle_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -855,19 +842,38 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
     t.boolean "active", null: false
   end
 
+  create_table "image_classifications", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.string "category"
+    t.boolean "active"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "images", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "object_key", limit: 12, null: false
+    t.bigint "base_imagable_id"
+    t.string "base_imagable_type"
     t.integer "imagable_id", null: false
     t.string "imagable_type", limit: 64, null: false
     t.string "image", limit: 128, null: false
+    t.string "name"
     t.string "description", limit: 254, null: false
+    t.boolean "exportable"
     t.string "original_filename", limit: 128, null: false
     t.string "content_type", limit: 128, null: false
     t.integer "file_size", null: false
     t.integer "created_by_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.float "latitude"
+    t.float "longitude"
+    t.float "bearing"
+    t.bigint "image_classification_id"
+    t.string "compass_point"
+    t.index ["base_imagable_type", "base_imagable_id"], name: "index_images_on_base_imagable_type_and_base_imagable_id"
     t.index ["imagable_id", "imagable_type"], name: "images_idx2"
+    t.index ["image_classification_id"], name: "index_images_on_image_classification_id"
     t.index ["object_key"], name: "images_idx1"
   end
 
@@ -954,6 +960,11 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
     t.bigint "organization_id"
     t.boolean "active"
     t.index ["organization_id"], name: "index_infrastructure_tracks_on_organization_id"
+  end
+
+  create_table "infrastructure_voltage_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.boolean "active"
   end
 
   create_table "infrastructures", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -1155,6 +1166,24 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
     t.index ["user_id"], name: "message_tags_idx2"
   end
 
+  create_table "message_templates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "priority_type_id"
+    t.string "object_key"
+    t.string "name"
+    t.string "subject"
+    t.text "description"
+    t.text "delivery_rules"
+    t.text "body"
+    t.boolean "active"
+    t.boolean "message_enabled"
+    t.boolean "email_enabled"
+    t.boolean "is_system_template"
+    t.boolean "is_implemented"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["priority_type_id"], name: "index_message_templates_on_priority_type_id"
+  end
+
   create_table "messages", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "object_key", limit: 12, null: false
     t.integer "organization_id", null: false
@@ -1167,6 +1196,9 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
     t.boolean "active"
     t.datetime "opened_at"
     t.datetime "created_at", null: false
+    t.bigint "message_template_id"
+    t.string "email_status"
+    t.index ["message_template_id"], name: "index_messages_on_message_template_id"
     t.index ["object_key"], name: "messages_idx1"
     t.index ["organization_id"], name: "messages_idx2"
     t.index ["thread_message_id"], name: "messages_idx5"
@@ -1217,8 +1249,8 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
     t.string "city", limit: 64
     t.string "state", limit: 2
     t.string "zip", limit: 10
-    t.float "latitude"
-    t.float "longitude"
+    t.decimal "latitude", precision: 11, scale: 6
+    t.decimal "longitude", precision: 11, scale: 6
     t.string "primary_mode", limit: 32
     t.string "secondary_mode"
     t.string "private_mode"
@@ -1233,6 +1265,8 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
     t.integer "reported_condition_rating"
     t.string "facility_object_key", limit: 12
     t.date "reported_condition_date"
+    t.integer "parking_measurement"
+    t.string "parking_measurement_unit"
     t.index ["ntd_report_id"], name: "ntd_admin_and_maintenance_facilities_idx1"
   end
 
@@ -1299,6 +1333,8 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
     t.string "asset_level"
     t.string "pcnt_goal"
     t.string "pcnt_performance"
+    t.integer "future_pcnt_goal"
+    t.boolean "is_group_measure"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["fta_asset_category_id"], name: "index_ntd_performance_measures_on_fta_asset_category_id"
@@ -1354,6 +1390,7 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
     t.string "additional_fta_service_type"
     t.string "other_ownership_type"
     t.string "other_fuel_type"
+    t.string "rebuilt_type"
     t.index ["ntd_report_id"], name: "ntd_revenue_vehicle_fleets_idx1"
   end
 
@@ -1375,6 +1412,7 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
     t.string "useful_life_benchmark"
     t.string "useful_life_remaining"
     t.string "notes", limit: 254
+    t.string "status"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["ntd_report_id"], name: "ntd_service_vehicle_fleets_idx1"
@@ -1413,7 +1451,7 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
     t.string "zip", limit: 10, null: false
     t.string "phone", limit: 12, null: false
     t.string "phone_ext", limit: 6
-    t.string "fax", limit: 10
+    t.string "fax", limit: 12
     t.string "url", limit: 128, null: false
     t.integer "grantor_id"
     t.integer "fta_agency_type_id"
@@ -1432,6 +1470,8 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
     t.decimal "longitude", precision: 11, scale: 6
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "country"
+    t.string "legal_name"
     t.index ["customer_id"], name: "organizations_idx2"
     t.index ["grantor_id"], name: "organizations_idx3"
     t.index ["organization_type_id"], name: "organizations_idx1"
@@ -1443,6 +1483,15 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
     t.integer "organization_id"
     t.integer "district_id"
     t.index ["organization_id", "district_id"], name: "organizations_districts_idx2"
+  end
+
+  create_table "organizations_saved_queries", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "saved_query_id", null: false
+    t.bigint "organization_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["organization_id"], name: "index_organizations_saved_queries_on_organization_id"
+    t.index ["saved_query_id"], name: "index_organizations_saved_queries_on_saved_query_id"
   end
 
   create_table "organizations_saved_searches", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -1457,6 +1506,12 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
     t.integer "service_provider_type_id", null: false
     t.index ["organization_id"], name: "organization_spt_idx1"
     t.index ["service_provider_type_id"], name: "organization_spt_idx2"
+  end
+
+  create_table "out_of_service_status_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.string "description"
+    t.boolean "active"
   end
 
   create_table "performance_restriction_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -1550,6 +1605,65 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
     t.boolean "active", null: false
   end
 
+  create_table "query_asset_classes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "table_name"
+    t.text "transam_assets_join"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "query_association_classes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "table_name"
+    t.string "display_field_name"
+    t.string "id_field_name", default: "id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "query_categories", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "query_field_asset_classes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "query_field_id"
+    t.bigint "query_asset_class_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["query_asset_class_id"], name: "index_query_field_asset_classes_on_query_asset_class_id"
+    t.index ["query_field_id"], name: "index_query_field_asset_classes_on_query_field_id"
+  end
+
+  create_table "query_fields", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.string "label"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "query_category_id"
+    t.string "filter_type"
+    t.bigint "query_association_class_id"
+    t.boolean "hidden"
+    t.string "pairs_with"
+    t.boolean "auto_show"
+    t.string "display_field"
+    t.string "column_filter"
+    t.string "column_filter_value"
+    t.index ["query_association_class_id"], name: "index_query_fields_on_query_association_class_id"
+    t.index ["query_category_id"], name: "index_query_fields_on_query_category_id"
+  end
+
+  create_table "query_filters", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "query_field_id"
+    t.text "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "saved_query_id"
+    t.string "op"
+    t.index ["query_field_id"], name: "index_query_filters_on_query_field_id"
+    t.index ["saved_query_id"], name: "index_query_filters_on_saved_query_id"
+  end
+
   create_table "query_params", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.string "description"
@@ -1634,6 +1748,27 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
     t.boolean "active"
   end
 
+  create_table "saved_queries", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "object_key"
+    t.string "name"
+    t.string "description"
+    t.integer "created_by_user_id"
+    t.integer "updated_by_user_id"
+    t.integer "shared_from_org_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "ordered_output_field_ids"
+  end
+
+  create_table "saved_query_fields", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "saved_query_id"
+    t.bigint "query_field_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["query_field_id"], name: "index_saved_query_fields_on_query_field_id"
+    t.index ["saved_query_id"], name: "index_saved_query_fields_on_saved_query_id"
+  end
+
   create_table "saved_searches", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "object_key", limit: 12, null: false
     t.integer "user_id", null: false
@@ -1713,6 +1848,7 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
   create_table "system_config_extensions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "class_name"
     t.string "extension_name"
+    t.string "engine_name"
     t.boolean "active"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -1721,6 +1857,7 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
   create_table "system_configs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "customer_id"
     t.string "start_of_fiscal_year", limit: 5
+    t.integer "fy_year"
     t.string "default_fiscal_year_formatter"
     t.string "default_weather_code"
     t.string "map_tile_provider", limit: 64
@@ -1851,13 +1988,6 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
     t.date "in_service_date"
     t.bigint "vendor_id"
     t.string "other_vendor"
-    t.bigint "operator_id"
-    t.string "other_operator"
-    t.string "title_number"
-    t.bigint "title_ownership_organization_id"
-    t.string "other_title_ownership_organization"
-    t.bigint "lienholder_id"
-    t.string "other_lienholder"
     t.integer "parent_id"
     t.integer "location_id"
     t.integer "policy_replacement_year"
@@ -1872,13 +2002,11 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
     t.integer "scheduled_disposition_year"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "rebuilt_year"
     t.index ["asset_subtype_id"], name: "index_transam_assets_on_asset_subtype_id"
-    t.index ["lienholder_id"], name: "index_transam_assets_on_lienholder_id"
     t.index ["manufacturer_id"], name: "index_transam_assets_on_manufacturer_id"
     t.index ["manufacturer_model_id"], name: "index_transam_assets_on_manufacturer_model_id"
-    t.index ["operator_id"], name: "index_transam_assets_on_operator_id"
     t.index ["organization_id"], name: "index_transam_assets_on_organization_id"
-    t.index ["title_ownership_organization_id"], name: "index_transam_assets_on_title_ownership_organization_id"
     t.index ["transam_assetible_type", "transam_assetible_id"], name: "transam_assetible_idx"
     t.index ["upload_id"], name: "index_transam_assets_on_upload_id"
     t.index ["vendor_id"], name: "index_transam_assets_on_vendor_id"
@@ -1897,6 +2025,13 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
     t.bigint "contract_type_id"
     t.boolean "has_warranty"
     t.date "warranty_date"
+    t.bigint "operator_id"
+    t.string "other_operator"
+    t.string "title_number"
+    t.bigint "title_ownership_organization_id"
+    t.string "other_title_ownership_organization"
+    t.bigint "lienholder_id"
+    t.string "other_lienholder"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["asset_id"], name: "index_transit_assets_on_asset_id"
@@ -1904,7 +2039,37 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
     t.index ["fta_asset_category_id"], name: "index_transit_assets_on_fta_asset_category_id"
     t.index ["fta_asset_class_id"], name: "index_transit_assets_on_fta_asset_class_id"
     t.index ["fta_type_type", "fta_type_id"], name: "index_transit_assets_on_fta_type_type_and_fta_type_id"
+    t.index ["lienholder_id"], name: "index_transit_assets_on_lienholder_id"
+    t.index ["operator_id"], name: "index_transit_assets_on_operator_id"
+    t.index ["title_ownership_organization_id"], name: "index_transit_assets_on_title_ownership_organization_id"
     t.index ["transit_assetible_type", "transit_assetible_id"], name: "transit_assetible_idx"
+  end
+
+  create_table "transit_components", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "component_type_id"
+    t.bigint "component_element_type_id"
+    t.bigint "component_subtype_id"
+    t.bigint "component_material_id"
+    t.bigint "infrastructure_rail_joining_id"
+    t.integer "infrastructure_measurement"
+    t.string "infrastructure_measurement_unit"
+    t.integer "infrastructure_weight"
+    t.string "infrastructure_weight_unit"
+    t.integer "infrastructure_diameter"
+    t.string "infrastructure_diameter_unit"
+    t.bigint "infrastructure_cap_material_id"
+    t.bigint "infrastructure_foundation_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "infrastructure_voltage_type_id"
+    t.index ["component_element_type_id"], name: "index_transit_components_on_component_element_type_id"
+    t.index ["component_material_id"], name: "index_transit_components_on_component_material_id"
+    t.index ["component_subtype_id"], name: "index_transit_components_on_component_subtype_id"
+    t.index ["component_type_id"], name: "index_transit_components_on_component_type_id"
+    t.index ["infrastructure_cap_material_id"], name: "index_transit_components_on_infrastructure_cap_material_id"
+    t.index ["infrastructure_foundation_id"], name: "index_transit_components_on_infrastructure_foundation_id"
+    t.index ["infrastructure_rail_joining_id"], name: "index_transit_components_on_infrastructure_rail_joining_id"
+    t.index ["infrastructure_voltage_type_id"], name: "index_transit_components_on_infrastructure_voltage_type_id"
   end
 
   create_table "uploads", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -1995,6 +2160,7 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
     t.integer "failed_attempts", null: false
     t.string "unlock_token", limit: 128
     t.datetime "locked_at"
+    t.datetime "password_changed_at"
     t.boolean "notify_via_email", null: false
     t.integer "weather_code_id"
     t.boolean "active", null: false
@@ -2125,4 +2291,9 @@ ActiveRecord::Schema.define(version: 2018_11_16_174415) do
     t.index ["object_key"], name: "workflow_events_idx1"
   end
 
+  add_foreign_key "query_field_asset_classes", "query_asset_classes"
+  add_foreign_key "query_field_asset_classes", "query_fields"
+  add_foreign_key "query_filters", "query_fields"
+  add_foreign_key "saved_query_fields", "query_fields"
+  add_foreign_key "saved_query_fields", "saved_queries"
 end
