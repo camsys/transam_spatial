@@ -51,7 +51,7 @@ module TransamCoordinateLocatable
       long = longitude || self.send(_geolocatable_geometry_attribute_name).x
       lat = latitude || self.send(_geolocatable_geometry_attribute_name).y
       self.location_reference_type = LocationReferenceType.find_by_format('COORDINATE')
-      self.location_reference = "(#{long},#{lat})"
+      self.location_reference = "(#{long.to_f},#{lat.to_f})"
     end
   end
 
