@@ -24,7 +24,7 @@ RSpec.describe TransamCoordinateLocatable do
     test_infrastructure.latitude = 40
     test_infrastructure.set_location_reference
     expect(test_infrastructure.location_reference_type).to eq(LocationReferenceType.find_by_format('COORDINATE'))
-    expect(test_infrastructure.location_reference).to eq("(-98,40)")
+    expect(test_infrastructure.location_reference).to eq("(-98.0,40.0)")
   end
 
 end
