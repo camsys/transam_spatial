@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_25_162632) do
+ActiveRecord::Schema.define(version: 2019_12_20_163050) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "object_key", limit: 12
@@ -132,6 +132,7 @@ ActiveRecord::Schema.define(version: 2019_07_25_162632) do
     t.string "document", limit: 128
     t.string "original_filename", limit: 128
     t.integer "created_by_id"
+    t.bigint "updated_by_id"
     t.integer "total_cost"
     t.integer "vehicle_rebuild_type_id"
     t.string "other_vehicle_rebuild_type"
@@ -147,6 +148,7 @@ ActiveRecord::Schema.define(version: 2019_07_25_162632) do
     t.index ["out_of_service_status_type_id"], name: "index_asset_events_on_out_of_service_status_type_id"
     t.index ["performance_restriction_type_id"], name: "index_asset_events_on_performance_restriction_type_id"
     t.index ["transam_asset_id"], name: "index_asset_events_on_transam_asset_id"
+    t.index ["updated_by_id"], name: "index_asset_events_on_updated_by_id"
     t.index ["upload_id"], name: "asset_events_idx5"
   end
 
@@ -573,6 +575,7 @@ ActiveRecord::Schema.define(version: 2019_07_25_162632) do
 
   create_table "districts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "district_type_id", null: false
+    t.string "state"
     t.string "name", limit: 64, null: false
     t.string "code"
     t.string "description", limit: 254, null: false
@@ -754,6 +757,7 @@ ActiveRecord::Schema.define(version: 2019_07_25_162632) do
     t.bigint "fta_asset_class_id"
     t.string "name"
     t.boolean "active"
+    t.integer "sort_order"
     t.index ["fta_asset_class_id"], name: "index_fta_guideway_types_on_fta_asset_class_id"
   end
 
@@ -781,6 +785,7 @@ ActiveRecord::Schema.define(version: 2019_07_25_162632) do
     t.bigint "fta_asset_class_id"
     t.string "name"
     t.boolean "active"
+    t.integer "sort_order"
     t.index ["fta_asset_class_id"], name: "index_fta_power_signal_types_on_fta_asset_class_id"
   end
 
@@ -816,6 +821,7 @@ ActiveRecord::Schema.define(version: 2019_07_25_162632) do
     t.bigint "fta_asset_class_id"
     t.string "name"
     t.boolean "active"
+    t.integer "sort_order"
     t.index ["fta_asset_class_id"], name: "index_fta_track_types_on_fta_asset_class_id"
   end
 
@@ -1297,8 +1303,8 @@ ActiveRecord::Schema.define(version: 2019_07_25_162632) do
     t.string "fta_service_type"
     t.string "fta_type"
     t.integer "size"
-    t.integer "linear_miles"
-    t.integer "track_miles"
+    t.decimal "linear_miles", precision: 7, scale: 2
+    t.decimal "track_miles", precision: 7, scale: 2
     t.integer "expected_service_life"
     t.integer "pcnt_capital_responsibility"
     t.string "shared_capital_responsibility_organization"
@@ -2255,6 +2261,15 @@ ActiveRecord::Schema.define(version: 2019_07_25_162632) do
     t.index ["organization_id"], name: "vendors_idx3"
   end
 
+  create_table "version_associations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "version_id"
+    t.string "foreign_key_name", null: false
+    t.integer "foreign_key_id"
+    t.string "foreign_type"
+    t.index ["foreign_key_name", "foreign_key_id", "foreign_type"], name: "index_version_associations_on_foreign_key"
+    t.index ["version_id"], name: "index_version_associations_on_version_id"
+  end
+
   create_table "versions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "item_type", null: false
     t.integer "item_id", null: false
@@ -2263,6 +2278,8 @@ ActiveRecord::Schema.define(version: 2019_07_25_162632) do
     t.text "object"
     t.datetime "created_at"
     t.text "object_changes"
+    t.integer "transaction_id"
+    t.index ["transaction_id"], name: "index_versions_on_transaction_id"
   end
 
   create_table "weather_codes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
