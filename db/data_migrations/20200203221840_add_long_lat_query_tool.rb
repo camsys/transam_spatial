@@ -1,11 +1,18 @@
 class AddLongLatQueryTool < ActiveRecord::DataMigration
   def up
-
-    view_sql = <<-SQL
-        CREATE OR REPLACE VIEW geometry_transam_assets_view AS
-        SELECT transam_assets.id, X(geometry) as longitude, Y(geometry) as latitude
-        FROM transam_assets
-    SQL
+    if ActiveRecord::Base.configurations[Rails.env]['adapter'].include? 'mysql2'
+      view_sql = <<-SQL
+          CREATE OR REPLACE VIEW geometry_transam_assets_view AS
+          SELECT transam_assets.id, X(geometry) as longitude, Y(geometry) as latitude
+          FROM transam_assets
+      SQL
+    elsif ActiveRecord::Base.configurations[Rails.env]['adapter'].include? 'post'
+      view_sql = <<-SQL
+          CREATE OR REPLACE VIEW geometry_transam_assets_view AS
+          SELECT transam_assets.id, ST_X(geometry) as longitude, ST_Y(geometry) as latitude
+          FROM transam_assets
+      SQL
+    end
 
     ActiveRecord::Base.connection.execute view_sql
 
