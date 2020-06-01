@@ -16,6 +16,7 @@
           = link_to new_map_overlay_service_path do
             %i.fa.fa-plus
             = " Add New Overlay"
+  = javascript_include_tag  "https://kit.fontawesome.com/#{ENV['FONT_AWESOME']}.js"
   .library-table
     %table.elbat{:id => table_dom_id,
       :use => 'true',
@@ -23,17 +24,15 @@
         :side => 'client',
         :current_page => '0',
         :current_page_size => '10',
-        :page_sizes => "10,20,50,100,200",
+        :page_sizes => "10,20,50,100",
         :search => 'client',
         :export => "['csv', 'txt', 'excel']",
-        :columns => "Name,
-                    Type,
-                    Status,
-                    Organization,",
-        :selected_columns => "Name,
-                    Type,
-                    Status,
-                    Organization",
+        :columns => '{"0":{"name":"Name","type":"drilldown-link"},
+                      "1":{"name":"Type"},
+                      "2":{"name":"Status"},
+                      "3":{"name":"Organization"},
+                      "4":{"name":"Actions","type":"action-column"}}',
+        :selected_columns => "0,1,2,3,4",
         :cookies => "true",
         :sort => 'client',
         :params => "{}",
@@ -41,16 +40,29 @@
         :data_source => 'client',
         :url => ''}}
     - @map_overlay_services.each_with_index do |service, index|
-
+      %div.actions
+        - if can?(:update, service)
+          = link_to edit_map_overlay_service_path(service), title: 'Edit service' do
+            %i.fa.fa-edit.fa-1-5x.text-success
+        - if can?(:destroy, service)
+          = link_to map_overlay_service_path(service), method: :delete, data: { confirm: 'Are you sure to delete this service?'}, title: 'Delete service' do 
+            %i.fa.fa-times-circle-o.text-danger.fa-1-5x
+      
       :javascript
         add_row('#{table_dom_id}',
         {
-          "Name": '#{h service.name }',
-          "Type": '#{h service.map_overlay_service_type }',
-          "Status": '#{h "Inactive" if !service.active }',
-          "Organization": '#{h service.organization.present? ? service.organization.try(:short_name) : "All" }',
+          "0": '#{h link_to service.name, edit_map_overlay_service_path(service) }',
+          "1": '#{h service.map_overlay_service_type }',
+          "2": '#{h "Inactive" if !service.active }',
+          "3": '#{h service.organization.present? ? service.organization.try(:short_name) : "All" }',
         }, #{index});
-
+        // TEMP UNTIL WE DO THIS FOR REAL
+        // TODO: PLEASE DON'T LET THIS GO TO PRODUCTION
+        // HACKY HACK IS HACKY
+        $(".row-item").eq(#{index}).ready(function (){
+          let cell = $("##{table_dom_id} .action-column").eq(#{index}).find(".cell-text");
+          $(".actions").eq(#{index}).detach().appendTo(cell);
+        });
 
 
 
