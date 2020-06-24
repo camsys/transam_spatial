@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_20_163050) do
+ActiveRecord::Schema.define(version: 2020_05_28_175054) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "object_key", limit: 12
@@ -421,6 +421,13 @@ ActiveRecord::Schema.define(version: 2019_12_20_163050) do
     t.index ["transam_asset_id"], name: "index_assets_fta_service_types_on_transam_asset_id"
   end
 
+  create_table "assets_rail_safety_features", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "transam_asset_id"
+    t.integer "rail_safety_feature_id"
+    t.index ["rail_safety_feature_id"], name: "index_assets_rail_safety_features_on_rail_safety_feature_id"
+    t.index ["transam_asset_id"], name: "index_assets_rail_safety_features_on_transam_asset_id"
+  end
+
   create_table "assets_vehicle_features", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "asset_id"
     t.bigint "transam_asset_id"
@@ -451,28 +458,28 @@ ActiveRecord::Schema.define(version: 2019_12_20_163050) do
     t.index ["commentable_id", "commentable_type"], name: "comments_idx1"
   end
 
-  create_table "component_element_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "component_elements", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "parent_type"
+    t.bigint "parent_id"
     t.string "name"
-    t.bigint "component_type_id"
     t.boolean "active"
-    t.index ["component_type_id"], name: "index_component_element_types_on_component_type_id"
+    t.index ["parent_type", "parent_id"], name: "index_component_elements_on_parent_type_and_parent_id"
   end
 
   create_table "component_materials", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.bigint "component_type_id"
-    t.bigint "component_element_type_id"
+    t.bigint "component_subtype_id"
     t.boolean "active"
-    t.index ["component_element_type_id"], name: "index_component_materials_on_component_element_type_id"
+    t.index ["component_subtype_id"], name: "index_component_materials_on_component_subtype_id"
     t.index ["component_type_id"], name: "index_component_materials_on_component_type_id"
   end
 
   create_table "component_subtypes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "parent_type"
-    t.bigint "parent_id"
     t.string "name"
+    t.bigint "component_type_id"
     t.boolean "active"
-    t.index ["parent_type", "parent_id"], name: "index_component_subtypes_on_parent_type_and_parent_id"
+    t.index ["component_type_id"], name: "index_component_subtypes_on_component_type_id"
   end
 
   create_table "component_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -721,6 +728,7 @@ ActiveRecord::Schema.define(version: 2019_12_20_163050) do
     t.string "class_name"
     t.string "display_icon_name"
     t.boolean "active"
+    t.string "code", null: false
     t.index ["fta_asset_category_id"], name: "index_fta_asset_classes_on_fta_asset_category_id"
   end
 
@@ -851,6 +859,7 @@ ActiveRecord::Schema.define(version: 2019_12_20_163050) do
   create_table "image_classifications", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.string "category"
+    t.integer "sort_order"
     t.boolean "active"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -1003,8 +1012,6 @@ ActiveRecord::Schema.define(version: 2019_12_20_163050) do
     t.decimal "gauge", precision: 10, scale: 5
     t.string "gauge_unit"
     t.bigint "infrastructure_reference_rail_id"
-    t.decimal "track_gradient_pcnt", precision: 10, scale: 5
-    t.decimal "track_gradient_degree", precision: 10, scale: 5
     t.decimal "track_gradient", precision: 10, scale: 5
     t.string "track_gradient_unit"
     t.decimal "horizontal_alignment", precision: 10, scale: 5
@@ -1035,6 +1042,7 @@ ActiveRecord::Schema.define(version: 2019_12_20_163050) do
     t.bigint "land_ownership_organization_id"
     t.string "other_land_ownership_organization"
     t.bigint "shared_capital_responsibility_organization_id"
+    t.string "other_shared_capital_responsibility"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["infrastructure_bridge_type_id"], name: "index_infrastructures_on_infrastructure_bridge_type_id"
@@ -1361,11 +1369,17 @@ ActiveRecord::Schema.define(version: 2019_12_20_163050) do
   create_table "ntd_revenue_vehicle_fleets", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "ntd_report_id"
     t.string "vehicle_object_key"
+    t.string "fta_asset_class"
     t.string "rvi_id", limit: 32
     t.string "fta_mode"
     t.string "fta_service_type"
     t.string "agency_fleet_id"
     t.string "dedicated"
+    t.string "is_autonomous"
+    t.string "total_event_data_recorders"
+    t.string "total_emergency_lighting"
+    t.string "total_emergency_signage"
+    t.string "total_emergency_path_marking"
     t.string "direct_capital_responsibility"
     t.integer "size"
     t.integer "num_active"
@@ -1678,6 +1692,12 @@ ActiveRecord::Schema.define(version: 2019_12_20_163050) do
     t.boolean "active"
   end
 
+  create_table "rail_safety_features", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.string "description"
+    t.boolean "active"
+  end
+
   create_table "ramp_manufacturers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.boolean "active"
@@ -1724,11 +1744,19 @@ ActiveRecord::Schema.define(version: 2019_12_20_163050) do
     t.bigint "fta_ownership_type_id"
     t.string "other_fta_ownership_type"
     t.boolean "dedicated"
+    t.boolean "is_autonomous"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["esl_category_id"], name: "index_revenue_vehicles_on_esl_category_id"
     t.index ["fta_funding_type_id"], name: "index_revenue_vehicles_on_fta_funding_type_id"
     t.index ["fta_ownership_type_id"], name: "index_revenue_vehicles_on_fta_ownership_type_id"
+  end
+
+  create_table "role_privilege_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "role_id"
+    t.bigint "privilege_id"
+    t.index ["privilege_id"], name: "index_role_privilege_mappings_on_privilege_id"
+    t.index ["role_id"], name: "index_role_privilege_mappings_on_role_id"
   end
 
   create_table "roles", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -1844,6 +1872,7 @@ ActiveRecord::Schema.define(version: 2019_12_20_163050) do
     t.boolean "ada_accessible"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "serial_number", null: false
     t.index ["chassis_id"], name: "index_service_vehicles_on_chassis_id"
     t.index ["dual_fuel_type_id"], name: "index_service_vehicles_on_dual_fuel_type_id"
     t.index ["fuel_type_id"], name: "index_service_vehicles_on_fuel_type_id"
@@ -1858,6 +1887,20 @@ ActiveRecord::Schema.define(version: 2019_12_20_163050) do
     t.boolean "active"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "system_config_field_customizations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "table_name"
+    t.string "field_name"
+    t.string "description"
+    t.string "code_frag"
+    t.boolean "is_locked"
+    t.boolean "active"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "is_visible"
+    t.string "label"
+    t.string "action_name"
   end
 
   create_table "system_configs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -1879,7 +1922,6 @@ ActiveRecord::Schema.define(version: 2019_12_20_163050) do
     t.integer "num_forecasting_years"
     t.integer "num_reporting_years"
     t.integer "max_rows_returned"
-    t.string "special_locked_fields"
     t.string "measurement_system"
     t.string "data_file_path", limit: 64
     t.datetime "created_at"
@@ -2053,8 +2095,8 @@ ActiveRecord::Schema.define(version: 2019_12_20_163050) do
 
   create_table "transit_components", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "component_type_id"
-    t.bigint "component_element_type_id"
     t.bigint "component_subtype_id"
+    t.bigint "component_element_id"
     t.bigint "component_material_id"
     t.bigint "infrastructure_rail_joining_id"
     t.integer "infrastructure_measurement"
@@ -2068,7 +2110,7 @@ ActiveRecord::Schema.define(version: 2019_12_20_163050) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "infrastructure_voltage_type_id"
-    t.index ["component_element_type_id"], name: "index_transit_components_on_component_element_type_id"
+    t.index ["component_element_id"], name: "index_transit_components_on_component_element_id"
     t.index ["component_material_id"], name: "index_transit_components_on_component_material_id"
     t.index ["component_subtype_id"], name: "index_transit_components_on_component_subtype_id"
     t.index ["component_type_id"], name: "index_transit_components_on_component_type_id"
@@ -2173,6 +2215,7 @@ ActiveRecord::Schema.define(version: 2019_12_20_163050) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "authentication_token", limit: 30
+    t.text "table_prefs"
     t.index ["authentication_token"], name: "index_users_on_authentication_token", unique: true
     t.index ["email"], name: "users_idx3"
     t.index ["object_key"], name: "users_idx1"
