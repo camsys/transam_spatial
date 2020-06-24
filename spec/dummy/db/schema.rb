@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_28_175054) do
+ActiveRecord::Schema.define(version: 2020_03_23_163855) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "object_key", limit: 12
@@ -421,13 +421,6 @@ ActiveRecord::Schema.define(version: 2020_05_28_175054) do
     t.index ["transam_asset_id"], name: "index_assets_fta_service_types_on_transam_asset_id"
   end
 
-  create_table "assets_rail_safety_features", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "transam_asset_id"
-    t.integer "rail_safety_feature_id"
-    t.index ["rail_safety_feature_id"], name: "index_assets_rail_safety_features_on_rail_safety_feature_id"
-    t.index ["transam_asset_id"], name: "index_assets_rail_safety_features_on_transam_asset_id"
-  end
-
   create_table "assets_vehicle_features", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "asset_id"
     t.bigint "transam_asset_id"
@@ -728,7 +721,6 @@ ActiveRecord::Schema.define(version: 2020_05_28_175054) do
     t.string "class_name"
     t.string "display_icon_name"
     t.boolean "active"
-    t.string "code", null: false
     t.index ["fta_asset_category_id"], name: "index_fta_asset_classes_on_fta_asset_category_id"
   end
 
@@ -1369,17 +1361,11 @@ ActiveRecord::Schema.define(version: 2020_05_28_175054) do
   create_table "ntd_revenue_vehicle_fleets", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "ntd_report_id"
     t.string "vehicle_object_key"
-    t.string "fta_asset_class"
     t.string "rvi_id", limit: 32
     t.string "fta_mode"
     t.string "fta_service_type"
     t.string "agency_fleet_id"
     t.string "dedicated"
-    t.string "is_autonomous"
-    t.string "total_event_data_recorders"
-    t.string "total_emergency_lighting"
-    t.string "total_emergency_signage"
-    t.string "total_emergency_path_marking"
     t.string "direct_capital_responsibility"
     t.integer "size"
     t.integer "num_active"
@@ -1692,12 +1678,6 @@ ActiveRecord::Schema.define(version: 2020_05_28_175054) do
     t.boolean "active"
   end
 
-  create_table "rail_safety_features", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "name"
-    t.string "description"
-    t.boolean "active"
-  end
-
   create_table "ramp_manufacturers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.boolean "active"
@@ -1744,7 +1724,6 @@ ActiveRecord::Schema.define(version: 2020_05_28_175054) do
     t.bigint "fta_ownership_type_id"
     t.string "other_fta_ownership_type"
     t.boolean "dedicated"
-    t.boolean "is_autonomous"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["esl_category_id"], name: "index_revenue_vehicles_on_esl_category_id"
@@ -1872,7 +1851,6 @@ ActiveRecord::Schema.define(version: 2020_05_28_175054) do
     t.boolean "ada_accessible"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "serial_number", null: false
     t.index ["chassis_id"], name: "index_service_vehicles_on_chassis_id"
     t.index ["dual_fuel_type_id"], name: "index_service_vehicles_on_dual_fuel_type_id"
     t.index ["fuel_type_id"], name: "index_service_vehicles_on_fuel_type_id"
@@ -1898,9 +1876,6 @@ ActiveRecord::Schema.define(version: 2020_05_28_175054) do
     t.boolean "active"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "is_visible"
-    t.string "label"
-    t.string "action_name"
   end
 
   create_table "system_configs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -2215,7 +2190,6 @@ ActiveRecord::Schema.define(version: 2020_05_28_175054) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "authentication_token", limit: 30
-    t.text "table_prefs"
     t.index ["authentication_token"], name: "index_users_on_authentication_token", unique: true
     t.index ["email"], name: "users_idx3"
     t.index ["object_key"], name: "users_idx1"
