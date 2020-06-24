@@ -71,19 +71,11 @@ merge_tables.each do |table_name|
 end
 
 puts "======= Loading spatial asset query configurations ======="
-if ActiveRecord::Base.configurations[Rails.env]['adapter'].include? 'mysql2'
-  view_sql = <<-SQL
-          CREATE OR REPLACE VIEW geometry_transam_assets_view AS
-          SELECT transam_assets.id, X(geometry) as longitude, Y(geometry) as latitude
-          FROM transam_assets
-  SQL
-elsif ActiveRecord::Base.configurations[Rails.env]['adapter'].include? 'post'
-  view_sql = <<-SQL
+view_sql = <<-SQL
           CREATE OR REPLACE VIEW geometry_transam_assets_view AS
           SELECT transam_assets.id, ST_X(geometry) as longitude, ST_Y(geometry) as latitude
           FROM transam_assets
-  SQL
-end
+SQL
 
 ActiveRecord::Base.connection.execute view_sql
 
