@@ -31,6 +31,9 @@ FactoryBot.define do
 
   trait :transit_service_vehicle do
     transam_support_vehicle
+    after :initialize do |vehicle|
+      vehicle.serial_number = "ABC123"
+    end
     fta_asset_category_id { 2 }
     fta_asset_class_id { 5 }
     fta_type_id { 1 }
