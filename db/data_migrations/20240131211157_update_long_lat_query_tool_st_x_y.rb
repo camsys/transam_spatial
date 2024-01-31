@@ -1,0 +1,37 @@
+class UpdateLongLatQueryToolStXY < ActiveRecord::DataMigration
+  def up
+    if ActiveRecord::Base.configurations[Rails.env]['adapter'].include? 'mysql2'
+      view_sql = <<-SQL
+          CREATE OR REPLACE VIEW geometry_transam_assets_view AS
+          SELECT transam_assets.id, ST_X(geometry) as longitude, ST_Y(geometry) as latitude
+          FROM transam_assets
+      SQL
+    elsif ActiveRecord::Base.configurations[Rails.env]['adapter'].include? 'post'
+      view_sql = <<-SQL
+          CREATE OR REPLACE VIEW geometry_transam_assets_view AS
+          SELECT transam_assets.id, ST_X(geometry) as longitude, ST_Y(geometry) as latitude
+          FROM transam_assets
+      SQL
+    end
+
+    ActiveRecord::Base.connection.execute view_sql
+
+    ac = QueryAssetClass.find_or_create_by(table_name: 'geometry_transam_assets_view', transam_assets_join: 'LEFT JOIN geometry_transam_assets_view ON geometry_transam_assets_view.id = transam_assets.id')
+
+    [{
+       name: 'longitude',
+       label: 'Longitude',
+       filter_type: 'text'
+     },
+     {
+       name: 'latitude',
+       label: 'Latitude',
+       filter_type: 'text'
+     }
+    ].each do |query_field_params|
+      query_field = QueryField.create!(query_field_params.merge(query_category: QueryCategory.find_by(name: 'Identification & Classification')))
+
+      query_field.query_asset_classes << ac
+    end
+  end
+end
