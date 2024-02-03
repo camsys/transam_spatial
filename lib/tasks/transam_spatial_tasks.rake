@@ -10,6 +10,17 @@ namespace :transam_spatial do
       Rake::Task[cmd].invoke
     end
   end
+
+  desc "Test"
+  task :update_geometry_view => :environment do
+    view_sql = <<-SQL
+      CREATE OR REPLACE VIEW geometry_transam_assets_view AS
+      SELECT transam_assets.id, ST_X(geometry) as longitude, ST_Y(geometry) as latitude
+      FROM transam_assets
+    SQL
+
+    ApplicationRecord.connection.execute view_sql
+  end
 end
 
 namespace :test do
